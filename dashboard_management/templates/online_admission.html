@@ -1,0 +1,88 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}
+<title>Students Info Dashboard</title>
+{% endblock title %}
+
+<!-- left side main things start from here -->
+{% block leftside %}
+<style>
+    body {
+        margin-top: 20px;
+        background: #FAFAFA;
+    }
+    .card {
+        border-radius: 5px;
+        box-shadow: 0 1px 2.94px 0.06px rgba(4, 26, 55, 0.16);
+        border: none;
+        margin-bottom: 30px;
+        transition: all 0.3s ease-in-out;
+    }
+    .table th, .table td {
+        vertical-align: middle;
+    }
+</style>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" rel="stylesheet">
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="container mt-5">
+                <h2 class="text-center">Online Admission Applications</h2>
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Active Applications</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Student Number</th>
+                                            <th>Father's Name</th>
+                                            <th>Mother's Name</th>
+                                            <th>Gender</th>
+                                            <th>Guardian Number</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for application in online_admission_apply %}
+                                        <tr>
+                                            <td>{{ application.student_name_en }}</td>
+                                            <td>{{ application.student_number }}</td>
+                                            <td>{{ application.student_father_name_en }}</td>
+                                            <td>{{ application.student_mother_name_en }}</td>
+                                            <td>{{ application.gender_choise }}</td>
+                                            <td>{{ application.gurdian_number }}</td>
+                                            <td>
+                                                <span class="badge bg-success rounded-pill">Active</span>
+                                            </td>
+                                            <td>
+                                                {% comment %} <form action="{% url 'admit_student' application.id %}" method="POST" class="d-inline">
+                                                    {% csrf_token %} {% endcomment %}
+                                                    <button type="submit" class="btn btn-sm btn-success">Admit</button>
+                                                {% comment %} </form> {% endcomment %}
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="8" class="text-center text-danger">No active applications found.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-xl-3"></div>
+    </div>
+</div>
+{% endblock leftside %}
+{% block rightside %}
+{% endblock rightside %}

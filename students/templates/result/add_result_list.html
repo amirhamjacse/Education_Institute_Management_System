@@ -1,0 +1,111 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% load widget_tweaks %}
+{% block title %}
+<title>Students Result add</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">Add Result</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 bangla">
+
+        <div class="table_scroll">
+            <table class="table table-hove table-bordered my-0">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Roll</th>
+                        <th>Class</th>
+                        <th>Year</th>
+                        <th>Result{{object_lis}}</th>
+                        {% comment %} <th style="width: 21%">Actions</th> {% endcomment %}
+                    </tr>
+                </thead>
+            <tbody>
+                {% for object in object_list %}
+                <tr>
+                    <td class="text-center">
+                    {% if page_obj %}
+                    {{ forloop.counter0|add:page_obj.start_index }}
+                    {% else %}
+                    {{ forloop.counter }}
+                    {% endif %}
+                    
+                    <td> Image{{object_lis}}</td>
+                    <td> {{object.name}} </td>
+                    <td> {{object.unique_roll}} </td>
+                    <td> {{object.class_name}} </td>
+                    <td> 2023</td>
+                    <form action="" method="post">
+                      {% csrf_token %}
+                    {% comment %} <td> {{form.marks}}</td> {% endcomment %}
+                    <td> <input width="5%" name="mark" class="form-control" placeholder="input result here" type="text"> </td>
+                    <td> <input name="sid" value="{{object.id}}" type="hidden"> </td>
+
+                    
+                
+                {% comment %} {% comment %} <td>{{object.lines.item}}</td>
+                <td>{{object.lines.amount}}</td>
+                <td>{% if object.date %}{{ object.date }}{% endif %}</td>
+                <td>{% if object.description %}{{ object.description|truncatewords:4 }}{% endif %}</td>
+                 {% endcomment %}
+                 {% comment %} <td><a class="btn btn-success btn-sm" href="#"><i class="fa-solid fa-pen-to-square"></i>Edit</a>  
+                    <a class="btn btn-primary btn-sm" href=""><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Delete</a>
+                    <a class="btn btn-primary btn-sm" href="{% url 'students:result_create' object.id 1 %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Add Result</a></td>   {% endcomment %}
+
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+      </div>
+      {% comment %} <div> {% endcomment %}
+        {% comment %} {% include 'snippets/pagination.html' %} {% endcomment %}
+        
+        <input class="btn btn-primary" type="submit" value="Submit Result">
+      </form>
+   
+
+    
+            
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+

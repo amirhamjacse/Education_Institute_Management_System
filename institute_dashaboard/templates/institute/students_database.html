@@ -1,0 +1,98 @@
+{% extends 'institute/base.html' %} {% load static %} {% block title %}
+<title>Student's Details</title>
+{% endblock title %}
+
+<!-- left side main things start from here -->
+{% block leftside %}
+
+<!-- Students Details start -->
+<div class="row">
+  <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1">
+        <h5 class="text-white text-center bangla">
+          শিক্ষার্থীর বিস্তারিত তথ্য
+        </h5>
+      </div>
+      <div class="bg-light border py-2 text-center bangla">
+        <!--Students Profile starts here-->
+
+        <div class="container-fluid">
+          <div class="d-flex f justify-content-left mt-0 pt-0">
+            <a href="{% url 'students_info' %}" class=" btn btn-outline-primary">Back To Recent Page</a> 
+          </div>
+          <div class="row">
+            <div class="col-lg-4 d-flex flex-column align-items-center justify-content-center">
+              <img 
+                src="{% if stinfo.students_image %}{{stinfo.students_image.url}}{% endif %}"
+                class="img-fluid mb-2"
+                width="200px"
+                alt="students image"
+              />
+              <h5>{{stinfo.student_name}}</h5>
+              
+              <button class="mt-1 btn btn-outline-primary" onClick="window.print()">Print or Save as PDF</button> 
+            </div>
+            <div class="col-lg-8">
+              <div class="table-wrapper">
+                <table class="table table-bordered text-start">
+                  <tr>
+                    <th>Students Name</th>
+                    <td>{{stinfo.name|default_if_none:'-'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Father's Name</th>
+                    <td>{{stinfo.father_name|default_if_none:'-'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Mother's Name</th>
+                    <td>{{stinfo.mother_name|default_if_none:'-'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Unique Roll/ID</th>
+                    <td>{{stinfo.unique_roll}}</td>
+                  </tr>
+                  <tr>
+                    <th>Mobile Number</th>
+                    <td>{{stinfo.personal_mobile_number}}</td>
+                  </tr>
+                  <tr>
+                    <th>Seassion</th>
+                    <td>{{stinfo.class_name.class_nm|default_if_none:'-'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Class/Department</th>
+                    <td>{{stinfo.class_name}}</td>
+                  </tr>
+                  <tr>
+                    <th>Date of Birth</th>
+                    <td>{{stinfo.date_of_birth}}</td>
+                  </tr>
+                  <tr>
+                    <th>Blood Group</th>
+                    <td>{{stinfo.blood_group|default_if_none:'-'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Religion</th>
+                    <td>{{stinfo.relegion|default_if_none:'-'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Present Address</th>
+                    <td>{{stinfo.present_address|default_if_none:'-'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Permanent Address</th>
+                    <td>{{stinfo.permanent_address|default_if_none:'-'}}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--Students Profile ends here-->
+<!-- Students Details end -->
+{% endblock leftside %} {% block rightside %} {% endblock rightside %}

@@ -1,0 +1,94 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% block title %}
+<title>Online Addmission Form</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">অনলাইন ভর্তি আবেদন</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 text-center bangla">
+      
+            <div class="container">
+                {% if messages %}
+                {% for message in messages  %}
+                    <p {% if message.tags %} class="alert alert-{{message.tags}}" {% endif %}>
+                {{message}} </p>
+                    <a class="btn btn-primary btn-sm" href="{% url 'onlineadm' %}">Back</a> 
+                {% endfor %}
+            </div>
+          
+
+          {% else %}
+       <!--  search start here -->
+       <h4 class="text-start text-center mb-5">অনলাইন ভর্তি আবেদন এর জন্য নিচের ফরমটি সঠিকভাবে পূরণ করুন</h4>
+       <form action="" method="post" enctype="multipart/form-data">
+        <div class="container">
+                    
+            {% csrf_token %}
+            {{fm.as_p}}
+            <div class="d-grid gap-2">
+                <input class="mb-2 btn btn-primary btn-block" type="submit" value="Submit Information">
+            </form>
+        </div>
+            {% endif %}
+    </div>
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+   
+</body>
+</html>

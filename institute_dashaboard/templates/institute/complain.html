@@ -1,0 +1,81 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% block title %}
+<title>Online Addmission Form</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">অভিযোগ বা পরামর্শ</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 text-center bangla">
+      
+            <div class="container">
+                {% if messages %}
+                {% for message in messages  %}
+                    <p {% if message.tags %} class="alert alert-{{message.tags}}" {% endif %}>
+                {{message}} </p>
+                    <a class="btn btn-primary btn-sm" href="{% url 'complain' %}">Back</a> 
+                {% endfor %}
+            </div>
+          
+
+          {% else %}
+       <!--  search start here -->
+       <h4 class="text-start text-center mb-5">আপনার কোন অভিযোগ বা পরামর্শ থাকলে ফরমটি পূরণ করে সাবমিট করুন, আমরা যাচাই করে প্রয়োজনীয় ব্যাবস্থা নিব।</h4>
+       <form action="" method="post">
+        <div class="container">
+                    
+            {% csrf_token %}
+            {{com.as_p}}
+            <div class="d-grid gap-2">
+                <input class="mb-2 btn btn-primary btn-block" type="submit" value="Submit Complain">
+            </form>
+        </div>
+            {% endif %}
+    </div>
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+
+
+
+
+
+
+
+

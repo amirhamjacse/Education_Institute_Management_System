@@ -1,0 +1,205 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% load widget_tweaks %}
+{% block title %}
+<title>Students Info add</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">Add Students Info</h5>
+      </div>
+      <div class="bg-light border container-fluid mt-1 py-2 bangla">
+            <div class="row">
+        <div class="col-lg-6 col-md-6 form-group">
+            <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+                {% csrf_token %}
+            <label>
+                Students Full Name
+            </label>
+            {% if form.name.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.name|add_class:"form-control" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                Unique Roll/Id <span class="required text-danger">(Put blank if you want auto genarate this id)</span>
+            </label>
+            {% if form.unique_roll.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.unique_roll|add_class:"form-control" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.father_name.field.label }}
+            </label>
+            {% if form.father_name.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.father_name|add_class:"form-control" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.mother_name.field.label }}
+            </label>
+            {% if form.mother_name.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.mother_name|add_class:"form-control" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.students_image.field.label }}
+            </label>
+            {% if form.students_image.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.students_image|add_class:"form-control" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.date_of_birth.field.label }}
+            </label>
+            {% if form.date_of_birth.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.date_of_birth|add_class:"form-control" type="date" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.present_address.field.label }}
+            </label>
+            {% if form.present_address.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.present_address|add_class:"form-control" rows="3" cols="5" title=""%}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.permanent_address.field.label }}
+            </label>
+            {% if form.permanent_address.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.permanent_address|add_class:"form-control" rows="3" cols="5" title="" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.personal_mobile_number.field.label }}
+            </label>
+            {% if form.personal_mobile_number.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.personal_mobile_number|add_class:"form-control" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.gender.field.label }}
+            </label>
+            {% if form.gender.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.gender|add_class:"form-control" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.gurdian_mobile_number.field.label }}
+            </label>
+            {% if form.gurdian_mobile_number.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.gurdian_mobile_number|add_class:"form-control" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {% comment %} {{ form.class_name.field.label }} {% endcomment %}
+                Class/Department
+            </label>
+            {% if form.class_name.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.class_name|add_class:"form-control" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {% comment %} {{ form.section_class.field.label }} {% endcomment %}
+                Section/Group
+            </label>
+            {% if form.section_class.field.required %}
+            <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.section_class|add_class:"form-control" %}
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label for="group-select">ID For:</label>
+            <select id="group-select" name="group_id" class="form-control">
+                {% for obj in group %}
+                    <option value="{{ obj.id }}">{{ obj.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {% comment %} {{ form.section_class.field.label }} {% endcomment %}
+                Admission Date
+            </label>
+            {% if form.admission_date.field.required %}
+            <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.admission_date|add_class:"form-control" type="date" %}
+        </div>
+        <div class="text-center mt-3">
+            <button class="btn btn-primary mt-2 w-50" type="submit">Add</button>
+        </div>
+
+        
+            
+
+        
+
+        </form>
+    </div>
+   
+       </div>
+    
+            
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+

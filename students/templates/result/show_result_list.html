@@ -1,0 +1,116 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% load widget_tweaks %}
+{% block title %}
+<title>Students List</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">All Students List</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 bangla">
+
+        <div class="table_scroll">
+            <table class="table table-hove table-bordered my-0">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Roll</th>
+                        <th>Class</th>
+                        <th>Year</th>
+                        {% comment %} <th>Result{{object_lis}}</th> {% endcomment %}
+                        <th >Semester</th>
+                    </tr>
+                </thead>
+            <tbody>
+              <form action="" method="post">
+                {% csrf_token %}
+            {% for object in object_list %}
+            <tr>
+                <td class="text-center">
+                    {% if page_obj %}
+                    {{ forloop.counter0|add:page_obj.start_index }}
+                    {% else %}
+                    {{ forloop.counter }}
+                    {% endif %}
+                    
+                    {% comment %} <td> <img src="{% url 'object.students_image' %}" width="50px" alt="img"></td> {% endcomment %}
+                    <td> image comming soon </td>
+                    <td> {{object.name}} </td>
+                    <td> {{object.unique_roll}} </td>
+                    <td> {{object.class_name}} </td>
+                    <td> {{object.admission_date}} </td>
+                                      {% comment %} <td> {{form.marks}}</td> {% endcomment %}
+                    {% comment %} <td> <input name="mark" type="text"> </td>
+                    <td> <input name="sid" value="{{object.id}}" type="text"> </td> {% endcomment %}
+
+                    
+                
+                {% comment %} {% comment %} <td>{{object.lines.item}}</td>
+                <td>{{object.lines.amount}}</td>
+                <td>{% if object.date %}{{ object.date }}{% endif %}</td>
+                <td>{% if object.description %}{{ object.description|truncatewords:4 }}{% endif %}</td>
+                 {% endcomment %}
+        <td><a class="btn btn-primary btn-sm" href="{% url 'students:show_result_detail' object.id 1 %}"></i> 1st Semester</a> 
+                    <td> <a class="btn btn-primary btn-sm" href="#"></i> 2nd Semester</a>  </td>
+                    <td>  <a class="btn btn-primary btn-sm" href="#"></i> 3rd Semester</a> </td> 
+                    {% comment %} <a class="btn btn-primary btn-sm" href="#"></i> 2nd Semester Result</a>  
+                    <a class="btn btn-primary btn-sm" href="#"></i> 3rd Semester Result</a>   {% endcomment %}
+                 </td>
+                    {% comment %} <a class="btn btn-danger btn-sm" href=""><i class="bi bi-trash"></i> Delete</a> {% endcomment %}
+                    {% comment %} <a class="btn btn-primary btn-sm" href="{% url 'students:result_create' object.id 1 %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Add Result</a></td>   {% endcomment %}
+
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+      </div>
+      {% comment %} <div> {% endcomment %}
+        {% comment %} {% include 'snippets/pagination.html' %} {% endcomment %}
+      
+      </form>
+   
+
+    
+            
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+

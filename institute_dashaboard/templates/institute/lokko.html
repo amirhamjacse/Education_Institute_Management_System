@@ -1,0 +1,60 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% block title %}
+<title>lokko & Uddesho</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">আমাদের লক্ষ্য ও উদ্দেশ্য</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 text-center bangla">
+       <div class="container-fluid">
+        <p  class=""></p>
+        <h5 class="alert alert-primary">আমাদের লক্ষ্য</h5>
+        <h4 style="text-align: justify" class="text-success pb-2">{{lokko.lokko}}</h4>
+        <h5 class="alert alert-primary">আমাদের উদ্দেশ্য</h5>
+        <h4 class=" text-center text-danger">{{lokko.uddesho}}</h4>
+       </div>
+      
+            
+               
+            
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+

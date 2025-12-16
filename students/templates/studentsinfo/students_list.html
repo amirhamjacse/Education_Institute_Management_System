@@ -1,0 +1,112 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% load widget_tweaks %}
+{% block title %}
+<title>Students List</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">All Students List</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 bangla">
+
+        <div class="table_scroll">
+            <table class="table table-hove table-bordered my-0">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Image</th>
+                        <th>Full Name</th>
+                        <th>Roll/ID</th>
+                        <th>Class/Department</th>
+                        <th>Date of Admission</th>
+                        {% comment %} <th>Result{{object_lis}}</th> {% endcomment %}
+                        <th style="width: 21%">Actions</th>
+                    </tr>
+                </thead>
+            <tbody>
+              <form action="" method="post">
+                {% csrf_token %}
+            {% for object in object_list %}
+            <tr>
+                <td class="text-center">
+                    {% if page_obj %}
+                    {{ forloop.counter0|add:page_obj.start_index }}
+                    {% else %}
+                    {{ forloop.counter }}
+                    {% endif %}
+                   
+                    <td> <img src=" {% if object.students_image %}{{object.students_image.url}}{% endif %}" width="50px" alt="img"></td>
+                    <td> {{object.name|default_if_none:'-'}} </td>
+                    <td> {{object.unique_roll|default_if_none:'-'}} </td>
+                    <td> {{object.class_name|default_if_none:'-'}} </td>
+                    <td> {{object.admission_date|default_if_none:'-'}} </td>
+                                      {% comment %} <td> {{form.marks}}</td> {% endcomment %}
+                    {% comment %} <td> <input name="mark" type="text"> </td>
+                    <td> <input name="sid" value="{{object.id}}" type="text"> </td> {% endcomment %}
+
+                    
+                
+                {% comment %} {% comment %} <td>{{object.lines.item}}</td>
+                <td>{{object.lines.amount}}</td>
+                <td>{% if object.date %}{{ object.date }}{% endif %}</td>
+                <td>{% if object.description %}{{ object.description|truncatewords:4 }}{% endif %}</td>
+                 {% endcomment %}
+                 <td>
+                  <a class="btn btn-primary btn-sm" href="{% url 'students_details' object.id %}"><i class="bi bi-eye"></i> Details</a>  
+                  <a class="btn btn-primary btn-sm" href="#"><i class="bi bi-pencil-square"></i> Edit</a>  
+                    <a class="btn btn-danger btn-sm" href=""><i class="bi bi-trash"></i> Delete</a>
+                    {% comment %} <a class="btn btn-primary btn-sm" href="{% url 'students:result_create' object.id 1 %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Add Result</a></td>   {% endcomment %}
+
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+      </div>
+      {% comment %} <div> {% endcomment %}
+        {% comment %} {% include 'snippets/pagination.html' %} {% endcomment %}
+      
+      </form>
+   
+
+    
+            
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+

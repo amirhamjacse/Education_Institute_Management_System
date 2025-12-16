@@ -1,0 +1,116 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% load widget_tweaks %}
+{% block title %}
+<title>Students Dashboard</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+<style>
+    body{
+        margin-top:20px;
+        background:#FAFAFA;
+    }
+    .order-card {
+        color: #fff;
+    }
+    
+    .bg-c-blue {
+        background: linear-gradient(45deg,#4099ff,#73b4ff);
+    }
+    
+    .bg-c-green {
+        background: linear-gradient(45deg,#2ed8b6,#59e0c5);
+    }
+    
+    .bg-c-yellow {
+        background: linear-gradient(45deg,#FFB64D,#ffcb80);
+    }
+    
+    .bg-c-pink {
+        background: linear-gradient(45deg,#FF5370,#ff869a);
+    }
+    
+    
+    .card {
+        border-radius: 5px;
+        -webkit-box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
+        box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
+        border: none;
+        margin-bottom: 30px;
+        -webkit-transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+    }
+    
+    .card .card-block {
+        padding: 25px;
+    }
+    
+    .order-card i {
+        font-size: 26px;
+    }
+    
+    .f-left {
+        float: left;
+    }
+    
+    .f-right {
+        float: right;
+    }
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assigned Classes</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2 class="text-center">Assigned Classes</h2>
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-body">
+                    {% comment %} <h5 class="card-title">Classes for Teacher: John Doe</h5> {% endcomment %}
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Class One - Mathematics
+                            <span class="badge bg-primary rounded-pill">Assigned</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Class Two - Science
+                            <span class="badge bg-primary rounded-pill">Assigned</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Class Three - English
+                            <span class="badge bg-primary rounded-pill">Assigned</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Class Four - History
+                            <span class="badge bg-primary rounded-pill">Assigned</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Class Five - Geography
+                            <span class="badge bg-primary rounded-pill">Assigned</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+{% endblock leftside %}
+{% block rightside %}
+
+{% endblock rightside %}

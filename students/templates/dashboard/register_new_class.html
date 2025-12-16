@@ -1,0 +1,183 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% load widget_tweaks %}
+{% block title %}
+<title>Register New Class</title>
+{% endblock title %}
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+      {% if messages %}
+      <div class="container mt-3">
+          {% for message in messages %}
+              <div class="alert alert-success" role="alert">
+                  {{ message }}
+              </div>
+          {% endfor %}
+      </div>
+  {% endif %}
+  
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">Select For Registration</h5>
+      </div>
+
+        <form action="" method="post" id="itemForm">
+            {% csrf_token %}
+
+      <div class="bg-light border container-fluid mt-1 py-2 bangla">
+            <div class="row">
+                <div class="col-lg-6 col-md-6 form-group">
+                    <label>
+                        Name:
+                    </label>
+                    {% if form.exam_type.field.required %}
+                        <span class="required text-danger">*</span>
+                    {% endif %}
+                    <br>
+                    <b>
+                    {{object.name}}
+                    </b>
+                </div>
+                <div class="col-lg-6 col-md-6 form-group">
+                    <label>
+                        Unique Id:
+                    </label>
+                    {% if form.exam_type.field.required %}
+                        <span class="required text-danger">*</span>
+                    {% endif %}
+                    <br>
+                    <b>{{object.unique_roll}}</b>
+                    {% comment %} <input class="form-control" type="text" disabled value="{{name}}"> {% endcomment %}
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <label class="d-flex justify-content-start my-2" for="result3">Class</label>
+                          <select class="form-select" id="category" name="class_nm">
+                              <option value="">Select</option>
+                              {% for obj in class %}
+                                  <option value="{{ obj.id }}">{{ obj.name }}</option>
+                              {% endfor %}
+                          </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="d-flex justify-content-start my-2" for="result4">Section</label>
+                        <select class="form-select" id="category" name="section">
+                          <option value="">Select</option>
+                          {% for obj in section %}
+                              <option value="{{ obj.id }}">{{ obj.name }}</option>
+                          {% endfor %}
+                          </select>
+                    </div>
+                </div>
+                
+                
+            
+            {% comment %} <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Roll
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %} {% endcomment %}
+                
+                {% comment %} <input class="form-control" type="text" disabled value="{{roll}}"> {% endcomment %}
+            {% comment %} </div>
+            <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Class
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %} {% endcomment %}
+                {% comment %} <input class="form-control" type="text" disabled value="{{class}}"> {% endcomment %}
+            {% comment %} </div>
+            <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Section
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %} {% endcomment %}
+                {% comment %} <input class="form-control" type="text" disabled value="{{section}}"> {% endcomment %}
+                
+            {% comment %} </div> {% endcomment %}
+            
+        {% comment %} <div class="col-lg-6 col-md-6 form-group">
+            <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+                {% csrf_token %}
+                <label>
+                    {{ form.exam_year.field.label }}
+                </label>
+                {% if form.exam_year.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %} {% endcomment %}
+                {% comment %} {% render_field form.exam_year|add_class:"form-control" rows="3" cols="5" title=""%} {% endcomment %}
+            {% comment %} </div> {% endcomment %}
+
+        {% comment %} <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.exam_type.field.label }}
+            </label>
+            {% if form.exam_type.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %} {% endcomment %}
+            {% comment %} {% render_field form.exam_type|add_class:"form-control" type="date" %} {% endcomment %}
+        {% comment %} </div> {% endcomment %}
+        
+        
+        {% comment %} <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.marks.field.label }}
+            </label>
+            {% if form.marks.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %} {% endcomment %}
+            {% comment %} {% render_field form.marks|add_class:"form-control" %} {% endcomment %}
+            {% comment %} 
+            </div> {% endcomment %}
+            <button class="btn btn-primary mt-2" type="submit">Register</button>
+        
+        </form>
+    {% comment %} </div>
+   
+       </div> {% endcomment %}
+    
+            
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+

@@ -1,0 +1,394 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% block title %}
+<title>Result</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      {% if not result %}
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">রেজাল্ট</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 text-center bangla">
+      
+
+      <!-- select menu ends -->
+        {% comment %} {% if is_false == result %} {% endcomment %}
+
+
+       <!--  search start here -->
+       {% comment %} <h4 class="text-start text-center ps-1 ">রেজাল্ট পেতে সঠিক তথ্য সিলেক্ট করুন</h4>
+       <div class="container">
+        <p class="py-1 mt-4 alert alert-danger">No Result Found, First Select</p>
+      </div>
+       
+       <div class="container-fluid">
+        <label class="d-flex justify-content-start my-2" for="select">শ্রেনী</label>
+                <form action="" method="post">
+                  {% csrf_token %}
+                    <select class=" form-select mb-1" name="result3" id="">
+                      <option value="six" selected>Six</option>
+                      <option value="seven">Seven</option>
+                      <option value="eight">Eight</option>
+                      <option value="nine">Nine</option>
+                      <option value="ten">Ten</option>
+                    </select>
+
+        <label class="d-flex justify-content-start my-2" for="select">সেশন</label>
+          <select class=" form-select mb-1" name="result4" id="">
+            <option value="2022"selected>2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+        <label class="d-flex justify-content-start my-2" for="select">পরীক্ষার বছর</label>
+          <select class=" form-select mb-1" name="result5" id="">
+            <option value="2022"selected>2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+        <label class="d-flex justify-content-start my-2" for="select">পরীক্ষার ধরন</label>
+          <select class=" form-select mb-1" name="result6" id="">
+            <option value="Mid"selected>Mid</option>
+            <option value="Final">Final</option>
+          </select>
+          <label class="d-flex justify-content-start my-2" for="select">ইউনিক রোল</label>
+            <input type="number" class="form-control" name="result7" id="" required>
+            <div class="container my-3">
+                <div class="d-grid gap-2">
+                  <input class="mb-2 btn btn-primary btn-block" type="submit" value="Get Result">
+                </form>
+                </div>
+              </div>
+      </div>  {% endcomment %}
+      <h4 class="text-start text-center ps-1">রেজাল্ট পেতে সঠিক তথ্য সিলেক্ট করুন</h4>
+{% comment %} <div class="container">
+    <p class="py-1 mt-4 alert alert-danger">No Result Found, First Select</p>
+</div> {% endcomment %}
+
+<div class="container-fluid">
+  <form action="" method="post" id="itemForm">
+      {% csrf_token %}
+      <div class="row mb-2">
+          <div class="col-md-6">
+              <label class="d-flex justify-content-start my-2" for="result3">শ্রেনী</label>
+                <select class="form-select" id="category" name="class_nm">
+                    <option value="">Select</option>
+                    {% for obj in classes %}
+                        <option value="{{ obj.id }}">{{ obj.name }}</option>
+                    {% endfor %}
+                </select>
+          </div>
+          <div class="col-md-6">
+              <label class="d-flex justify-content-start my-2" for="result4">সেশন</label>
+              <select class="form-select" id="category" name="session">
+                <option value="">Select</option>
+                {% for obj in session %}
+                    <option value="{{ obj.id }}">{{ obj.class_year }}</option>
+                {% endfor %}
+                </select>
+          </div>
+      </div>
+
+      <div class="row mb-2">
+          <div class="col-md-6">
+              <label class="d-flex justify-content-start my-2" for="result5">পরীক্ষার বছর</label>
+              <select class="form-select" id="category" name="exam_year">
+                <option value="">Select</option>
+                {% for obj in exm_years %}
+                    <option value="{{ obj.id }}">{{ obj.exam_year }}</option>
+                {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+              <label class="d-flex justify-content-start my-2" for="result6">পরীক্ষার ধরন</label>
+              <select class="form-select" id="category" name="exam_type">
+                <option value="">Select</option>
+                {% for obj in exam_nm %}
+                    <option value="{{ obj.id }}">{{ obj.name }}</option>
+                {% endfor %}
+            </select>
+          </div>
+      </div>
+
+      <div class="row mb-2">
+          <div class="col-md-6">
+              <label class="d-flex justify-content-start my-2" for="result7">ইউনিক রোল</label>
+              <input type="number" value="{% if students %}{{students.unique_roll}}{% endif %}" class="form-control" name="unique_id" id="result7" required>
+          </div>
+          <div class="col-md-6">
+              <!-- You can place another input or leave it empty for spacing -->
+          </div>
+      </div>
+
+      <div class="container my-3">
+          <div class="d-grid gap-2">
+              <input class="mb-2 btn btn-primary btn-block" type="submit" value="Get Result">
+          </div>
+      </div>
+  </form>
+</div>
+
+
+
+      
+
+      {% elif result %}
+      {% for stinfos in result %}
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla text-center">{{stinfos.exam_type}} Result {{stinfos.exam_year}}</h5>
+      </div>
+      <div class="bg-light border mt-1 text-center bangla">
+    <div class="container">
+      <div class="table-wrapper">
+        <table  class="table table-bordered text-start">
+            <tr>
+              <td>Unique Roll No</td>
+              <td>{{stinfos.unique_roll}}</td>            
+              <td>Registrtion No</td>
+              <td>[No Regi no]</td>            
+            </tr>
+            <tr>
+              <td>Name of Student</td>
+              <td colspan="3">{{stinfos.students_name}}</td>            
+            </tr>
+            <tr>
+              <td>Class/Department</td>
+              <td>{{stinfos.class_name}}</td>            
+              <td>Session</td>
+              <td>{{stinfos.session}}</td>            
+            </tr>
+           
+            <tr>
+              <td>Exam Type</td>
+              <td>{{stinfos.exam_type}}</td>            
+              <td>Exam Year</td>
+              <td>{{stinfos.exam_year}}</td>            
+            </tr>
+            <tr>
+              <td>GPA</td>
+              <td>{{stinfos.grade_gpa}}</td>            
+              <td>Grade Letter</td>
+              <td>{{stinfos.grade_letter}}</td>            
+            </tr>
+            
+            <tr>
+              {% if stinfos.sub1_name %}
+              <td colspan="2">{{stinfos.sub1_name}}</td>
+              <td colspan="2">{{stinfos.sub1_number}}</td>  
+              {% endif %}          
+            </tr>
+            <tr>
+              {% if stinfos.sub2_name %}
+              <td colspan="2">{{stinfos.sub2_name}}</td>
+              <td colspan="2">{{stinfos.sub2_number}}</td>  
+              {% endif %}          
+            </tr>
+            <tr>
+              {% if stinfos.sub3_name %}
+              <td colspan="2">{{stinfos.sub3_name}}</td>
+              <td colspan="2">{{stinfos.sub3_number}}</td>  
+              {% endif %}          
+            </tr>
+            <tr>
+              {% if stinfos.sub4_name %}
+              <td colspan="2">{{stinfos.sub4_name}}</td>
+              <td colspan="2">{{stinfos.sub4_number}}</td>  
+              {% endif %}          
+            </tr>
+            <tr>
+              {% if stinfos.sub5_name %}
+              <td colspan="2">{{stinfos.sub5_name}}</td>
+              <td colspan="2">{{stinfos.sub5_number}}</td>  
+              {% endif %}          
+            </tr>
+            <tr>
+              {% if stinfos.sub6_name %}
+              <td colspan="2">{{stinfos.sub6_name}}</td>
+              <td colspan="2">{{stinfos.sub6_number}}</td>  
+              {% endif %}          
+            </tr>
+            <tr>
+              {% if stinfos.sub7_name %}
+              <td colspan="2">{{stinfos.sub7_name}}</td>
+              <td colspan="2">{{stinfos.sub7_number}}</td>  
+              {% endif %}          
+            </tr>
+            <tr>
+              {% if stinfos.sub8_name %}
+              <td colspan="2">{{stinfos.sub8_name}}</td>
+              <td colspan="2">{{stinfos.sub8_number}}</td>  
+              {% endif %}          
+            </tr>
+            <tr>
+              {% if stinfos.sub9_name %}
+              <td colspan="2">{{stinfos.sub9_name}}</td>
+              <td colspan="2">{{stinfos.sub9_number}}</td>  
+              {% endif %}          
+            </tr>
+            <tr>
+              {% if stinfos.sub10_name %}
+              <td colspan="2">{{stinfos.sub10_name}}</td>
+              <td colspan="2">{{stinfos.sub10_number}}</td>  
+              {% endif %}          
+            </tr>
+                  {% endfor %}
+        </table>
+      </div>
+    </div>
+
+
+
+
+
+      {% comment %} {% for m in result %}
+      
+      <p>{{m.students_name}}</p>
+      <p>{{m.class_name}}</p>
+      {% if m.sub1_name %}
+      <p>{{m.sub1_name}}</p>
+      <p>{{m.sub1_number}}</p>
+      {% endif %}
+      {% if m.sub2_name %}
+      <p>{{m.sub2_name}}</p>
+      <p>{{m.sub2_number}}</p>
+      {% endif %}
+      {% endfor %} {% endcomment %}
+      
+      {% comment %} {% else %} {% endcomment %}
+      <div class="btn-group">
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'result' %}">Search Again</a>
+        <a class="btn btn-outline-primary btn-sm" onClick="window.print()">Print result</a>
+      </div>
+      
+ 
+      {% endif %}
+       
+       
+       {% comment %} <div class="container-fluid mb-5">
+            <form action="" method="POST">
+              {% csrf_token %}
+                <div class="input-group mb-3">
+                    <input type="search" name="students_search3" class="form-control" placeholder="Name and Roll">
+                    <button type="submit"  class="btn btn-primary btn-sm">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div> {% endcomment %}
+
+    <!--  search end here -->
+        
+    
+    <!-- students info table by select menu starting here -->
+    {% if student_info %}
+        {% if st == 'six' %}
+        <div class="bg-dark text-white py-2">ষষ্ঠ শ্রেনীর ছাত্রছাত্রীর ইনফরমেশন</div>
+        {% endif %}
+        {% if st == 'seven' %}
+        <div class="bg-dark text-white py-2">সপ্তম শ্রেনীর ছাত্রছাত্রীর ইনফরমেশন</div>
+        {% endif %}
+        {% if st == 'eight' %}
+        <div class="bg-dark text-white py-2">অষ্টম শ্রেনীর ছাত্রছাত্রীর ইনফরমেশন</div>
+        {% endif %}
+        {% if st == 'nine' %}
+        <div class="bg-dark text-white py-2">নবম শ্রেনীর ছাত্রছাত্রীর ইনফরমেশন</div>
+        {% endif %}
+        {% if st == 'ten' %}
+        <div class="bg-dark text-white py-2">দশম শ্রেনীর ছাত্রছাত্রীর ইনফরমেশন</div>
+        {% endif %}
+        
+
+        <div class="table-wrapper">
+          <table  class="table table-bordered">
+              <tr>
+                  <th>শিক্ষার্থীর নাম</th>
+                  <th>পিতার নাম</th>           
+                  <th>রোল</th>            
+                  <th>সেশন</th>
+                  <th>শ্রেনী</th>
+                  <th>বিস্তারিত</th>
+                </tr>
+                    {% for stinfos in student_info %}
+                <tr>
+                  <td>{{stinfos.student_name}}</td>            
+                  <td>{{stinfos.fathers_name}}</td>                  
+                  <td>{{stinfos.unique_roll}}</td>            
+                  <td>{{stinfos.seasion}}</td>            
+                  <td>{{stinfos.class_name}}</td>            
+                  <td><a class="btn btn-primary btn-sm" href="{% url 'students_details' stinfos.id %}">Details</a></td>          
+                </tr>
+                    {% endfor %}
+          </table>
+        </div>
+            <!-- students info table by select end here -->
+
+
+            <!-- students info table by search starting here -->
+                    {% elif search  %}
+
+          <div class="table-wrapper">
+           <table class="table table-bordered">
+              <tr>
+                  <th>শিক্ষার্থীর নাম</th>
+                  <th>পিতার নাম</th>           
+                  <th>রোল</th>            
+                  <th>সেশন</th>
+                  <th>শ্রেনী</th>
+                  <th>বিস্তারিত</th>
+              </tr>
+                {% for stinfo in search %}
+              <tr>
+                <td> {{stinfo.student_name}} </td>            
+                <td>{{stinfo.fathers_name}}</td>            
+                <td>{{stinfo.unique_roll}}</td>            
+                <td>{{stinfo.seasion}}</td>            
+                <td>{{stinfo.class_name}}</td>            
+                <td><a class="btn btn-primary btn-sm" href="{% url 'students_details' stinfo.id %}">Details</a></td>
+              </tr>
+                {% endfor %}
+            </table>
+          </div>
+                {% else %}
+                {% comment %} <div class="container">
+                  <h4 class="py-2 alert alert-danger">No Data to show, First Select</h4>
+                </div> {% endcomment %}
+                {% endif %}
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}

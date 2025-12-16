@@ -1,0 +1,76 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% load widget_tweaks %}
+{% block title %}
+<title>Students List</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">All Subjects List</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 bangla">
+
+        <div class="table_scroll">
+
+
+          <table  class="table table-bordered text-start">
+            <tr>
+              <td>Unique Roll No</td>
+              <td>{{students_instance.unique_roll}}</td>            
+              {% comment %} <td>Registrtion No</td>
+              <td>[No Regi no]</td>             {% endcomment %}
+            </tr>
+            <tr>
+              <td>Name of Student</td>
+              <td colspan="3"><b>{{students_instance.name}}</b></td>            
+            </tr>
+            <tr>
+              <td>Class/Department</td>
+              <td>{{students_instance.class_name}}</td>            
+              <td>Session</td>
+              <td>{{students_instance.session}}</td>            
+            </tr>
+
+            <tr>
+              <td> No. </td>
+              <td><b>Subject List</b></td>
+            </tr>
+            {% for obj in subjects_obj %}
+            <tr>
+           
+              <td>{{forloop.counter}}</td>
+              <td>{{obj.name}}</td>            
+              {% comment %} <td>Exam Year</td>
+              <td>{{obj.exam_year}}</td>             {% endcomment %}
+            </tr>
+            {% endfor %}
+              {% comment %}
+              <tr>
+              <td>Subjects</td>
+              <td>{{result.subject}}</td>            
+              <td>Marks</td>
+              <td>{{result.marks}}</td>            
+            </tr> {% endcomment %}
+
+          </table>
+   
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+

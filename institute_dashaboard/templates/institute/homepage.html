@@ -1,0 +1,394 @@
+{% extends 'institute/base.html' %} {% load static %} {% block title %}
+<title>{{webname.name_headline}} Homepage</title>
+{% endblock title %} 
+
+
+
+{% block leftside %} {% comment %} left side main things
+start from here {% endcomment %}
+<div class="container-fluid mb-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div width="60%" id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    </div>
+                    <div class="carousel-inner">
+                        {% for g in gallerytp %}
+                        <div class="carousel-item {% if forloop.first %} active {% endif %}" data-bs-interval="2000"> 
+                            <img src="{{g.gallery_photo.url}}" class="d-block w-100" alt="{{g.title}}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Next</span>
+                    </button>
+                  </div>
+                </div>
+            </div>
+        </div> 
+    </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8 col-lg-8">
+    <div class="container-fluid pe-lg-0">
+      {% comment %} <img
+        class=""
+        src="{{sinebord.sineboard_photo.url}}"
+        width="100%"
+        alt=""
+      /> {% endcomment %}
+      {% comment %} <h4 class="py-2 text-center border bg-white bangla">
+        <a style="text-decoration: none" href="{{sinebord.url_link}}">{{sinebord.title}}</a>
+      </h4> {% endcomment %}
+      <div class="jumbo bangla">
+        <div class="">
+          <img
+            src="{% static 'institute/img/bg-notice-board.png' %}"
+            width="150px"
+            class="text-right float-end pt-0 ps-0"
+          />
+        </div>
+        <div class="liste container py-4">
+          <h4>নোটিশ বোর্ড</h4>
+
+          {% for a in notice %}
+          <ul class="list">
+            <li class="text-dark">
+              {% if a.img_or_pdf %}
+              <a
+                style="text-decoration: none"
+                class="text-dark"
+                href=" 
+                        {{a.img_or_pdf.url}}
+                        "
+                download="{{a.img_or_pdf.url}}"
+                >{{a.title}}</a
+              >
+              {% else %}
+              <a
+                style="text-decoration: none"
+                class="text-dark"
+                target="_blank"
+                href="{{a.url_link}}"
+                >{{a.title}}</a
+              >
+              {% endif %}
+            </li>
+          </ul>
+          {% endfor %}
+          <div class="pb-4">
+            <a
+              class="text-right btn btn-primary btn-sm float-end"
+              href="{% url 'notice_board' %}"
+              target="_blank"
+              rel="noopener noreferrer"
+              >সকল নোটিশ</a
+            >
+          </div>
+        </div>
+      </div>
+
+      {% comment %} <!-- amader dristi start -->
+      <div class="bg-success pt-3 ps-2 pb-1 mt-3">
+        <h5 class="text-white bangla">আমাদের দৃষ্টিঃ-</h5>
+      </div>
+      <p class="bg-light border text-danger mt-1 py-2 text-center bangla">
+        {{qt.amader_dristi}}
+      </p>
+      <!-- amader dristi end -->
+
+      <!-- amader lokko start -->
+      <div class="bg-success pt-3 ps-2 pb-1 mt-1">
+        <h5 class="text-white bangla">আমাদের লক্ষ্যঃ-</h5>
+      </div>
+      <p class="bg-light border text-success mt-1 py-2 text-center bangla">
+        {{qt.amader_lokko}}
+      </p> {% endcomment %}
+      <!-- amader lokko end -->
+
+      <!-- amader porichiti start -->
+      <div class="bg-success pt-3 ps-2 pb-1 mt-1">
+        <h5 class="text-white bangla">অধ্যক্ষের বাণীঃ</h5>
+      </div>
+      <p style="text-align: justify" class="bg-light py-2 bangla">
+        {{qt.short_porichiti}}
+      </p>
+      <!-- amader pirichiti end -->
+
+      <div class="cardsection bg-cards liste">
+        <!-- <div class="container-fluid"> -->
+        <div class="row">
+          <div class="col-md-6 col-lg-6">
+            <div class="card my-3 py-2 navcol bangla">
+              <h3 class="card-title ps-2">প্রতিষ্ঠান সম্পর্কিত</h3>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-2">
+                    <div class="">
+                      <img
+                        src="{% static 'institute/img/cardicon/protistan_som.jpg' %}"
+                        class="pt-4"
+                        width="60px"
+                        alt=""
+                      />
+                      <!-- <p class="align-self-center"> amir</p> -->
+                    </div>
+                  </div>
+                  <div class="ms-lg-2 ms-4 col-9">
+                    <ul >
+                      <li><a class="nolinelink text-dark" href="{% url 'history' %}">প্রতিষ্ঠানের সংক্ষিপ্ত ইতিহাস</a></li>
+                      <li><a class="nolinelink text-dark" href="{% url 'speach' %}">অধ্যক্ষের বাণী</a></li>
+                      <li><a class="nolinelink text-dark" href="{% url 'lokko' %}">লক্ষ্য ও উদ্দেশ্য</a></li>  
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-6">
+            <div class="card my-3 py-2 navcol bangla">
+              <h3 class="card-title ps-2">পরীক্ষা সংক্রান্ত</h3>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-2">
+                    <div class="">
+                      <img
+                        src="{% static 'institute/img/cardicon/Examination.png' %}"
+                        class="pt-4"
+                        width="60px"
+                        alt=""
+                      />
+                      <!-- <p class="align-self-center"> amir</p> -->
+                    </div>
+                  </div>
+                  <div class="ms-3 col-9">
+                    <ul>
+                      <li><a class="nolinelink text-dark" href="{% url 'news' %}">বিশেষ নিউজ</a></li> 
+                      <li><a class="nolinelink text-dark" href="{% url 'notice_board' %}">পরীক্ষার রুটিন</a></li>
+                      <li><a class="nolinelink text-dark" href="{% url 'notice_board' %}">বিজ্ঞপ্তি</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- </div> -->
+      </div>
+
+      <div class="cardsection bg-cards liste">
+        <!-- <div class="container-fluid"> -->
+        <div class="row">
+          <div class="col-md-6 col-lg-6">
+            <div class="card my-3 py-2 navcol bangla">
+              <h3 class="card-title ps-2">নোটিশ</h3>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-2">
+                    <div class="">
+                      <img
+                        src="{% static 'institute/img/cardicon/notice.png' %}"
+                        class="pt-4"
+                        width="60px"
+                        alt=""
+                      />
+                      <!-- <p class="align-self-center"> amir</p> -->
+                    </div>
+                  </div>
+                  <div class="col-9 ms-lg-2 ms-4">
+                    <ul>
+                      <li><a class="nolinelink text-dark" href="{% url 'notice_board' %}">নোটিশ</a></li>
+                      <li><a class="nolinelink text-dark" href="{% url 'gallery' %}">গ্যালারী</a></li>
+                      <li><a class="nolinelink text-dark" href="{% url 'cultur' %}">ইন্সটিটিউটের বিভিন্ন কার্যক্রমের চিত্র</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-6">
+            <div class="card my-3 py-2 navcol bangla">
+              <h3 class="card-title ps-2">ফলাফল</h3>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-2">
+                    <div class="">
+                      <img
+                        src="{% static 'institute/img/cardicon/folafol.png' %}"
+                        class="pt-4"
+                        width="60px"
+                        alt=""
+                      />
+                      <!-- <p class="align-self-center"> amir</p> -->
+                    </div>
+                  </div>
+                  <div class="col-9 ms-3">
+                    <ul>
+                      <li><a class="nolinelink text-dark" href="{% url 'result' %}">বিভিন্ন পরীক্ষার ফলাফল</a></li>
+                      <li><a class="nolinelink text-dark" href="{% url 'result' %}">বোর্ড ফলাফল</a></li>
+                      <li><a class="nolinelink text-dark" href="{% url 'result' %}">বিবিধ/উপবৃত্তি ফলাফল</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 col-lg-6">
+          <div class="card my-3 py-2 navcol bangla liste">
+            <h3 class="card-title ps-2">ভর্তি সংক্রান্ত</h3>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-2">
+                  <div class="">
+                    <img src="{% static 'institute/img/cardicon/vorti.png' %}" class="pt-4" width="60px" alt="" />
+                    <!-- <p class="align-self-center"> amir</p> -->
+                  </div>
+                </div>
+                <div class="col-9 ms-2">
+                  <ul>
+                    <li><a class="nolinelink text-dark" href="{% url 'onlineadm' %}">অনলাইন ভর্তি আবেদন</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'notice_board' %}">ভর্তি রেজাল্ট</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'onlineadm' %}">ভর্তির নিয়ম</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-6">
+          <div class="card my-3 py-2 navcol bangla liste">
+            <h3 class="card-title ps-2">উদ্ভাবনী কার্যক্রম</h3>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-2">
+                  <div class="">
+                    <img src="{% static 'institute/img/cardicon/udvaboni.png' %}" class="pt-4" width="60px" alt="" />
+                    <!-- <p class="align-self-center"> amir</p> -->
+                  </div>
+                </div>
+                <div class="col-9 ms-2">
+                  <ul>
+                    <li><a class="nolinelink text-dark" href="{% url 'complain' %}">উদ্ভাবনী আইডিয়া সাবমিট</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'sports' %}">উদ্ভাবনী প্রকল্পসমূহ</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'gallery' %}">ফটোগ্যালারী</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 col-lg-6">
+          <div class="card my-3 py-2 navcol bangla liste">
+            <h3 class="card-title ps-2">শিক্ষার্থী তথ্য</h3>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-2">
+                  <div class="">
+                    <img src="{% static 'institute/img/cardicon/shikkarrthi.png' %}" class="pt-4" width="60px" alt="" />
+                    <!-- <p class="align-self-center"> amir</p> -->
+                  </div>
+                </div>
+                <div class="col-9 ms-lg-2 ms-4">
+                  <ul>
+                      <li><a class="nolinelink text-dark" href="{% url 'students_info' %}">শিক্ষার্থী ডাটাবেস</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'notice_board' %}">নিয়ম এবং প্রবিধান</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'notice_board' %}">শিক্ষার্থী ইউনিফর্ম</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-6">
+          <div class="card my-3 py-2 navcol bangla liste">
+            <h3 class="card-title ps-2">একাডেমিক কার্যক্রম</h3>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-2">
+                  <div class="">
+                    <img src="{% static 'institute/img/cardicon/academic.png' %}" class="pt-4" width="60px" alt="" />
+                    <!-- <p class="align-self-center"> amir</p> -->
+                  </div>
+                </div>
+                <div class="col-9 ms-lg-2 ms-4">
+                  <ul>
+                    <li><a class="nolinelink text-dark" href="{% url 'result' %}">পরীক্ষার ফলাফল</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'notice_board' %}">ক্লাশ রুটিন</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'notice_board' %}">সিলেবাস/সেমিস্টার প্ল্যান</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 col-lg-6">
+          <div class="card my-3 py-2 navcol bangla liste">
+            <h3 class="card-title ps-2">জব প্লেসমেন্ট সেল</h3>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-2">
+                  <div class="">
+                    <img src="{% static 'institute/img/cardicon/jobplace.png' %}" class="pt-4" width="60px" alt="" />
+                    <!-- <p class="align-self-center"> amir</p> -->
+                  </div>
+                </div>
+                <div class="col-9 ms-lg-2 ms-4">
+                  <ul>
+                    <li><a class="nolinelink text-dark" href="{% url 'notice_board' %}">জব নোটিশ</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'onlineadm' %}">প্রাক্তন শিক্ষার্থী নিবন্ধকরণ</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'staf' %}">স্টাফ তথ্য</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-6">
+          <div class="card my-3 py-2 navcol bangla liste">
+            <h3 class="card-title ps-2">রিসোর্স</h3>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-2">
+                  <div class="">
+                    <img src="{% static 'institute/img/cardicon/resource.png' %}" class="pt-4" width="60px" alt="" />
+                    <!-- <p class="align-self-center"> amir</p> -->
+                  </div>
+                </div>
+                <div class="col-9 ms-lg-2 ms-4">
+                  <ul>
+                    <li><a class="nolinelink text-dark" href="{% url 'teachers_info' %}">শিক্ষক ডাটাবেস</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'cultur' %}">প্রতিষ্ঠানের ল্যব সমূহ</a></li>
+                    <li><a class="nolinelink text-dark" href="{% url 'cultur' %}">গ্রন্থগার/খেলার মাঠ</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+        
+      
+    </div>
+  </div>
+
+  {% endblock leftside %}
+</div>

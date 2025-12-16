@@ -1,0 +1,180 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% load custom_filters %}
+{% load widget_tweaks %}
+{% block title %}
+<title>Students Info add</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+<style>
+    body{
+        margin-top:20px;
+        background:#FAFAFA;
+    }
+    .order-card {
+        color: #fff;
+    }
+    
+    .bg-c-blue {
+        background: linear-gradient(45deg,#4099ff,#73b4ff);
+    }
+    
+    .bg-c-green {
+        background: linear-gradient(45deg,#2ed8b6,#59e0c5);
+    }
+    
+    .bg-c-yellow {
+        background: linear-gradient(45deg,#FFB64D,#ffcb80);
+    }
+    
+    .bg-c-pink {
+        background: linear-gradient(45deg,#FF5370,#ff869a);
+    }
+    
+    
+    .card {
+        border-radius: 5px;
+        -webkit-box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
+        box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
+        border: none;
+        margin-bottom: 30px;
+        -webkit-transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+    }
+    
+    .card .card-block {
+        padding: 25px;
+    }
+    
+    .order-card i {
+        font-size: 26px;
+    }
+    
+    .f-left {
+        float: left;
+    }
+    
+    .f-right {
+        float: right;
+    }
+</style>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" rel="stylesheet">
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <p class="alert bg-success text-light text-center">Dashboard</p>
+            <div class="card-body">
+
+           
+    <div class="row">
+        {% if request.user|has_group:"Admission_officer" or request.user.is_superuser %}
+        <div class="col-md-4 col-xl-3">
+            <a style="text-decoration:none"  href="{% url 'students:std_info_dashboard' %}"> 
+                <div class="card bg-c-blue order-card">
+                    <div class="card-block">
+                        <h6 class="m-b-20">AOD</h6>
+                         {% comment %} <h4 class="text-center"> <i class="bi bi-mouse2-fill"></i></h4> {% endcomment %}
+                        <h4 class="text-right"><i class="bi bi-person-lines-fill"></i><span> Admission Officer's Dashboard</span></h4>
+                        {% comment %} <p class="m-b-0">Total Students<span class="f-right">300</span></p> {% endcomment %}
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+        {% if request.user|has_group:"Teacher" or request.user.is_superuser %}
+        <div class="col-md-4 col-xl-3">
+            <a style="text-decoration:none"  href="{% url 'students:result_dashobard' %}"> 
+            <div class="card bg-c-green order-card">
+                <div class="card-block">
+                    <h6 class="m-b-20">TD
+                    </h6>
+                     {% comment %} <h4 class="text-center"> <i class="bi bi-mouse2-fill"></i></h4> {% endcomment %}
+                    <h4 class="text-right"><i class="bi bi-person-lines-fill"></i> <span>Teacher's Dashboard</span></h4>
+                    {% comment %} <p class="m-b-0">Total<span class="f-right">400</span></p> {% endcomment %}
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    {% endif %}
+    
+    
+    {% if request.user|has_group:"Student" or request.user.is_superuser %}
+    <div class="col-md-4 col-xl-3">
+        <a style="text-decoration:none"  href="{% url 'students:students_dashobard' %}"> 
+            <div class="card bg-c-yellow order-card">
+                <div class="card-block">
+                    <h6 class="m-b-20">SD</h6>
+                     {% comment %} <h4 class="text-center"> <i class="bi bi-mouse2-fill"></i></h4> {% endcomment %}
+                    <h4 class="text-right"> <i class="bi bi-person-lines-fill"></i> <span>Student's Dashboard</span></h4>
+                    {% comment %} <p class="m-b-0">Click Here For your<span class="f-right">00</span></p> {% endcomment %}
+                </div>
+            </div>
+        </a>
+        </div>
+        {% endif %}
+        {% if request.user|has_group:"Portal_Manager" or request.user.is_superuser %}
+        <div class="col-md-4 col-xl-3">
+            <a style="text-decoration:none"  href="{% url 'dashboard_management:portal_manager_board' %}">
+            <div class="card bg-c-pink order-card">
+                <div class="card-block">
+                    <h6 class="m-b-20">PMIT</h6>
+                    {% comment %} <h4 class="text-center"> <i class="bi bi-mouse2-fill"></i></h4> {% endcomment %}
+                    <h4 class="text-right"><i class="bi bi-person-lines-fill"></i> <span>Portal Manager or IT Officer's</span></h4>
+                    {% comment %} <p class="m-b-0"> <i class="bi bi-person-lines-fill"></i> </p> {% endcomment %}
+                </div>
+            </div>
+        </a>
+        </div>
+        {% endif %}
+        {% if request.user|has_group:"teacherser" %}
+        
+        <div class="col-md-4 col-xl-3">
+            <div class="card bg-c-pink order-card">
+                <div class="card-block">
+                    <h6 class="m-b-20">Cooming Soon</h6>
+                    <h2 class="text-right"> <i class="bi bi-person-lines-fill"></i><span>0</span></h2>
+                    <p class="m-b-0">Total<span class="f-right">00</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-xl-3">
+            <div class="card bg-c-blue order-card">
+                <div class="card-block">
+                    <h6 class="m-b-20">Cooming Soon</h6>
+                    <h2 class="text-right"><i class="fa-solid fa-screen-users"></i><span>00</span></h2>
+                    <p class="m-b-0">Total<span class="f-right">00</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-xl-3">
+            <div class="card bg-c-green order-card">
+                <div class="card-block">
+                    <h6 class="m-b-20">Cooming Soon</h6>
+                    <h2 class="text-right"><i class="fa-solid fa-screen-users"></i><span>00</span></h2>
+                    <p class="m-b-0">Total<span class="f-right">00</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-xl-3">
+            <div class="card bg-c-yellow order-card">
+                <div class="card-block">
+                    <h6 class="m-b-20">Cooming Soon</h6>
+                    <h2 class="text-right"><i class="fa-solid fa-screen-users"></i><span>00</span></h2>
+                    <p class="m-b-0">Total<span class="f-right">00</span></p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+	</div>
+</div>
+</div>
+</div>
+</div>
+{% endblock leftside %}
+{% block rightside %}
+
+{% endblock rightside %}

@@ -1,0 +1,134 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% load widget_tweaks %}
+{% block title %}
+<title>Result Add</title>
+{% endblock title %}
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+{% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">Result Input For</h5>
+      </div>
+      <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+        {% csrf_token %}
+      <div class="bg-light border container-fluid mt-1 py-2 bangla">
+            <div class="row">
+                
+                
+            
+            <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Class
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %}
+                {% render_field form.class_name|add_class:'form-control' %}
+            </div>
+            <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Class Year
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %}
+                {% render_field forms.class_nm|add_class:'form-control' %}
+            </div>
+            <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Section
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %}
+                {% render_field form.section|add_class:'form-control' %}            
+            </div>
+            <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Subject
+                </label>
+                {% if form.exam_type.field.required %}
+                <span class="required text-danger">*</span>
+                {% endif %}
+                {% render_field form.subject|add_class:'form-control' %}
+                   </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            
+                <label>
+                    {{ form.exam_type.field.label }}
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %}
+                {% render_field form.exam_type|add_class:"form-control" rows="3" cols="5" title=""%}
+            </div>
+
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.exam_year.field.label }}
+            </label>
+            {% if form.exam_year.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.exam_year|add_class:"form-control" %}
+        </div>
+        <div class="col-md-6">
+
+            <button class="btn btn-primary mt-2" type="submit">Next</button>
+        </div>
+        </div>
+        
+        </form>
+    </div>
+   
+       </div>
+    
+            
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+

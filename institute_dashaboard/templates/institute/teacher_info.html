@@ -1,0 +1,125 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% block title %}
+<title>Teacher</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla text-center">শিক্ষক</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 text-center bangla">
+      
+            <div class="container-fluid">
+                <div class="table-wrapper">
+                <table class="table table-bordered">
+                    <td>
+                        {% for tea in notice %}
+                        <table class="table table-bordered class="text-start"">
+                            <tr>
+                                <td style="width:100px" class="text-start"><img width="170px" class="" src="{{tea.teachers_photo.url}}" alt=""></td>
+                                <td>
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <td class="text-start">নাম</td>
+                                            <td class="text-start">{{tea.teachers_name}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-start">পদবী</td>
+                                            <td class="text-start">{{tea.designation}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-start">মোবাইল</td>
+                                            <td class="text-start">{{tea.phone_number}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-start">ইমেইল</td>
+                                            <td class="text-start">{{tea.email}}</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                                            
+                            </tr>
+                        </table>
+                        {% endfor %}
+                    </td>
+                </table>
+                </div
+                
+            </div>
+           
+
+            <!-- Pagination starting start here -->
+         <div class="row">
+            <div class="col-lg-6">
+              <div class="d-flex justify-content-start ms-2">
+                <ul class="pagination justify-content-center py-3">
+                      {% if notice.has_previous %}
+                    <li class="page-item"><a href="?page={{notice.previous_page_number}}" class="page-link">Previous</a></li>  
+                      {% else %}
+                    <li class="page-item disabled"><a href="" class="page-link">Previous</a></li>  
+                      {% endif %}
+                      {% if notice.has_previous %}
+                    <li class="page-item"><a href="?page={{notice.previous_page_number}}" class="page-link">{{notice.previous_page_number}}</a></li>  
+                      {% endif %}
+                    <li class="page-item active"><a href="?page={{notice.number}}" class="page-link">{{notice.number}}</a></li>  
+                      {% if notice.has_next %}
+                    <li class="page-item"><a href="?page={{notice.next_page_number}}" class="page-link">{{notice.next_page_number}}</a></li>
+                      {% endif %}
+                      {% if notice.has_next %}
+                    <li class="page-item"><a href="?page={{notice.next_page_number}}" class="page-link">Next</a></li>
+                      {% else %}
+                    <li class="page-item disabled"><a href="" class="page-link">Next</a></li>
+                      {% endif %}
+                </ul>   
+              </div>
+            </div>
+            <!-- Pagination end here -->
+            
+            <!-- Page Number show starting here -->
+            <div class="col-lg-6">
+              <div class="d-flex justify-content-lg-end me-3 mt-4">
+                <p class="text-dark ms-2">Showing Page {{notice.number}} out of {{notice.paginator.num_pages}}</p>
+              </div>
+              
+            </div>
+          </div>
+          <!-- Page Number show end here -->
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+

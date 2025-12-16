@@ -1,0 +1,89 @@
+from django.urls import path
+from students import views
+
+app_name = 'students'
+
+urlpatterns = [
+
+    # students info
+    path(
+        'dashboard/',
+        views.SDashboard.as_view(),
+        name='dashobard_app'
+    ),
+    path(
+        'result/dashboard/',
+        views.ResultsDashboard.as_view(),
+        name='result_dashobard'
+    ),
+    path(
+        'studentsportal/',
+        views.StudentsDashboard.as_view(),
+        name='students_dashobard'
+    ),
+    path(
+        'create',
+        views.StudentsCreateView.as_view(),
+        name='students_create'
+    ),
+    path(
+        'list',
+        views.StudentsListView.as_view(),
+        name='students_list'
+    ),
+    path(
+        'search/add/result',
+        views.ListOfResultsAddView.as_view(),
+        name='students_list_for_result'
+    ),
+    path( 
+        '<int:exm_tp>/search/<int:clas_nm>/add/<int:sub>/<int:clas_yr>/result/<int:ecm_yr>/<int:clas_sec>/list',
+        views.ListOfResultscCeateResultView.as_view(),
+        name='students_list_for_result_add'
+    ),
+    path(
+        'show/result/list',
+        views.ShowResultView.as_view(),
+        name='show_result'
+    ),
+    path(
+        'show/<int:pk>/<int:sem>/result',
+        views.SemesterResultView.as_view(),
+        name='show_result_detail'
+    ),
+    path(
+        'show/<int:pk>/<int:sem>/result/pdf',
+        views.SemesterResultViews.as_view(),
+        name='show_result_detail_pdf'
+    ),
+    path(
+        'info',
+        views.StudentsInfoDashboard.as_view(),
+        name='std_info_dashboard'
+    ),
+    path(
+        'result/<int:stdn>/<int:subj>/create',
+        views.ResultsCreateView.as_view(),
+        name='result_create'
+    ),
+    path(
+        'subjects/<int:stu_id>/',
+        views.StudentsSubjects.as_view(),
+        name='students_subjects'
+    ),
+    path(
+        'routine/',
+        views.StudentsRoutine.as_view(),
+        name='students_routine'
+    ),
+    path(
+        'register/<int:stu_id>/class',
+        views.StudentsClassRegister.as_view(),
+        name='students_class_register'
+    ),
+    path(
+        'my/result',
+        views.StudentsResultSpecific.as_view(),
+        name='students_specific_result'
+    ),
+]

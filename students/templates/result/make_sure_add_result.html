@@ -1,0 +1,127 @@
+            {% extends 'institute/base.html' %} 
+            {% load static %} 
+            {% load widget_tweaks %}
+            {% block title %}
+            <title>Result Add</title>
+            {% endblock title %}
+            
+            <!-- left side main things start from here -->
+            {% block leftside %} 
+            
+                  <!-- student short info start -->
+            <div class="row">
+                <div class="container-fluid">
+                <div class="container-fluid">
+                  <div class="bg-success pt-3 ps-2 pb-1 ">
+                    <h5 class="text-white bangla">Your Selected Option</h5>
+                  </div>
+                  <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+                    {% csrf_token %}
+                  <div class="bg-light border container-fluid mt-1 py-2 bangla">
+                        <div class="row">
+                            
+                            
+                        
+                        <div class="col-lg-6 col-md-6 form-group">
+                            <label>
+                                Class
+                            </label>
+                            {% if form.exam_type.field.required %}
+                                <span class="required text-danger">*</span>
+                            {% endif %}
+                            <input disabled type="text" value="{{class}}" class="form-control">
+                        </div>
+                        <div class="col-lg-6 col-md-6 form-group">
+                            <label>
+                                Class Year
+                            </label>
+                            {% if form.exam_type.field.required %}
+                                <span class="required text-danger">*</span>
+                            {% endif %}
+                            <input disabled type="text" value="{{class_year}}" class="form-control">
+                        </div>
+                        <div class="col-lg-6 col-md-6 form-group">
+                            <label>
+                                Section
+                            </label>
+                            {% if form.exam_type.field.required %}
+                                <span class="required text-danger">*</span>
+                            {% endif %}
+                            <input disabled type="text" value="{{section}}" class="form-control">
+                            
+                        </div>
+                        <div class="col-lg-6 col-md-6 form-group">
+                            <label>
+                                Subject
+                            </label>
+                            {% if form.exam_type.field.required %}
+                            <span class="required text-danger">*</span>
+                            {% endif %}
+                            <input disabled type="text" value="{{subject}}" class="form-control">
+                        </div>
+                    <div class="col-lg-6 col-md-6 form-group">
+                        
+                            <label>
+                                Exam Type
+                            </label>
+                            {% if form.exam_type.field.required %}
+                                <span class="required text-danger">*</span>
+                            {% endif %}
+                            <input disabled type="text" value="{{exmtype}}" class="form-control">
+                        </div>
+                        
+                        <div class="col-lg-6 col-md-6 form-group">
+                            <label>
+                                Exam Year
+                            </label>
+                            {% if form.exam_year.field.required %}
+                            <span class="required text-danger">*</span>
+                            {% endif %}
+                            <input disabled type="text" value="{{exmyr}}" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        Are Your Sure to want add result of this option?
+                        <a class="btn btn-primary mt-2" href="{% url 'students:students_list_for_result_add' clas_nm=class.id clas_yr=class_year.id clas_sec=section.id exm_tp=exmtype.id  sub=subject.id  ecm_yr=exmyr.id%}">Next</a> 
+                        {% comment %} <button type="submit">Next</button> {% endcomment %}
+                    </div>
+                    </div>
+                    
+                    </form>
+                </div>
+               
+                   </div>
+                
+                        
+            
+                        <!-- students info table by search end here -->
+                            <!-- student short info end -->
+                           
+            
+                      
+                 
+            
+             
+                      <!-- Notice Table non-search end here -->
+                      
+                     <!-- Pagination starting start here -->
+                     
+                      <!-- Pagination end here -->
+                      
+                      <!-- Page Number show starting here -->
+                      
+                    <!-- Page Number show end here -->
+                    
+                    
+                  </div>
+                </div>
+              </div>
+              {% endblock leftside %}
+              {% block rightside %}
+            
+              {% endblock rightside %}
+            
+            
+            
+            
+            
+            

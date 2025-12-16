@@ -1,0 +1,96 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% load widget_tweaks %}
+{% block title %}
+<title>Students List</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">Routine</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 bangla">
+
+        <div class="table_scroll">
+          <div class="container mt-5">
+            <h2 class="text-center">Class Routine</h2>
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>9:00 - 10:00</td>
+                        <td>Math</td>
+                        <td>Physics</td>
+                        <td>Chemistry</td>
+                        <td>Biology</td>
+                        <td>English</td>
+                    </tr>
+                    <tr>
+                        <td>10:00 - 11:00</td>
+                        <td>History</td>
+                        <td>Math</td>
+                        <td>Physics</td>
+                        <td>Chemistry</td>
+                        <td>PE</td>
+                    </tr>
+                    <tr>
+                        <td>11:00 - 12:00</td>
+                        <td>English</td>
+                        <td>History</td>
+                        <td>Math</td>
+                        <td>Physics</td>
+                        <td>Art</td>
+                    </tr>
+                    <tr>
+                        <td>12:00 - 1:00</td>
+                        <td>Lunch</td>
+                        <td>Lunch</td>
+                        <td>Lunch</td>
+                        <td>Lunch</td>
+                        <td>Lunch</td>
+                    </tr>
+                    <tr>
+                        <td>1:00 - 2:00</td>
+                        <td>Chemistry</td>
+                        <td>Biology</td>
+                        <td>English</td>
+                        <td>Math</td>
+                        <td>Physics</td>
+                    </tr>
+                    <tr>
+                        <td>2:00 - 3:00</td>
+                        <td>PE</td>
+                        <td>Art</td>
+                        <td>History</td>
+                        <td>Biology</td>
+                        <td>Math</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+      </div>
+
+
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}

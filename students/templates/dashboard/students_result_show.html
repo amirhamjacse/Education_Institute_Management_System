@@ -1,0 +1,145 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% block title %}
+<title>Result</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      {% comment %} {% if not result %} {% endcomment %}
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">রেজাল্ট</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 text-center bangla">
+        
+<div class="container">
+    <div class="table-wrapper">
+
+
+      <table  class="table table-bordered text-start">
+          <tr>
+            <td>Unique Roll No</td>
+            <td>{{info.student.unique_roll}}</td>            
+            <td>Registrtion No</td>
+            <td>[No Regi no]</td>            
+          </tr>
+          <tr>
+            <td>Name of Student</td>
+            <td colspan="3">{{info.student.name}}</td>            
+          </tr>
+          <tr>
+            <td>Class/Department</td>
+            <td>{{info.class_name}}</td>            
+            <td>Session</td>
+            <td>{{info.session}}</td>            
+          </tr>
+         
+          <tr>
+            <td>Exam Type</td>
+            <td>{{info.exam_type}}</td>            
+            <td>Exam Year</td>
+            <td>{{info.exam_year}}</td>            
+          </tr>
+          <th>Subjects</th>
+          <th>Marks</th>
+          {% for result in results %}
+          <tr>
+            <td>{{result.subject}}</td>            
+            <td>{{result.marks}}</td>            
+          </tr>
+          {% endfor %}
+          
+          <!-- {{ai_message}} -->
+        <!-- <div class="feedback-section" id="feedbackSection" style="display:none;">
+            <h4>AI Feedback</h4>
+     
+            <div id="aiFeedback">{{ ai_message }}</div>
+        </div> -->
+
+          {% comment %} <tr>
+            {% if stinfos.sub1_name %}
+            <td colspan="2">{{stinfos.sub1_name}}</td>
+            <td colspan="2">{{stinfos.sub1_number}}</td>  
+            {% endif %}          
+          </tr>
+          <tr>
+            {% if stinfos.sub2_name %}
+            <td colspan="2">{{stinfos.sub2_name}}</td>
+            <td colspan="2">{{stinfos.sub2_number}}</td>  
+            {% endif %}          
+          </tr>
+          <tr>
+            {% if stinfos.sub3_name %}
+            <td colspan="2">{{stinfos.sub3_name}}</td>
+            <td colspan="2">{{stinfos.sub3_number}}</td>  
+            {% endif %}          
+          </tr>
+          <tr>
+            {% if stinfos.sub4_name %}
+            <td colspan="2">{{stinfos.sub4_name}}</td>
+            <td colspan="2">{{stinfos.sub4_number}}</td>  
+            {% endif %}          
+          </tr>
+          <tr>
+            {% if stinfos.sub5_name %}
+            <td colspan="2">{{stinfos.sub5_name}}</td>
+            <td colspan="2">{{stinfos.sub5_number}}</td>  
+            {% endif %}          
+          </tr>
+          <tr>
+            {% if stinfos.sub6_name %}
+            <td colspan="2">{{stinfos.sub6_name}}</td>
+            <td colspan="2">{{stinfos.sub6_number}}</td>  
+            {% endif %}          
+          </tr>
+          <tr>
+            {% if stinfos.sub7_name %}
+            <td colspan="2">{{stinfos.sub7_name}}</td>
+            <td colspan="2">{{stinfos.sub7_number}}</td>  
+            {% endif %}          
+          </tr>
+          <tr>
+            {% if stinfos.sub8_name %}
+            <td colspan="2">{{stinfos.sub8_name}}</td>
+            <td colspan="2">{{stinfos.sub8_number}}</td>  
+            {% endif %}          
+          </tr>
+          <tr>
+            {% if stinfos.sub9_name %}
+            <td colspan="2">{{stinfos.sub9_name}}</td>
+            <td colspan="2">{{stinfos.sub9_number}}</td>  
+            {% endif %}          
+          </tr>
+          <tr>
+            {% if stinfos.sub10_name %}
+            <td colspan="2">{{stinfos.sub10_name}}</td>
+            <td colspan="2">{{stinfos.sub10_number}}</td>  
+            {% endif %}          
+          </tr>
+                {% endfor %} {% endcomment %}
+      </table>
+      <div class="container mt-5">
+        <h2 class="text-center">Feedback and Advice</h2>
+        
+        <div class="alert alert-success mt-4" role="alert">
+            {{ ai_message }}
+        </div>
+    </div>
+    
+    </div>
+  </div>
+
+
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+

@@ -1,0 +1,141 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% load widget_tweaks %}
+{% block title %}
+<title>Result Add</title>
+{% endblock title %}
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- student short info start -->
+<div class="row">
+    <div class="container-fluid">
+    <div class="container-fluid">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">Result Input</h5>
+      </div>
+      <div class="bg-light border container-fluid mt-1 py-2 bangla">
+            <div class="row">
+                
+                
+            <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Name
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %}
+                
+                <input class="form-control" type="text" disabled value="{{name}}">
+            </div>
+            <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Roll
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %}
+                
+                <input class="form-control" type="text" disabled value="{{roll}}">
+            </div>
+            <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Class
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %}
+                <input class="form-control" type="text" disabled value="{{class}}">
+            </div>
+            <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Section
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %}
+                <input class="form-control" type="text" disabled value="{{section}}">
+                
+            </div>
+            <div class="col-lg-6 col-md-6 form-group">
+                <label>
+                    Subject
+                </label>
+                {% if form.exam_type.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %}
+                <input class="form-control" type="text" disabled value="{{sub}}">
+            </div>
+        <div class="col-lg-6 col-md-6 form-group">
+            <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+                {% csrf_token %}
+                <label>
+                    {{ form.exam_year.field.label }}
+                </label>
+                {% if form.exam_year.field.required %}
+                    <span class="required text-danger">*</span>
+                {% endif %}
+                {% render_field form.exam_year|add_class:"form-control" rows="3" cols="5" title=""%}
+            </div>
+
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.exam_type.field.label }}
+            </label>
+            {% if form.exam_type.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.exam_type|add_class:"form-control" type="date" %}
+        </div>
+        
+        
+        <div class="col-lg-6 col-md-6 form-group">
+            <label>
+                {{ form.marks.field.label }}
+            </label>
+            {% if form.marks.field.required %}
+                <span class="required text-danger">*</span>
+            {% endif %}
+            {% render_field form.marks|add_class:"form-control" %}
+            <button class="btn btn-primary mt-2" type="submit">Add</button>
+        </div>
+        
+        </form>
+    </div>
+   
+       </div>
+    
+            
+
+            <!-- students info table by search end here -->
+                <!-- student short info end -->
+               
+
+          
+     
+
+ 
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+  {% block rightside %}
+
+  {% endblock rightside %}
+
+
+
+
+

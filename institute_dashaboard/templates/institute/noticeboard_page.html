@@ -1,0 +1,176 @@
+{% extends 'institute/base.html' %} 
+{% load static %} 
+{% block title %}
+<title>Notice Board</title>
+{% endblock title %} 
+
+<!-- left side main things start from here -->
+{% block leftside %} 
+
+      <!-- Notice board table start -->
+<div class="row">
+  <div class="col-lg-8 col-lg-8">
+    <div class="container-fluid pe-lg-0">
+      <div class="bg-success pt-3 ps-2 pb-1 ">
+        <h5 class="text-white bangla">নোটিশ বোর্ডঃ</h5>
+      </div>
+      <div class="bg-light border mt-1 py-2 text-center bangla">
+
+        <p class="text-start ps-1">সর্বশেষ হালনাগাদঃ {{up_date.notice_published_date}}</p>
+        
+        <!-- select menu start -->
+        <div class="row">
+          <div class="col-lg-1 col-md-1 col-3">
+            <p class="ps-1 mt-1" for="Select">Showing</p> 
+          </div>
+          <div class="col-lg-4 col-md-4 col-6 me-lg-0">
+            <form action="" method="get">
+              <select class="form-select mb-3" name="result" id="">
+                <option value="5" selected>5 Row</option>
+                <option value="10">10 Row</option>
+                <option value="15">15 Row</option>
+                <option value="20">20 Row</option>
+                <option value="30">30 Row</option>
+                <option value="50">50 Row</option>
+                <option value="80">80 Row</option>
+                <option value="100">100 Row</option>
+              </select>
+          </div>
+          <div class="col-lg-1 col-md-1 col-3 ms-lg-0">
+            <input class="mt-1 btn btn-primary btn-sm " type="submit" value="Show">
+            </form>
+          </div>
+          <div class="col-12 col-lg-6 col-md-6">
+            <div class="input-group d-flex justify-content-center mb-2">
+              <div class="form-outline">
+                <form action="" method="get">
+                    <input type="search" name="notice_search" id="form1" placeholder="Notice Name" class="form-control">
+              </div>
+                  <button type="submit"  class="btn btn-primary btn-sm">
+                    <i class="bi bi-search"></i> Search
+                  </button>
+                </form>
+            </div>
+          </div>
+        </div>
+        <!-- select menu ends -->
+        
+
+        <!-- Notice Table search starting here -->
+      {% if search %}
+      <div class="table-wrapper">
+          <table class="table table-bordered">
+            <tr>
+              <th>ক্রমিক</th>
+              <th>শিরোনাম</th>
+              <th>প্রকাশের তারিখ</th>
+              <th>ডাউনলোড</th>
+            </tr>
+              {% for notices in search %}
+            <tr>
+              <td>{{notices.id}}</td>
+              <td class="text-start">{{notices.title}}</td>
+              <td>{{notices.notice_published_date}}</td>
+              <td>
+                  {% if notices.img_or_pdf %}
+                      <a style="text-decoration:none" class='btn btn-primary btn-sm' href="{{notices.img_or_pdf.url}}" download="{{notices.img_or_pdf.url}}">Download<i class="ps-1 bi bi-download"></i></a> 
+                  {% else %}
+                      <a style="text-decoration:none" class='btn btn-primary btn-sm' target="_blank" href="{{notices.url_link}}">Download<i class="ps-1 bi bi-download"></i> </a>
+                  {% endif %}
+              </td>
+            </tr>
+              {% endfor %}
+          </table>
+        </div>
+      {% else %}
+      
+
+            <!-- Notice Table search end here -->
+
+       
+        <!-- Notice Table non-search starting here -->
+        <div class="table-wrapper">
+        <table class="table table-bordered">
+          <tr>
+            <th>ক্রমিক</th>
+            <th>শিরোনাম</th>
+            <th>প্রকাশের তারিখ</th>
+            <th>ডাউনলোড</th>
+          </tr>
+            {% for notices in notice %}
+          <tr>
+            <td>{{notices.id}}</td>
+            <td class="text-start">{{notices.title}}</td>            
+            <td>{{notices.notice_published_date}}</td>            
+            <td>
+                {% if notices.img_or_pdf %}
+              <a style="text-decoration:none" class='btn btn-primary btn-sm' href="{{notices.img_or_pdf.url}}" download="{{notices.img_or_pdf.url}}">Download<i class="ps-1 bi bi-download"></i></a> 
+                {% else %}
+              <a style="text-decoration:none" class='btn btn-primary btn-sm' target="_blank" href="{{notices.url_link}}">Download<i class="ps-1 bi bi-download"></i></a>
+                {% endif %}
+            </td>
+          </tr>
+            {% endfor %}
+          </table>
+          
+      {% endif %}
+        </div>
+
+          <!-- Notice Table non-search end here -->
+          
+         <!-- Pagination starting start here -->
+         <div class="row">
+          <div class="col-lg-6">
+            <div class="d-flex justify-content-start ms-2">
+              <ul class="pagination justify-content-center py-3">
+                    {% if notice.has_previous %}
+                  <li class="page-item"><a href="?page={{notice.previous_page_number}}" class="page-link">Previous</a></li>  
+                    {% else %}
+                  <li class="page-item disabled"><a href="" class="page-link">Previous</a></li>  
+                    {% endif %}
+                    {% if notice.has_previous %}
+                  <li class="page-item"><a href="?page={{notice.previous_page_number}}" class="page-link">{{notice.previous_page_number}}</a></li>  
+                    {% endif %}
+                  <li class="page-item active"><a href="?page={{notice.number}}" class="page-link">{{notice.number}}</a></li>  
+                    {% if notice.has_next %}
+                  <li class="page-item"><a href="?page={{notice.next_page_number}}" class="page-link">{{notice.next_page_number}}</a></li>
+                    {% endif %}
+                    {% if notice.has_next %}
+                  <li class="page-item"><a href="?page={{notice.next_page_number}}" class="page-link">Next</a></li>
+                    {% else %}
+                  <li class="page-item disabled"><a href="" class="page-link">Next</a></li>
+                    {% endif %}
+              </ul>   
+            </div>
+          </div>
+          <!-- Pagination end here -->
+          
+          <!-- Page Number show starting here -->
+          <div class="col-lg-6">
+            <div class="d-flex justify-content-lg-end me-3 mt-4">
+              <p class="text-dark">Showing Page {{notice.number}} out of {{notice.paginator.num_pages}}</p>
+            </div>
+            
+          </div>
+        </div>
+        <!-- Page Number show end here -->
+        
+        
+      </div>
+    </div>
+  </div>
+  {% endblock leftside %}
+</div>
+
+<!-- Pagination end here -->
+
+<!-- amader dristi end -->
+
+<!-- amader lokko start -->
+
+
+<!-- amader lokko end -->
+
+<!-- amader porichiti start -->
+
+<!-- amader pirichiti end -->
