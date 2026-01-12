@@ -174,49 +174,49 @@ class StudentsResultSpecific(
             result_dict[sub] = marks
 
         # Now result_dict will have subjects as keys and marks as values
-        print(result_dict)
+        # print(result_dict)
     
-        import os
-        import google.generativeai as genai
-        import json
+        # import os
+        # import google.generativeai as genai
+        # import json
 
-        # Configure API key from environment variable
-        api_key = "AIzaSyB0l6UWfcqQ5fHDhpYTA_LK0EL0_gKQYfM"
-        if not api_key:
-            raise ValueError("API key is missing. Please set the environment variable.")
+        # # Configure API key from environment variable
+        # api_key = "AIzaSyB0l6UWfcqQ5fHDhpYTA_LK0EL0_gKQYfM"
+        # if not api_key:
+        #     raise ValueError("API key is missing. Please set the environment variable.")
 
-        genai.configure(api_key=api_key)
+        # genai.configure(api_key=api_key)
 
-        # Create the model
-        generation_config = {
-            "temperature": 1,
-            "top_p": 0.95,
-            "top_k": 64,
-            "max_output_tokens": 8192,
-            "response_mime_type": "text/plain",
-        }
+        # # Create the model
+        # generation_config = {
+        #     "temperature": 1,
+        #     "top_p": 0.95,
+        #     "top_k": 64,
+        #     "max_output_tokens": 8192,
+        #     "response_mime_type": "text/plain",
+        # }
 
-        model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
-            generation_config=generation_config,
-        )
+        # model = genai.GenerativeModel(
+        #     model_name="gemini-1.5-flash",
+        #     generation_config=generation_config,
+        # )
 
-        chat_session = model.start_chat(
-            history=[]
-        )
+        # chat_session = model.start_chat(
+        #     history=[]
+        # )
 
-        try:
-            message = "Make a feedback and advise for students to this result: " + json.dumps(result_dict)
-            response_msg = chat_session.send_message(message)
-            # response = chat_session.send_message("Make a feedback to this result, this is a students result", result_dict)
-            print(response_msg.text)
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        # try:
+        #     message = "Make a feedback and advise for students to this result: " + json.dumps(result_dict)
+        #     response_msg = chat_session.send_message(message)
+        #     # response = chat_session.send_message("Make a feedback to this result, this is a students result", result_dict)
+        #     print(response_msg.text)
+        # except Exception as e:
+        #     print(f"An error occurred: {e}")
 
 
         context = {
             'results': result,
             'info': infos,
-            'ai_message': response_msg.text
+            # 'ai_message': response_msg.text
         }
         return render(request, 'dashboard/students_result_show.html', context)
