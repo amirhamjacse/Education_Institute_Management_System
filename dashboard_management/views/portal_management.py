@@ -29,6 +29,23 @@ class PortalManagerDashboard(
 
     def test_func(self):
         return self.request.user.is_active
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # import models here to avoid circular imports at module load
+        from students.models import StudentsInfo
+        from institute_dashaboard.models import Notice_board, News_headline, Gallery
+
+        context.update({
+            'total_students': StudentsInfo.objects.count(),
+            'total_notices': Notice_board.objects.count(),
+            'total_news': News_headline.objects.count(),
+            'total_gallery': Gallery.objects.count(),
+            'recent_notices': Notice_board.objects.order_by('-id')[:5],
+            'recent_news': News_headline.objects.order_by('-id')[:5],
+            'recent_gallery': Gallery.objects.order_by('-id')[:6],
+        })
+        return context
 
 
 
