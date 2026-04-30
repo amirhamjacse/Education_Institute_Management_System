@@ -1,104 +1,315 @@
-{% extends 'institute/base.html' %} 
-{% load static %} 
+{% extends 'institute/base.html' %}
+{% load static %}
 {% load widget_tweaks %}
+
 {% block title %}
-<title>Students Info add</title>
-{% endblock title %} 
+<title>Login | {{ webname.name_headline|default:"Institute Portal" }}</title>
+{% endblock title %}
 
-<!-- left side main things start from here -->
-{% block leftside %} 
+{% block leftside %}
 <style>
-  .divider:after,
-  .divider:before {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: #eee;
-}
+  .login-page {
+    min-height: 620px;
+    display: grid;
+    place-items: center;
+    padding: 28px 18px 40px;
+    margin: 12px 0 18px;
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid #d7e2dc;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  .login-shell {
+    width: min(1080px, 100%);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 440px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #dfe8e3;
+    border-radius: 10px;
+    box-shadow: 0 22px 48px rgba(18, 52, 38, 0.14);
+  }
+
+  .login-visual {
+    position: relative;
+    min-height: 540px;
+    padding: 42px;
+    color: #fff;
+    background:
+      linear-gradient(135deg, rgba(4, 91, 53, 0.94), rgba(8, 114, 67, 0.78)),
+      url("{% static 'institute/img/444.jpg' %}") center/cover;
+  }
+
+  .login-visual::after {
+    content: "";
+    position: absolute;
+    inset: auto 42px 42px 42px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.34);
+  }
+
+  .login-logo {
+    width: 78px;
+    height: 78px;
+    object-fit: contain;
+    padding: 8px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+  }
+
+  .login-visual h1 {
+    max-width: 680px;
+    margin: 34px 0 12px;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+
+  .login-visual p {
+    max-width: 560px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 1.08rem;
+    line-height: 1.75;
+  }
+
+  .login-points {
+    display: grid;
+    gap: 12px;
+    margin-top: 38px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .login-points li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255, 255, 255, 0.94);
+    font-weight: 700;
+  }
+
+  .login-points i {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 34px;
+    color: #045b35;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 8px;
+  }
+
+  .login-card {
+    padding: 44px 38px;
+    align-self: center;
+  }
+
+  .login-card h2 {
+    margin: 0;
+    color: #1b2838;
+    font-size: 1.85rem;
+    font-weight: 800;
+  }
+
+  .login-card .login-subtitle {
+    margin: 8px 0 28px;
+    color: #667085;
+    line-height: 1.6;
+  }
+
+  .login-alert {
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    color: #842029;
+    background: #f8d7da;
+    border: 1px solid #f1aeb5;
+    border-radius: 8px;
+  }
+
+  .login-field {
+    margin-bottom: 18px;
+  }
+
+  .login-field label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #34443c;
+    font-weight: 800;
+  }
+
+  .login-field .form-control {
+    min-height: 48px;
+    border-color: #d7e2dc;
+    border-radius: 8px;
+    box-shadow: none;
+  }
+
+  .login-field .form-control:focus {
+    border-color: #087243;
+    box-shadow: 0 0 0 0.2rem rgba(8, 114, 67, 0.14);
+  }
+
+  .login-field .invalid-feedback {
+    display: block;
+  }
+
+  .login-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 0 24px;
+    color: #667085;
+    font-size: 0.95rem;
+  }
+
+  .login-options a {
+    color: #087243;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .login-submit {
+    width: 100%;
+    min-height: 50px;
+    border: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #087243, #0f8b63);
+    font-weight: 800;
+    box-shadow: 0 14px 28px rgba(8, 114, 67, 0.22);
+  }
+
+  .login-footnote {
+    margin: 22px 0 0;
+    color: #667085;
+    font-size: 0.92rem;
+    text-align: center;
+  }
+
+  @media (max-width: 991.98px) {
+    .login-shell {
+      grid-template-columns: 1fr;
+    }
+
+    .login-visual {
+      min-height: auto;
+      padding: 30px;
+    }
+
+    .login-visual h1 {
+      margin-top: 22px;
+      font-size: 2rem;
+    }
+
+    .login-points {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 24px;
+    }
+
+    .login-card {
+      padding: 34px 28px;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .login-page {
+      padding: 12px 8px 24px;
+      margin: 8px 0 14px;
+    }
+
+    .login-visual {
+      padding: 22px;
+    }
+
+    .login-logo {
+      width: 62px;
+      height: 62px;
+    }
+
+    .login-points {
+      grid-template-columns: 1fr;
+    }
+
+    .login-card {
+      padding: 28px 18px;
+    }
+
+    .login-options {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
 </style>
-{% comment %} <form method="post">
-  {% csrf_token %}
-  <div class="card">
-    
-  <div class="card-body">
-    <p class="alert bg-success text-light text-center">Login</p>
 
-    {{ form.non_field_errors }}
-    <div class="fieldWrapper">
-        {{ form.username.errors }}
-        <label for="{{ form.username.id_for_label }}">Username/Email:</label>
-        
-        
-     
-      </div>
-      <div class="fieldWrapper">
-        {{ form.password.errors }}
-        <label for="{{ form.password.id_for_label }}">Password:</label>
-        {% render_field form.password|add_class:"form-control" %}
-        
+<section class="login-page bangla">
+  <div class="login-shell">
+    <div class="login-visual">
+      {% if webname.institute_logo %}
+      <img class="login-logo" src="{{ webname.institute_logo.url }}" alt="{{ webname.name_headline|default:'Institute' }}">
+      {% endif %}
+      <h1>{{ webname.name_headline|default:"Institute Portal" }}</h1>
+      <p>{{ webname.location|default:"Access your student dashboard, admission services, notices, and academic information from one secure portal." }}</p>
+      <ul class="login-points">
+        <li><i class="bi bi-shield-check"></i><span>Secure access</span></li>
+        <li><i class="bi bi-speedometer2"></i><span>Student dashboard</span></li>
+        <li><i class="bi bi-bell"></i><span>Latest notices</span></li>
+      </ul>
     </div>
-    <div>
 
-      <button class="btn btn-primary mt-2" type="submit">Login</button>
-    </div>
-    </div>
-</form>
-    
-</div>
+    <div class="login-card">
+      <h2>Welcome back</h2>
+      <p class="login-subtitle">Sign in with your registered email or username to continue.</p>
 
------ {% endcomment %}
-<div class="container-fluid">
-  <div class="card">
-    <div class="card-head">
-      <p class="alert bg-success text-light text-center">Login</p>
-    <div class="card-body">
-<section class="vh-10">
-  <div class="container py-5 h-100">
-    <div class="row d-flex align-items-center justify-content-center h-10">
-      <div class="col-md-8 col-lg-7 col-xl-6">
-        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
-          class="img-fluid" alt="Phone image">
-      </div>
-      <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
-        <form method="POST">
-          {% csrf_token %}
-          <!-- Email input -->
-          <div class="form-outline mb-4">
-            <label class="form-label" for="form1Example13">Email address</label>
-            {% render_field form.username|add_class:"form-control" %}
-            {% comment %} <input type="email" id="form1Example13" class="form-control form-control-lg" /> {% endcomment %}
+      <form method="POST" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="login-alert">
+          {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="login-field">
+          <label for="{{ form.username.id_for_label }}"><i class="bi bi-person"></i> Email or username</label>
+          {% render_field form.username class+="form-control" placeholder="Enter email or username" autocomplete="username" %}
+          {% for error in form.username.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="login-field">
+          <label for="{{ form.password.id_for_label }}"><i class="bi bi-lock"></i> Password</label>
+          {% render_field form.password class+="form-control" placeholder="Enter password" autocomplete="current-password" %}
+          {% for error in form.password.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="login-options">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="rememberLogin">
+            <label class="form-check-label" for="rememberLogin">Remember me</label>
           </div>
+          <a href="{% url 'contact' %}">Need help?</a>
+        </div>
 
-          <!-- Password input -->
-          <div class="form-outline mb-4">
-            <label class="form-label" for="form1Example23">Password</label>
-            {% render_field form.password|add_class:"form-control" %}
-            {% comment %} <input type="password" id="form1Example23" class="form-control form-control-lg" /> {% endcomment %}
-          </div>
+        <button type="submit" class="btn btn-success login-submit">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Sign in
+        </button>
+      </form>
 
-          <div class="d-flex justify-content-around align-items-center mb-4">
-            <!-- Checkbox -->
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="form1Example3" checked />
-              <label class="form-check-label" for="form1Example3"> Remember me </label>
-            </div>
-            <a style="text-decoration:none" href="#!">Forgot password?</a>
-          </div>
-
-          <!-- Submit button -->
-          <button type="submit" class="btn btn-primary btn-lg btn-block">Sign in</button>
-
-        </form>
-      </div>
+      <p class="login-footnote">For account access issues, please contact the institute office.</p>
     </div>
-  </div>
-  </div>
   </div>
 </section>
-</div>
-</div>
-
 {% endblock leftside %}
-{% block rightside %}
 
+{% block rightside %}
 {% endblock rightside %}

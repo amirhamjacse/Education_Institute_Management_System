@@ -6,11 +6,11 @@
 
 {% block leftside %} {% comment %} left side main things
 start from here {% endcomment %}
-<div class="container-fluid mb-2">
+<div class="container-fluid mb-2 hero-wrap">
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div width="60%" id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                <div width="60%" id="carouselExampleIndicators" class="carousel slide hero-carousel" data-bs-ride="carousel">
                     <div class="carousel-indicators">
                         <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
                         <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
@@ -30,6 +30,15 @@ start from here {% endcomment %}
                       <span class="carousel-control-next-icon" aria-hidden="true"></span>
                       <span class="visually-hidden">Next</span>
                     </button>
+                    <div class="hero-content bangla">
+                      <span class="hero-kicker">শিক্ষা • শৃঙ্খলা • উন্নয়ন</span>
+                      <h1>{{webname.name_headline}}</h1>
+                      <p>{{webname.location}}</p>
+                      <div class="hero-actions">
+                        <a class="btn btn-light" href="{% url 'onlineadm' %}"><i class="bi bi-pencil-square me-1"></i> অনলাইন ভর্তি</a>
+                        <a class="btn btn-outline-light" href="{% url 'notice_board' %}"><i class="bi bi-bell me-1"></i> নোটিশ দেখুন</a>
+                      </div>
+                    </div>
                   </div>
                 </div>
             </div>
@@ -37,9 +46,15 @@ start from here {% endcomment %}
     </div>
 </div>
 
-<div class="row">
-  <div class="col-lg-8 col-lg-8">
+<div class="row landing-grid g-3">
+  <div class="col-lg-8 landing-main">
     <div class="container-fluid pe-lg-0">
+      <div class="quick-actions bangla">
+        <a href="{% url 'students_info' %}"><i class="bi bi-people-fill"></i><span>শিক্ষার্থী তথ্য</span></a>
+        <a href="{% url 'result' %}"><i class="bi bi-award-fill"></i><span>ফলাফল</span></a>
+        <a href="{% url 'teachers_info' %}"><i class="bi bi-person-badge-fill"></i><span>শিক্ষক তালিকা</span></a>
+        <a href="{% url 'gallery' %}"><i class="bi bi-images"></i><span>গ্যালারি</span></a>
+      </div>
       {% comment %} <img
         class=""
         src="{{sinebord.sineboard_photo.url}}"
@@ -49,7 +64,7 @@ start from here {% endcomment %}
       {% comment %} <h4 class="py-2 text-center border bg-white bangla">
         <a style="text-decoration: none" href="{{sinebord.url_link}}">{{sinebord.title}}</a>
       </h4> {% endcomment %}
-      <div class="jumbo bangla">
+      <div class="jumbo bangla notice-board-panel">
         <div class="">
           <img
             src="{% static 'institute/img/bg-notice-board.png' %}"
@@ -58,7 +73,7 @@ start from here {% endcomment %}
           />
         </div>
         <div class="liste container py-4">
-          <h4>নোটিশ বোর্ড</h4>
+          <h4 class="section-heading">নোটিশ বোর্ড</h4>
 
           {% for a in notice %}
           <ul class="list">
@@ -116,10 +131,10 @@ start from here {% endcomment %}
       <!-- amader lokko end -->
 
       <!-- amader porichiti start -->
-      <div class="bg-success pt-3 ps-2 pb-1 mt-1">
+      <div class="bg-success pt-3 ps-2 pb-1 mt-1 section-title-bar">
         <h5 class="text-white bangla">অধ্যক্ষের বাণীঃ</h5>
       </div>
-      <p style="text-align: justify" class="bg-light py-2 bangla">
+      <p style="text-align: justify" class="bg-light py-2 bangla principal-message">
         {{qt.short_porichiti}}
       </p>
       <!-- amader pirichiti end -->
