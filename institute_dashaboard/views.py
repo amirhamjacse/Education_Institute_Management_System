@@ -280,8 +280,11 @@ class OnlineAdmissionView(View):
             name = form.student_name_en
             amount = form.admission_fee
             form.save()
-            messages.success(request, 'আবেদনটি সফলভাবে সম্পন্ন হয়েছে, ধন্যবাদ!!')
-            return redirect(sslcommerz_payment_gateway(request, name, amount))
+            payment_url = sslcommerz_payment_gateway(request, name, amount)
+            if payment_url:
+                messages.success(request, 'আবেদনটি সফলভাবে সম্পন্ন হয়েছে, ধন্যবাদ!!')
+                return redirect(payment_url)
+            return redirect('onlineadm')
             # return redirect('some_view_name')  # Replace with your desired redirect view
         else:
             webheading = Web_Heading.objects.last()
@@ -481,6 +484,7 @@ import random
 from django.conf import settings
 from sslcommerz_lib import SSLCOMMERZ
 from .models import PaymentGateway
+import logging
 
 
 def generator_trangection_id(size=7, chars=string.ascii_uppercase + string.digits):
@@ -500,8 +504,26 @@ def sslcommerz_payment_gateway(
     ):
  
     gateway = PaymentGateway.objects.all().first()
-    cradentials = {'store_id': gateway.store_id,
-            'store_pass': gateway.store_pass, 'issandbox': True} 
+    store_id = getattr(settings, 'SSLCOMMERZ_STORE_ID', None)
+    store_pass = getattr(settings, 'SSLCOMMERZ_STORE_PASS', None)
+
+    if gateway:
+        store_id = gateway.store_id or store_id
+        store_pass = gateway.store_pass or store_pass
+
+    if settings.DEBUG and (not store_id or not store_pass):
+        store_id = store_id or 'testbox'
+        store_pass = store_pass or 'qwerty'
+
+    if not store_id or not store_pass:
+        messages.error(
+            request,
+            'Payment gateway is not configured yet. Please contact the administrator.'
+        )
+        return None
+
+    cradentials = {'store_id': store_id,
+            'store_pass': store_pass, 'issandbox': True} 
             
     sslcommez = SSLCOMMERZ(cradentials)
     body = {}
@@ -526,6 +548,32 @@ def sslcommerz_payment_gateway(
     body['product_profile'] = "general"
     body['value_a'] = name
 
+    logger = logging.getLogger(__name__)
     response = sslcommez.createSession(body)
-    return 'https://sandbox.sslcommerz.com/gwprocess/v4/gw.php?Q=pay&SESSIONKEY=' + response["sessionkey"]
+
+    if not response:
+        logger.error('SSLCOMMERZ.createSession returned no response (None)')
+        messages.error(request, 'Payment service currently unavailable. Your application was submitted — please try again later or contact the administrator.')
+        return None
+
+    if not isinstance(response, dict):
+        logger.error('Unexpected createSession response type: %s', type(response))
+        messages.error(request, 'Payment service returned an unexpected response. Try again later.')
+        return None
+
+    # Try common keys returned by the library / API
+    gateway_url = None
+    if 'GatewayPageURL' in response and response.get('GatewayPageURL'):
+        gateway_url = response.get('GatewayPageURL')
+    elif 'redirectGatewayURL' in response and response.get('redirectGatewayURL'):
+        gateway_url = response.get('redirectGatewayURL')
+    elif 'sessionkey' in response and response.get('sessionkey'):
+        gateway_url = f'https://sandbox.sslcommerz.com/gwprocess/v4/gw.php?Q=pay&SESSIONKEY={response.get("sessionkey")}'
+
+    if not gateway_url:
+        logger.error('No gateway URL found in createSession response: %s', response)
+        messages.error(request, 'Payment session could not be created. Your application was saved — please try again later.')
+        return None
+
+    return gateway_url
 

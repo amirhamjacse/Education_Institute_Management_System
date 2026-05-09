@@ -1,94 +1,531 @@
-{% extends 'institute/base.html' %} 
-{% load static %} 
+{% extends 'institute/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
 {% block title %}
-<title>Online Addmission Form</title>
-{% endblock title %} 
+<title>Online Admission Form</title>
+{% endblock title %}
 
-<!-- left side main things start from here -->
-{% block leftside %} 
+{% block leftside %}
+<style>
+  .admission-page {
+    padding: 8px 0 18px;
+  }
 
-      <!-- student short info start -->
-<div class="row">
-    <div class="container-fluid">
-    <div class="container-fluid">
-      <div class="bg-success pt-3 ps-2 pb-1 ">
-        <h5 class="text-white bangla">অনলাইন ভর্তি আবেদন</h5>
-      </div>
-      <div class="bg-light border mt-1 py-2 text-center bangla">
-      
-            <div class="container">
-                {% if messages %}
-                {% for message in messages  %}
-                    <p {% if message.tags %} class="alert alert-{{message.tags}}" {% endif %}>
-                {{message}} </p>
-                    <a class="btn btn-primary btn-sm" href="{% url 'onlineadm' %}">Back</a> 
-                {% endfor %}
-            </div>
-          
+  .admission-shell {
+    overflow: hidden;
+    background: #f8fbf9;
+    border: 1px solid #dbe7e0;
+    border-radius: 18px;
+    box-shadow: 0 24px 56px rgba(18, 52, 38, 0.12);
+  }
 
-          {% else %}
-       <!--  search start here -->
-       <h4 class="text-start text-center mb-5">অনলাইন ভর্তি আবেদন এর জন্য নিচের ফরমটি সঠিকভাবে পূরণ করুন</h4>
-       <form action="" method="post" enctype="multipart/form-data">
-        <div class="container">
-                    
-            {% csrf_token %}
-            {{fm.as_p}}
-            <div class="d-grid gap-2">
-                <input class="mb-2 btn btn-primary btn-block" type="submit" value="Submit Information">
-            </form>
+  .admission-hero {
+    position: relative;
+    padding: clamp(20px, 3vw, 34px);
+    color: #fff;
+    background:
+      linear-gradient(135deg, rgba(4, 91, 53, 0.96), rgba(8, 114, 67, 0.84)),
+      radial-gradient(circle at top right, rgba(255, 255, 255, 0.22), transparent 30%),
+      url("{% static 'institute/img/44444.jpg' %}") center/cover;
+  }
+
+  .admission-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  .admission-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+
+  .admission-hero h1 {
+    margin: 14px 0 8px;
+    color: #fff;
+    font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+    font-weight: 900;
+    line-height: 1.1;
+  }
+
+  .admission-hero p {
+    max-width: 760px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.92);
+    line-height: 1.65;
+  }
+
+  .admission-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .admission-pills span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    font-weight: 700;
+    backdrop-filter: blur(8px);
+  }
+
+  .admission-content {
+    padding: clamp(12px, 2vw, 18px);
+  }
+
+  .admission-card,
+  .side-panel-card,
+  .side-panel-hero {
+    background: #fff;
+    border: 1px solid #e2ece5;
+    border-radius: 14px;
+    box-shadow: 0 14px 34px rgba(18, 52, 38, 0.08);
+    overflow: hidden;
+  }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 16px 18px;
+    border-bottom: 1px solid #e7eee9;
+  }
+
+  .section-head h2,
+  .section-head h4 {
+    margin: 0;
+    color: #173126;
+    font-weight: 900;
+  }
+
+  .section-head p {
+    margin: 0;
+    color: #667085;
+    font-weight: 600;
+  }
+
+  .message-card {
+    padding: 16px;
+  }
+
+  .form-body {
+    padding: 0 18px 18px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .form-group-card {
+    padding: 14px;
+    border: 1px solid #e7eee9;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #ffffff, #fbfdfc);
+  }
+
+  .form-group-card.full {
+    grid-column: 1 / -1;
+  }
+
+  .form-group-card label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #1b2838;
+    font-weight: 800;
+    line-height: 1.35;
+  }
+
+  .form-group-card .form-control,
+  .form-group-card .form-select {
+    min-height: 48px;
+    border-color: #d6e2db;
+    border-radius: 10px;
+    box-shadow: none;
+  }
+
+  .form-group-card textarea.form-control {
+    min-height: 104px;
+  }
+
+  .form-group-card .form-control:focus,
+  .form-group-card .form-select:focus {
+    border-color: #087243;
+    box-shadow: 0 0 0 0.2rem rgba(8, 114, 67, 0.12);
+  }
+
+  .field-errors {
+    margin-top: 6px;
+    color: #b42318;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .field-errors ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 6px 0 2px;
+  }
+
+  .form-actions .btn {
+    min-width: 180px;
+    min-height: 48px;
+    border-radius: 999px;
+    font-weight: 800;
+  }
+
+  .form-help {
+    padding: 0 18px 18px;
+    color: #5b6b64;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .form-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 18px;
+    border-top: 1px solid #eef3ee;
+    background: #f7fbf8;
+  }
+
+  .summary-item {
+    padding: 14px;
+    border: 1px solid #e7eee9;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .summary-item h3 {
+    margin: 0 0 6px;
+    color: #173126;
+    font-size: 1rem;
+    font-weight: 900;
+  }
+
+  .summary-item p {
+    margin: 0;
+    color: #667085;
+    line-height: 1.55;
+  }
+
+  .side-stack {
+    display: grid;
+    gap: 14px;
+    align-content: start;
+    position: sticky;
+    top: 12px;
+  }
+
+  .side-panel-hero {
+    padding: 16px;
+    background: linear-gradient(180deg, #ffffff, #f7fbf8);
+  }
+
+  .side-panel-hero h3 {
+    margin: 10px 0 6px;
+    color: #173126;
+    font-weight: 900;
+  }
+
+  .side-panel-hero p,
+  .side-checklist li,
+  .side-panel-card p {
+    color: #51615a;
+    line-height: 1.6;
+  }
+
+  .side-panel-head {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid #e7eee9;
+  }
+
+  .side-panel-head h4 {
+    margin: 0;
+    color: #173126;
+    font-weight: 900;
+  }
+
+  .side-checklist {
+    margin: 0;
+    padding: 16px 18px 18px;
+    list-style: none;
+  }
+
+  .side-checklist li {
+    position: relative;
+    padding-left: 26px;
+    margin-bottom: 10px;
+  }
+
+  .side-checklist li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 11px;
+    height: 11px;
+    border-radius: 999px;
+    background: #087243;
+    box-shadow: 0 0 0 4px rgba(8, 114, 67, 0.12);
+  }
+
+  @media (max-width: 991.98px) {
+    .form-grid,
+    .form-summary {
+      grid-template-columns: 1fr;
+    }
+
+    .side-stack {
+      position: static;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .admission-content,
+    .form-body,
+    .form-help {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    .section-head {
+      padding: 14px;
+    }
+
+    .form-actions .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="container-fluid admission-page">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="admission-shell">
+        <div class="admission-hero bangla">
+          <span class="admission-badge"><i class="bi bi-file-earmark-text"></i> অনলাইন ভর্তি আবেদন</span>
+          <h1>এক জায়গায় গুছানো, পরিষ্কার এবং নির্ভরযোগ্য ভর্তি ফর্ম</h1>
+          <p>নিচের তথ্যগুলো যত্ন করে পূরণ করুন। স্পষ্ট নাম, সঠিক নম্বর, এবং মানসম্মত ছবি দিলে আবেদন প্রক্রিয়া আরও দ্রুত সম্পন্ন হয়।</p>
+          <div class="admission-pills">
+            <span><i class="bi bi-shield-check"></i> নিরাপদ ফর্ম</span>
+            <span><i class="bi bi-phone"></i> মোবাইল ফ্রেন্ডলি</span>
+            <span><i class="bi bi-clock-history"></i> দ্রুত প্রসেসিং</span>
+          </div>
         </div>
+
+        <div class="admission-content">
+          {% if messages %}
+            <div class="message-card">
+              {% for message in messages %}
+                <div class="alert {% if 'success' in message.tags %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show bangla mb-3" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+              <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center bangla">
+                <a class="btn btn-success" href="{% url 'homepage' %}"><i class="bi bi-house-door"></i> হোম পেজ</a>
+                <a class="btn btn-outline-success" href="{% url 'onlineadm' %}"><i class="bi bi-arrow-repeat"></i> নতুন আবেদন</a>
+              </div>
+            </div>
+          {% else %}
+            <div class="section-head bangla">
+              <div>
+                <h2>আবেদন ফর্ম</h2>
+                <p>অনুগ্রহ করে সব তথ্য সঠিকভাবে লিখুন</p>
+              </div>
+              <div class="text-muted fw-semibold">* চিহ্নিত তথ্যগুলো যাচাইযোগ্য রাখুন</div>
+            </div>
+
+            {% if fm.non_field_errors %}
+              <div class="message-card bangla">
+                <div class="alert alert-danger mb-0">{{ fm.non_field_errors }}</div>
+              </div>
             {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="form-body bangla">
+              {% csrf_token %}
+
+              <div class="form-grid">
+                <div class="form-group-card">
+                  <label for="{{ fm.student_name_bn.id_for_label }}">{{ fm.student_name_bn.label }}</label>
+                  {% render_field fm.student_name_bn placeholder="আপনার পূর্ণ নাম" %}
+                  <div class="field-errors">{{ fm.student_name_bn.errors }}</div>
+                </div>
+
+                <div class="form-group-card">
+                  <label for="{{ fm.student_name_en.id_for_label }}">{{ fm.student_name_en.label }}</label>
+                  {% render_field fm.student_name_en placeholder="Your full name" %}
+                  <div class="field-errors">{{ fm.student_name_en.errors }}</div>
+                </div>
+
+                <div class="form-group-card">
+                  <label for="{{ fm.student_father_name_bn.id_for_label }}">{{ fm.student_father_name_bn.label }}</label>
+                  {% render_field fm.student_father_name_bn placeholder="পিতার নাম" %}
+                  <div class="field-errors">{{ fm.student_father_name_bn.errors }}</div>
+                </div>
+
+                <div class="form-group-card">
+                  <label for="{{ fm.student_father_name_en.id_for_label }}">{{ fm.student_father_name_en.label }}</label>
+                  {% render_field fm.student_father_name_en placeholder="Father name" %}
+                  <div class="field-errors">{{ fm.student_father_name_en.errors }}</div>
+                </div>
+
+                <div class="form-group-card">
+                  <label for="{{ fm.student_mother_name_bn.id_for_label }}">{{ fm.student_mother_name_bn.label }}</label>
+                  {% render_field fm.student_mother_name_bn placeholder="মাতার নাম" %}
+                  <div class="field-errors">{{ fm.student_mother_name_bn.errors }}</div>
+                </div>
+
+                <div class="form-group-card">
+                  <label for="{{ fm.student_mother_name_en.id_for_label }}">{{ fm.student_mother_name_en.label }}</label>
+                  {% render_field fm.student_mother_name_en placeholder="Mother name" %}
+                  <div class="field-errors">{{ fm.student_mother_name_en.errors }}</div>
+                </div>
+
+                <div class="form-group-card">
+                  <label for="{{ fm.gender_choise.id_for_label }}">{{ fm.gender_choise.label }}</label>
+                  {% render_field fm.gender_choise %}
+                  <div class="field-errors">{{ fm.gender_choise.errors }}</div>
+                </div>
+
+                <div class="form-group-card">
+                  <label for="{{ fm.date_of_birth.id_for_label }}">{{ fm.date_of_birth.label }}</label>
+                  {% render_field fm.date_of_birth %}
+                  <div class="field-errors">{{ fm.date_of_birth.errors }}</div>
+                </div>
+
+                <div class="form-group-card">
+                  <label for="{{ fm.student_number.id_for_label }}">{{ fm.student_number.label }}</label>
+                  {% render_field fm.student_number placeholder="Applicant mobile number" %}
+                  <div class="field-errors">{{ fm.student_number.errors }}</div>
+                </div>
+
+                <div class="form-group-card">
+                  <label for="{{ fm.gurdian_number.id_for_label }}">{{ fm.gurdian_number.label }}</label>
+                  {% render_field fm.gurdian_number placeholder="Guardian mobile number" %}
+                  <div class="field-errors">{{ fm.gurdian_number.errors }}</div>
+                </div>
+
+                <div class="form-group-card full">
+                  <label for="{{ fm.present_address.id_for_label }}">{{ fm.present_address.label }}</label>
+                  {% render_field fm.present_address placeholder="বর্তমান ঠিকানা" %}
+                  <div class="field-errors">{{ fm.present_address.errors }}</div>
+                </div>
+
+                <div class="form-group-card full">
+                  <label for="{{ fm.permanent_address.id_for_label }}">{{ fm.permanent_address.label }}</label>
+                  {% render_field fm.permanent_address placeholder="স্থায়ী ঠিকানা" %}
+                  <div class="field-errors">{{ fm.permanent_address.errors }}</div>
+                </div>
+
+                <div class="form-group-card">
+                  <label for="{{ fm.online_admission_pic.id_for_label }}">{{ fm.online_admission_pic.label }}</label>
+                  {% render_field fm.online_admission_pic accept="image/*" %}
+                  <div class="field-errors">{{ fm.online_admission_pic.errors }}</div>
+                </div>
+
+                <div class="form-group-card">
+                  <label for="{{ fm.admission_fee.id_for_label }}">{{ fm.admission_fee.label }}</label>
+                  {% render_field fm.admission_fee placeholder="Admission fee" %}
+                  <div class="field-errors">{{ fm.admission_fee.errors }}</div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="reset" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i> রিসেট</button>
+                <button type="submit" class="btn btn-success"><i class="bi bi-send"></i> আবেদন জমা দিন</button>
+              </div>
+            </form>
+
+            <div class="form-help bangla">
+              তথ্য জমা দেওয়ার আগে বানান, মোবাইল নম্বর, এবং ছবি একবার দেখে নিন। ভুল তথ্য থাকলে প্রক্রিয়ায় দেরি হতে পারে।
+            </div>
+
+            <div class="form-summary bangla">
+              <div class="summary-item">
+                <h3>শুরু করুন</h3>
+                <p>নাম, মোবাইল এবং জন্মতারিখ আগে প্রস্তুত রাখলে ফর্ম পূরণ আরও দ্রুত হয়।</p>
+              </div>
+              <div class="summary-item">
+                <h3>ছবি আপলোড</h3>
+                <p>সুস্পষ্ট ছবি ব্যবহার করুন, যাতে যাচাইয়ের সময় তথ্য সহজে মিলিয়ে দেখা যায়।</p>
+              </div>
+              <div class="summary-item">
+                <h3>জমা দেওয়ার পর</h3>
+                <p>সফল বার্তা দেখলে পরের ধাপে যেতে পারবেন বা নতুন আবেদন শুরু করতে পারবেন।</p>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
-            <!-- students info table by search end here -->
-                <!-- student short info end -->
-               
+    <div class="col-lg-4">
+      <aside class="side-stack">
+        <div class="side-panel-hero bangla">
+          <span class="admission-badge"><i class="bi bi-info-circle"></i> নির্দেশনা</span>
+          <h3>আবেদন করার আগে এই তিনটি বিষয় দেখে নিন</h3>
+          <p>ফর্মটি জমা দেওয়ার আগে নাম, মোবাইল নম্বর, ঠিকানা এবং ছবি মিলিয়ে নিলে পরবর্তীতে সম্পাদনার প্রয়োজন কমে।</p>
+        </div>
 
-          
-     
+        <div class="side-panel-card bangla">
+          <div class="side-panel-head">
+            <h4>চেকলিস্ট</h4>
+          </div>
+          <ul class="side-checklist">
+            <li>বাংলা ও ইংরেজি নাম মিলিয়ে লিখুন</li>
+            <li>সক্রিয় ফোন নম্বর ব্যবহার করুন</li>
+            <li>ছবি স্পষ্ট এবং সাম্প্রতিক রাখুন</li>
+            <li>জমা দেওয়ার আগে ঠিকানা যাচাই করুন</li>
+          </ul>
+        </div>
 
- 
-          <!-- Notice Table non-search end here -->
-          
-         <!-- Pagination starting start here -->
-         
-          <!-- Pagination end here -->
-          
-          <!-- Page Number show starting here -->
-          
-        <!-- Page Number show end here -->
-        
-        
-      </div>
+        <div class="side-panel-card bangla">
+          <div class="side-panel-head">
+            <h4>সহায়তা</h4>
+          </div>
+          <div class="p-4 pt-3">
+            <p class="mb-3">কোনো তথ্য বুঝতে সমস্যা হলে প্রতিষ্ঠানের অফিসে যোগাযোগ করুন অথবা হোম পেজ থেকে অন্যান্য তথ্য দেখে নিন।</p>
+            <div class="d-grid gap-2">
+              <a class="btn btn-outline-success" href="{% url 'homepage' %}">হোম পেজ দেখুন</a>
+              <a class="btn btn-success" href="{% url 'contact' %}">যোগাযোগ করুন</a>
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
   </div>
-  {% endblock leftside %}
-  {% block rightside %}
+</div>
+{% endblock leftside %}
 
-  {% endblock rightside %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-   
-</body>
-</html>
+{% block rightside %}{% endblock rightside %}
