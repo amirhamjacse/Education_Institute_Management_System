@@ -6,392 +6,349 @@
 
 <!-- left side main things start from here -->
 {% block leftside %} 
+<style>
+  .result-shell {
+    --result-primary: #0f6a5a;
+    --result-primary-deep: #0b4f43;
+    --result-soft: #e9f7f3;
+    --result-card: #ffffff;
+    --result-border: #d6e5df;
+    --result-text: #1f2d2a;
+    --result-muted: #5b6f6a;
+    background: radial-gradient(circle at 15% 20%, #edf9f6 0%, #f7fbfa 42%, #eef4f2 100%);
+    border: 1px solid var(--result-border);
+    border-radius: 18px;
+    box-shadow: 0 16px 35px rgba(11, 79, 67, 0.1);
+    margin: 14px 0 22px;
+    padding: 18px;
+  }
 
-      <!-- student short info start -->
+  .result-hero {
+    background: linear-gradient(125deg, var(--result-primary) 0%, #19866f 58%, #37a487 100%);
+    border-radius: 14px;
+    color: #fff;
+    margin-bottom: 16px;
+    padding: 22px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-hero:before,
+  .result-hero:after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .result-hero:before {
+    width: 180px;
+    height: 180px;
+    right: -70px;
+    top: -40px;
+  }
+
+  .result-hero:after {
+    width: 130px;
+    height: 130px;
+    right: 32px;
+    bottom: -78px;
+  }
+
+  .result-title {
+    font-size: 1.32rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .result-subtitle {
+    margin: 0;
+    opacity: 0.96;
+    position: relative;
+    z-index: 1;
+  }
+
+  .result-card {
+    background: var(--result-card);
+    border: 1px solid var(--result-border);
+    border-radius: 14px;
+    box-shadow: 0 8px 22px rgba(16, 55, 47, 0.06);
+    margin-bottom: 18px;
+    padding: 16px;
+  }
+
+  .result-grid {
+    row-gap: 10px;
+  }
+
+  .result-label {
+    color: var(--result-text);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .result-input {
+    border: 1px solid #c5d9d3;
+    border-radius: 10px;
+    box-shadow: none;
+    min-height: 42px;
+  }
+
+  .result-input:focus {
+    border-color: #69ad9b;
+    box-shadow: 0 0 0 0.2rem rgba(25, 134, 111, 0.18);
+  }
+
+  .result-btn {
+    background: var(--result-primary);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 600;
+    min-height: 44px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+
+  .result-btn:hover {
+    background: var(--result-primary-deep);
+    box-shadow: 0 10px 20px rgba(11, 79, 67, 0.25);
+    transform: translateY(-1px);
+  }
+
+  .result-note {
+    background: var(--result-soft);
+    border: 1px dashed #9bc8bb;
+    border-radius: 12px;
+    color: var(--result-muted);
+    margin-top: 12px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+
+  .result-summary {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 14px;
+  }
+
+  .result-summary-item {
+    background: #f5faf8;
+    border: 1px solid #deebe7;
+    border-radius: 11px;
+    padding: 10px 12px;
+  }
+
+  .result-summary-item strong {
+    color: var(--result-text);
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+  }
+
+  .result-summary-item span {
+    color: var(--result-muted);
+    font-size: 0.98rem;
+    word-break: break-word;
+  }
+
+  .result-table {
+    border: 1px solid #cddfda;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .result-table thead th {
+    background: #eef7f4;
+    border-bottom: 1px solid #cddfda;
+    color: var(--result-text);
+    font-weight: 700;
+  }
+
+  .result-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .result-outline-btn {
+    border-color: var(--result-primary);
+    color: var(--result-primary);
+  }
+
+  .result-outline-btn:hover {
+    background: var(--result-primary);
+    color: #fff;
+  }
+
+  @media (max-width: 767px) {
+    .result-shell {
+      padding: 12px;
+    }
+
+    .result-summary {
+      grid-template-columns: 1fr;
+    }
+
+    .result-title {
+      font-size: 1.12rem;
+    }
+  }
+
+  @media print {
+    .result-shell {
+      border: none;
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .result-card,
+    .result-hero {
+      border: 1px solid #c9c9c9;
+      box-shadow: none;
+    }
+
+    .result-actions,
+    .result-form-panel {
+      display: none;
+    }
+  }
+</style>
+
 <div class="row">
-    <div class="container-fluid">
-    <div class="container-fluid">
-      {% if not result %}
-      <div class="bg-success pt-3 ps-2 pb-1 ">
-        <h5 class="text-white bangla">রেজাল্ট</h5>
-      </div>
-      <div class="bg-light border mt-1 py-2 text-center bangla">
-      
-
-      <!-- select menu ends -->
-        {% comment %} {% if is_false == result %} {% endcomment %}
-
-
-       <!--  search start here -->
-       {% comment %} <h4 class="text-start text-center ps-1 ">রেজাল্ট পেতে সঠিক তথ্য সিলেক্ট করুন</h4>
-       <div class="container">
-        <p class="py-1 mt-4 alert alert-danger">No Result Found, First Select</p>
-      </div>
-       
-       <div class="container-fluid">
-        <label class="d-flex justify-content-start my-2" for="select">শ্রেনী</label>
-                <form action="" method="post">
-                  {% csrf_token %}
-                    <select class=" form-select mb-1" name="result3" id="">
-                      <option value="six" selected>Six</option>
-                      <option value="seven">Seven</option>
-                      <option value="eight">Eight</option>
-                      <option value="nine">Nine</option>
-                      <option value="ten">Ten</option>
-                    </select>
-
-        <label class="d-flex justify-content-start my-2" for="select">সেশন</label>
-          <select class=" form-select mb-1" name="result4" id="">
-            <option value="2022"selected>2022</option>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="2027">2027</option>
-          </select>
-        <label class="d-flex justify-content-start my-2" for="select">পরীক্ষার বছর</label>
-          <select class=" form-select mb-1" name="result5" id="">
-            <option value="2022"selected>2022</option>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="2027">2027</option>
-          </select>
-        <label class="d-flex justify-content-start my-2" for="select">পরীক্ষার ধরন</label>
-          <select class=" form-select mb-1" name="result6" id="">
-            <option value="Mid"selected>Mid</option>
-            <option value="Final">Final</option>
-          </select>
-          <label class="d-flex justify-content-start my-2" for="select">ইউনিক রোল</label>
-            <input type="number" class="form-control" name="result7" id="" required>
-            <div class="container my-3">
-                <div class="d-grid gap-2">
-                  <input class="mb-2 btn btn-primary btn-block" type="submit" value="Get Result">
-                </form>
-                </div>
-              </div>
-      </div>  {% endcomment %}
-      <h4 class="text-start text-center ps-1">রেজাল্ট পেতে সঠিক তথ্য সিলেক্ট করুন</h4>
-<div class="container">
-    <p class="py-1 mt-4 alert alert-danger">No Result Found, First Select</p>
-</div>
-
-<div class="container-fluid">
-  <form action="" method="post">
-      {% csrf_token %}
-      <div class="row mb-2">
-          <div class="col-md-6">
-              <label class="d-flex justify-content-start my-2" for="result3">শ্রেনী</label>
-              <select class="form-select" name="result3" id="result3">
-                  <option value="six" selected>Six</option>
-                  <option value="seven">Seven</option>
-                  <option value="eight">Eight</option>
-                  <option value="nine">Nine</option>
-                  <option value="ten">Ten</option>
-              </select>
-          </div>
-          <div class="col-md-6">
-              <label class="d-flex justify-content-start my-2" for="result4">সেশন</label>
-              <select class="form-select" name="result4" id="result4">
-                  <option value="2022" selected>2022</option>
-                  <option value="2023">2023</option>
-                  <option value="2024">2024</option>
-                  <option value="2025">2025</option>
-                  <option value="2026">2026</option>
-                  <option value="2027">2027</option>
-              </select>
-          </div>
-      </div>
-
-      <div class="row mb-2">
-          <div class="col-md-6">
-              <label class="d-flex justify-content-start my-2" for="result5">পরীক্ষার বছর</label>
-              <select class="form-select" name="result5" id="result5">
-                  <option value="2022" selected>2022</option>
-                  <option value="2023">2023</option>
-                  <option value="2024">2024</option>
-                  <option value="2025">2025</option>
-                  <option value="2026">2026</option>
-                  <option value="2027">2027</option>
-              </select>
-          </div>
-          <div class="col-md-6">
-              <label class="d-flex justify-content-start my-2" for="result6">পরীক্ষার ধরন</label>
-              <select class="form-select" name="result6" id="result6">
-                  <option value="Mid" selected>Mid</option>
-                  <option value="Final">Final</option>
-              </select>
-          </div>
-      </div>
-
-      <div class="row mb-2">
-          <div class="col-md-6">
-              <label class="d-flex justify-content-start my-2" for="result7">ইউনিক রোল</label>
-              <input type="number" class="form-control" name="result7" id="result7" required>
-          </div>
-          <div class="col-md-6">
-              <!-- You can place another input or leave it empty for spacing -->
-          </div>
-      </div>
-
-      <div class="container my-3">
-          <div class="d-grid gap-2">
-              <input class="mb-2 btn btn-primary btn-block" type="submit" value="Get Result">
-          </div>
-      </div>
-  </form>
-</div>
-
-
-
-      
-
-      {% elif result %}
-      {% for stinfos in result %}
-      <div class="bg-success pt-3 ps-2 pb-1 ">
-        <h5 class="text-white bangla text-center">{{stinfos.exam_type}} Result {{stinfos.exam_year}}</h5>
-      </div>
-      <div class="bg-light border mt-1 text-center bangla">
-    <div class="container">
-      <div class="table-wrapper">
-        <table  class="table table-bordered text-start">
-            <tr>
-              <td>Unique Roll No</td>
-              <td>{{stinfos.unique_roll}}</td>            
-              <td>Registrtion No</td>
-              <td>[No Regi no]</td>            
-            </tr>
-            <tr>
-              <td>Name of Student</td>
-              <td colspan="3">{{stinfos.students_name}}</td>            
-            </tr>
-            <tr>
-              <td>Class/Department</td>
-              <td>{{stinfos.class_name}}</td>            
-              <td>Session</td>
-              <td>{{stinfos.session}}</td>            
-            </tr>
-           
-            <tr>
-              <td>Exam Type</td>
-              <td>{{stinfos.exam_type}}</td>            
-              <td>Exam Year</td>
-              <td>{{stinfos.exam_year}}</td>            
-            </tr>
-            <tr>
-              <td>GPA</td>
-              <td>{{stinfos.grade_gpa}}</td>            
-              <td>Grade Letter</td>
-              <td>{{stinfos.grade_letter}}</td>            
-            </tr>
-            
-            <tr>
-              {% if stinfos.sub1_name %}
-              <td colspan="2">{{stinfos.sub1_name}}</td>
-              <td colspan="2">{{stinfos.sub1_number}}</td>  
-              {% endif %}          
-            </tr>
-            <tr>
-              {% if stinfos.sub2_name %}
-              <td colspan="2">{{stinfos.sub2_name}}</td>
-              <td colspan="2">{{stinfos.sub2_number}}</td>  
-              {% endif %}          
-            </tr>
-            <tr>
-              {% if stinfos.sub3_name %}
-              <td colspan="2">{{stinfos.sub3_name}}</td>
-              <td colspan="2">{{stinfos.sub3_number}}</td>  
-              {% endif %}          
-            </tr>
-            <tr>
-              {% if stinfos.sub4_name %}
-              <td colspan="2">{{stinfos.sub4_name}}</td>
-              <td colspan="2">{{stinfos.sub4_number}}</td>  
-              {% endif %}          
-            </tr>
-            <tr>
-              {% if stinfos.sub5_name %}
-              <td colspan="2">{{stinfos.sub5_name}}</td>
-              <td colspan="2">{{stinfos.sub5_number}}</td>  
-              {% endif %}          
-            </tr>
-            <tr>
-              {% if stinfos.sub6_name %}
-              <td colspan="2">{{stinfos.sub6_name}}</td>
-              <td colspan="2">{{stinfos.sub6_number}}</td>  
-              {% endif %}          
-            </tr>
-            <tr>
-              {% if stinfos.sub7_name %}
-              <td colspan="2">{{stinfos.sub7_name}}</td>
-              <td colspan="2">{{stinfos.sub7_number}}</td>  
-              {% endif %}          
-            </tr>
-            <tr>
-              {% if stinfos.sub8_name %}
-              <td colspan="2">{{stinfos.sub8_name}}</td>
-              <td colspan="2">{{stinfos.sub8_number}}</td>  
-              {% endif %}          
-            </tr>
-            <tr>
-              {% if stinfos.sub9_name %}
-              <td colspan="2">{{stinfos.sub9_name}}</td>
-              <td colspan="2">{{stinfos.sub9_number}}</td>  
-              {% endif %}          
-            </tr>
-            <tr>
-              {% if stinfos.sub10_name %}
-              <td colspan="2">{{stinfos.sub10_name}}</td>
-              <td colspan="2">{{stinfos.sub10_number}}</td>  
-              {% endif %}          
-            </tr>
-                  {% endfor %}
-        </table>
-      </div>
+  <div class="col-lg-8">
+    <div class="container-fluid pe-lg-0">
+  <section class="result-shell bangla">
+    <div class="result-hero">
+      <h1 class="result-title mb-0"><i class="bi bi-award-fill me-2"></i>পরীক্ষার ফলাফল</h1>
+      <p class="result-subtitle">সঠিক তথ্য নির্বাচন করে দ্রুত এবং নির্ভুলভাবে ফলাফল দেখুন</p>
     </div>
 
+    <div class="result-card result-form-panel">
+      <form action="" method="post">
+        {% csrf_token %}
+        <div class="row result-grid">
+          <div class="col-md-6">
+            <label class="result-label" for="result3">শ্রেণী</label>
+            <select class="form-select result-input" name="result3" id="result3" required>
+              <option value="six" selected>Six</option>
+              <option value="seven">Seven</option>
+              <option value="eight">Eight</option>
+              <option value="nine">Nine</option>
+              <option value="ten">Ten</option>
+            </select>
+          </div>
 
+          <div class="col-md-6">
+            <label class="result-label" for="result4">সেশন</label>
+            <select class="form-select result-input" name="result4" id="result4" required>
+              <option value="2022" selected>2022</option>
+              <option value="2023">2023</option>
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
 
+          <div class="col-md-6">
+            <label class="result-label" for="result5">পরীক্ষার বছর</label>
+            <select class="form-select result-input" name="result5" id="result5" required>
+              <option value="2022" selected>2022</option>
+              <option value="2023">2023</option>
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
 
+          <div class="col-md-6">
+            <label class="result-label" for="result6">পরীক্ষার ধরন</label>
+            <select class="form-select result-input" name="result6" id="result6" required>
+              <option value="Mid" selected>Mid</option>
+              <option value="Final">Final</option>
+            </select>
+          </div>
 
-      {% comment %} {% for m in result %}
-      
-      <p>{{m.students_name}}</p>
-      <p>{{m.class_name}}</p>
-      {% if m.sub1_name %}
-      <p>{{m.sub1_name}}</p>
-      <p>{{m.sub1_number}}</p>
-      {% endif %}
-      {% if m.sub2_name %}
-      <p>{{m.sub2_name}}</p>
-      <p>{{m.sub2_number}}</p>
-      {% endif %}
-      {% endfor %} {% endcomment %}
-      
-      {% comment %} {% else %} {% endcomment %}
-      <div class="btn-group">
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'result' %}">Search Again</a>
-        <a class="btn btn-outline-primary btn-sm" onClick="window.print()">Print result</a>
+          <div class="col-md-6">
+            <label class="result-label" for="result7">ইউনিক রোল</label>
+            <input type="number" class="form-control result-input" name="result7" id="result7" required>
+          </div>
+
+          <div class="col-md-6 d-flex align-items-end">
+            <button class="btn result-btn w-100" type="submit">
+              <i class="bi bi-search me-1"></i> Get Result
+            </button>
+          </div>
+        </div>
+      </form>
+
+      {% if not result %}
+      <div class="result-note">
+        পরীক্ষার ফলাফল পেতে উপরের তথ্যগুলো পূরণ করুন
       </div>
-      
- 
       {% endif %}
-       
-       
-       {% comment %} <div class="container-fluid mb-5">
-            <form action="" method="POST">
-              {% csrf_token %}
-                <div class="input-group mb-3">
-                    <input type="search" name="students_search3" class="form-control" placeholder="Name and Roll">
-                    <button type="submit"  class="btn btn-primary btn-sm">
-                        <i class="bi bi-search"></i> Search
-                    </button>
-                </div>
-            </form>
-        </div> {% endcomment %}
+    </div>
 
-    <!--  search end here -->
-        
-    
-    <!-- students info table by select menu starting here -->
-    {% if student_info %}
-        {% if st == 'six' %}
-        <div class="bg-dark text-white py-2">ষষ্ঠ শ্রেনীর ছাত্রছাত্রীর ইনফরমেশন</div>
-        {% endif %}
-        {% if st == 'seven' %}
-        <div class="bg-dark text-white py-2">সপ্তম শ্রেনীর ছাত্রছাত্রীর ইনফরমেশন</div>
-        {% endif %}
-        {% if st == 'eight' %}
-        <div class="bg-dark text-white py-2">অষ্টম শ্রেনীর ছাত্রছাত্রীর ইনফরমেশন</div>
-        {% endif %}
-        {% if st == 'nine' %}
-        <div class="bg-dark text-white py-2">নবম শ্রেনীর ছাত্রছাত্রীর ইনফরমেশন</div>
-        {% endif %}
-        {% if st == 'ten' %}
-        <div class="bg-dark text-white py-2">দশম শ্রেনীর ছাত্রছাত্রীর ইনফরমেশন</div>
-        {% endif %}
-        
+    {% if result %}
+      {% for stinfos in result %}
+      <article class="result-card">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+          <h2 class="h5 m-0 text-success fw-bold">{{stinfos.exam_type}} Result {{stinfos.exam_year}}</h2>
+          <span class="badge bg-success-subtle text-success border border-success-subtle">Unique Roll: {{stinfos.unique_roll}}</span>
+        </div>
 
-        <div class="table-wrapper">
-          <table  class="table table-bordered">
+        <div class="result-summary">
+          <div class="result-summary-item"><strong>Name</strong><span>{{stinfos.students_name}}</span></div>
+          <div class="result-summary-item"><strong>Class / Department</strong><span>{{stinfos.class_name}}</span></div>
+          <div class="result-summary-item"><strong>Session</strong><span>{{stinfos.session}}</span></div>
+          <div class="result-summary-item"><strong>Exam Type</strong><span>{{stinfos.exam_type}}</span></div>
+          <div class="result-summary-item"><strong>Exam Year</strong><span>{{stinfos.exam_year}}</span></div>
+          <div class="result-summary-item"><strong>Registration No</strong><span>N/A</span></div>
+          <div class="result-summary-item"><strong>GPA</strong><span>{{stinfos.grade_gpa}}</span></div>
+          <div class="result-summary-item"><strong>Grade Letter</strong><span>{{stinfos.grade_letter}}</span></div>
+        </div>
+
+        <div class="table-responsive result-table">
+          <table class="table table-striped table-hover mb-0">
+            <thead>
               <tr>
-                  <th>শিক্ষার্থীর নাম</th>
-                  <th>পিতার নাম</th>           
-                  <th>রোল</th>            
-                  <th>সেশন</th>
-                  <th>শ্রেনী</th>
-                  <th>বিস্তারিত</th>
-                </tr>
-                    {% for stinfos in student_info %}
-                <tr>
-                  <td>{{stinfos.student_name}}</td>            
-                  <td>{{stinfos.fathers_name}}</td>                  
-                  <td>{{stinfos.unique_roll}}</td>            
-                  <td>{{stinfos.seasion}}</td>            
-                  <td>{{stinfos.class_name}}</td>            
-                  <td><a class="btn btn-primary btn-sm" href="{% url 'students_details' stinfos.id %}">Details</a></td>          
-                </tr>
-                    {% endfor %}
+                <th scope="col">Subject</th>
+                <th scope="col">Marks</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if stinfos.sub1_name %}<tr><td>{{stinfos.sub1_name}}</td><td>{{stinfos.sub1_number}}</td></tr>{% endif %}
+              {% if stinfos.sub2_name %}<tr><td>{{stinfos.sub2_name}}</td><td>{{stinfos.sub2_number}}</td></tr>{% endif %}
+              {% if stinfos.sub3_name %}<tr><td>{{stinfos.sub3_name}}</td><td>{{stinfos.sub3_number}}</td></tr>{% endif %}
+              {% if stinfos.sub4_name %}<tr><td>{{stinfos.sub4_name}}</td><td>{{stinfos.sub4_number}}</td></tr>{% endif %}
+              {% if stinfos.sub5_name %}<tr><td>{{stinfos.sub5_name}}</td><td>{{stinfos.sub5_number}}</td></tr>{% endif %}
+              {% if stinfos.sub6_name %}<tr><td>{{stinfos.sub6_name}}</td><td>{{stinfos.sub6_number}}</td></tr>{% endif %}
+              {% if stinfos.sub7_name %}<tr><td>{{stinfos.sub7_name}}</td><td>{{stinfos.sub7_number}}</td></tr>{% endif %}
+              {% if stinfos.sub8_name %}<tr><td>{{stinfos.sub8_name}}</td><td>{{stinfos.sub8_number}}</td></tr>{% endif %}
+              {% if stinfos.sub9_name %}<tr><td>{{stinfos.sub9_name}}</td><td>{{stinfos.sub9_number}}</td></tr>{% endif %}
+              {% if stinfos.sub10_name %}<tr><td>{{stinfos.sub10_name}}</td><td>{{stinfos.sub10_number}}</td></tr>{% endif %}
+            </tbody>
           </table>
         </div>
-            <!-- students info table by select end here -->
+      </article>
+      {% endfor %}
 
-
-            <!-- students info table by search starting here -->
-                    {% elif search  %}
-
-          <div class="table-wrapper">
-           <table class="table table-bordered">
-              <tr>
-                  <th>শিক্ষার্থীর নাম</th>
-                  <th>পিতার নাম</th>           
-                  <th>রোল</th>            
-                  <th>সেশন</th>
-                  <th>শ্রেনী</th>
-                  <th>বিস্তারিত</th>
-              </tr>
-                {% for stinfo in search %}
-              <tr>
-                <td> {{stinfo.student_name}} </td>            
-                <td>{{stinfo.fathers_name}}</td>            
-                <td>{{stinfo.unique_roll}}</td>            
-                <td>{{stinfo.seasion}}</td>            
-                <td>{{stinfo.class_name}}</td>            
-                <td><a class="btn btn-primary btn-sm" href="{% url 'students_details' stinfo.id %}">Details</a></td>
-              </tr>
-                {% endfor %}
-            </table>
-          </div>
-                {% else %}
-                {% comment %} <div class="container">
-                  <h4 class="py-2 alert alert-danger">No Data to show, First Select</h4>
-                </div> {% endcomment %}
-                {% endif %}
-
-            <!-- students info table by search end here -->
-                <!-- student short info end -->
-               
-
-          
-     
-
- 
-          <!-- Notice Table non-search end here -->
-          
-         <!-- Pagination starting start here -->
-         
-          <!-- Pagination end here -->
-          
-          <!-- Page Number show starting here -->
-          
-        <!-- Page Number show end here -->
-        
-        
+      <div class="result-actions">
+        <a class="btn btn-outline-primary result-outline-btn" href="{% url 'result' %}">
+          <i class="bi bi-arrow-repeat me-1"></i> Search Again
+        </a>
+        <button class="btn btn-outline-success" type="button" onclick="window.print()">
+          <i class="bi bi-printer-fill me-1"></i> Print Result
+        </button>
       </div>
+    {% endif %}
+  </section>
     </div>
   </div>
-  {% endblock leftside %}
-  {% block rightside %}
-
-  {% endblock rightside %}
+{% endblock leftside %}
