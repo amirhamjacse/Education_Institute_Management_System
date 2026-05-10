@@ -576,4 +576,3 @@ def sslcommerz_payment_gateway(
         return None
 
     return gateway_url
-
