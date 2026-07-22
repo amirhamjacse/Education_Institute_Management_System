@@ -4,7 +4,8 @@ from .dashboard import (
 )
 from .result import (
     ResultsCreateView, ListOfResultsAddView, ListOfResultscCeateResultView,
-    ShowResultView, SemesterResultView, SemesterResultViews
+    ShowResultView, SemesterResultView, SemesterResultViews,
+    ResultsAddedSuccessView
 )
 from .students_dashboard import (
     StudentsSubjects, StudentsRoutine, StudentsClassRegister,
@@ -18,5 +19,5 @@ __all__ = [
     ListOfResultscCeateResultView, ResultsDashboard, ShowResultView,
     SemesterResultView, SemesterResultViews, StudentsDashboard,
     StudentsSubjects, StudentsRoutine, StudentsClassRegister,
-    StudentsResultSpecific
+    StudentsResultSpecific, ResultsAddedSuccessView
 ]

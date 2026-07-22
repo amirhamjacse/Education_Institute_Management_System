@@ -52,6 +52,11 @@ urlpatterns = [
         name='students_list_for_result_add'
     ),
     path(
+        'results/added/success',
+        views.ResultsAddedSuccessView.as_view(),
+        name='results_added_success'
+    ),
+    path(
         'show/result/list',
         views.ShowResultView.as_view(),
         name='show_result'

@@ -162,11 +162,11 @@ class ListOfResultscCeateResultView(
 
         # Ensure the number of marks matches the number of students
         if len(marks) != len(student_ids):
-            # Handle error: Number of marks and students do not match
             return render(request, self.template_name, {'error': 'Number of marks and students do not match.'})
 
+        saved_results = []
         for i, student_id in enumerate(student_ids):
-            students = get_object_or_404(StudentsInfo, id=student_id)  # Safely get student
+            students = get_object_or_404(StudentsInfo, id=student_id)
             reg = ResultInfo(
                 class_name=cls,
                 subject=subject,
@@ -174,11 +174,21 @@ class ListOfResultscCeateResultView(
                 exam_type=exmtype,
                 exam_year=exmyr,
                 student=students,
-                marks=marks[i]  # Use indexed marks
+                marks=marks[i]
             )
             reg.save()
-        messages.success(request, 'Results uploaded successfully!')
-        return redirect('students:students_list_for_result')  # Redirect after processing all students
+            saved_results.append(reg)
+
+        # Redirect to success page with saved results data
+        request.session['saved_results'] = {
+            'class_name': str(cls),
+            'section': str(section),
+            'subject': str(subject),
+            'exam_type': str(exmtype),
+            'exam_year': str(exmyr),
+            'result_ids': [r.id for r in saved_results],
+        }
+        return redirect('students:results_added_success')
 
 
     # def post(self, request, clas_nm, clas_yr, clas_sec,  exm_tp, sub, ecm_yr):
@@ -209,6 +219,36 @@ class ListOfResultscCeateResultView(
     #             i += 1
     #             return redirect('students:show_result')
     #         return render(request, self.template_name)
+
+
+class ResultsAddedSuccessView(
+    LoginRequiredMixin, UserPassesTestMixin,
+    PermissionRequiredMixin, View
+):
+    model = ResultInfo
+    template_name = 'result/result_added_success.html'
+    permission_required = 'students.add_resultinfo'
+
+    def test_func(self):
+        return self.request.user.is_active
+
+    def get(self, request):
+        saved_data = request.session.pop('saved_results', None)
+        if not saved_data:
+            return redirect('students:students_list_for_result')
+        
+        result_ids = saved_data.get('result_ids', [])
+        results = ResultInfo.objects.filter(id__in=result_ids).select_related('student')
+        
+        context = {
+            'results': results,
+            'class_name': saved_data.get('class_name', ''),
+            'section': saved_data.get('section', ''),
+            'subject': saved_data.get('subject', ''),
+            'exam_type': saved_data.get('exam_type', ''),
+            'exam_year': saved_data.get('exam_year', ''),
+        }
+        return render(request, self.template_name, context)
 
 
 class ShowResultView(
