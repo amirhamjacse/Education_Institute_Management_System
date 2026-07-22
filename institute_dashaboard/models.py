@@ -232,3 +232,75 @@ class PaymentGateway(models.Model):
         verbose_name = "Payment Gateway"
         verbose_name_plural = "Payment Gateway"
         
+
+class Event(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    event_date = models.DateField()
+    event_time = models.TimeField(blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True)
+    photo = models.FileField(upload_to='events/', blank=True, null=True)
+    is_upcoming = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['event_date']
+
+    def __str__(self):
+        return self.title
+
+
+class Testimonial(models.Model):
+    name = models.CharField(max_length=100)
+    designation = models.CharField(max_length=150, blank=True, null=True)
+    message = models.TextField()
+    photo = models.FileField(upload_to='testimonials/', blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name
+
+
+class Download(models.Model):
+    title = models.CharField(max_length=200)
+    file = models.FileField(upload_to='downloads/')
+    category = models.CharField(max_length=100, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title
+
+
+class SocialMedia(models.Model):
+    platform = models.CharField(max_length=50)
+    url = models.URLField()
+    icon_class = models.CharField(max_length=100, help_text="Bootstrap icon class e.g. bi-facebook")
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.platform
+
+
+class SiteMeta(models.Model):
+    meta_title = models.CharField(max_length=200, blank=True, null=True)
+    meta_description = models.TextField(blank=True, null=True)
+    meta_keywords = models.CharField(max_length=300, blank=True, null=True)
+    favicon = models.FileField(upload_to='site_meta/', blank=True, null=True)
+    og_image = models.FileField(upload_to='site_meta/', blank=True, null=True)
+    google_analytics_id = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Site Meta"
+        verbose_name_plural = "Site Meta"
+
+    def __str__(self):
+        return self.meta_title or "Site Meta"
+        

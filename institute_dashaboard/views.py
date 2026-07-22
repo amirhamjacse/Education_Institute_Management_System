@@ -4,7 +4,8 @@ from .models import  (
     Head_Teachers_speach, Notice_board, Result,  News_headline, Montri, 
     Sochib, DG_or_Chairman, Upo_Montri, SineBoard, Students_Information,
     Teachers_Information, Other_Employee_Information, Gallery, 
-    Cultural_Program, Sports, Web_Heading, ImportantLink
+    Cultural_Program, Sports, Web_Heading, ImportantLink,
+    Event, Testimonial, Download, SocialMedia, SiteMeta
 )
 from django.views.generic import (
     ListView, CreateView, UpdateView, DetailView, View
@@ -37,6 +38,20 @@ def all_global_context(request):
     important_link = ImportantLink.objects.order_by('id').reverse()[:5]
     students = StudentsInfo.objects.filter(unique_roll=str(request.user)).last()
     user_info = request.user
+    
+    # New professional features
+    upcoming_events = Event.objects.filter(is_upcoming=True)[:4]
+    testimonials = Testimonial.objects.filter(is_active=True)[:5]
+    downloads = Download.objects.filter(is_active=True)[:6]
+    social_media = SocialMedia.objects.filter(is_active=True)
+    site_meta = SiteMeta.objects.last()
+    
+    # Stats counters
+    total_students = StudentsInfo.objects.count()
+    total_teachers = Teachers_Information.objects.count()
+    total_staff = Other_Employee_Information.objects.count()
+    total_notices = Notice_board.objects.count()
+    
     context = {
         'sinebord':sinebord,
         'qt':leftsideqt,
@@ -52,6 +67,16 @@ def all_global_context(request):
         'important_link': important_link,
         'user': user_info,
         'students': students,
+        # New context
+        'upcoming_events': upcoming_events,
+        'testimonials': testimonials,
+        'downloads': downloads,
+        'social_media': social_media,
+        'site_meta': site_meta,
+        'total_students': total_students,
+        'total_teachers': total_teachers,
+        'total_staff': total_staff,
+        'total_notices': total_notices,
     }
     return context
 

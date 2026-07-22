@@ -5,7 +5,8 @@ from .models import (
     OnlineAdmission, Notice_board, Result,  News_headline, Montri, 
     Sochib, DG_or_Chairman, Upo_Montri, SineBoard,Students_Information, 
     Teachers_Information, Other_Employee_Information, Gallery,
-    Cultural_Program, Sports, Web_Heading, ImportantLink, Transaction, PaymentGateway
+    Cultural_Program, Sports, Web_Heading, ImportantLink, Transaction, PaymentGateway,
+    Event, Testimonial, Download, SocialMedia, SiteMeta
 )
 
 
@@ -109,3 +110,31 @@ class AboutAdmin(admin.ModelAdmin):
 @admin.register(Lokko_uddessho)
 class AboutAdmin(admin.ModelAdmin):
     list_display = ['id', 'lokko', 'uddesho']
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    list_display = ['title', 'event_date', 'is_upcoming']
+    list_filter = ['is_upcoming', 'event_date']
+    search_fields = ['title']
+    date_hierarchy = 'event_date'
+
+@admin.register(Testimonial)
+class TestimonialAdmin(admin.ModelAdmin):
+    list_display = ['name', 'designation', 'is_active']
+    list_filter = ['is_active']
+    search_fields = ['name', 'message']
+
+@admin.register(Download)
+class DownloadAdmin(admin.ModelAdmin):
+    list_display = ['title', 'category', 'is_active']
+    list_filter = ['category', 'is_active']
+    search_fields = ['title']
+
+@admin.register(SocialMedia)
+class SocialMediaAdmin(admin.ModelAdmin):
+    list_display = ['platform', 'url', 'is_active']
+    list_filter = ['is_active']
+
+@admin.register(SiteMeta)
+class SiteMetaAdmin(admin.ModelAdmin):
+    list_display = ['meta_title', 'meta_description']

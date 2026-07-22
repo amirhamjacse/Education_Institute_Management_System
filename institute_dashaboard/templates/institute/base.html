@@ -1,16 +1,44 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta -->
+    <meta name="description" content="{% if site_meta and site_meta.meta_description %}{{ site_meta.meta_description }}{% else %}{{ webname.name_headline }} - একটি উন্নত শিক্ষা প্রতিষ্ঠান{% endif %}">
+    <meta name="keywords" content="{% if site_meta and site_meta.meta_keywords %}{{ site_meta.meta_keywords }}{% else %}শিক্ষা প্রতিষ্ঠান, স্কুল, কলেজ, শিক্ষা, ভর্তি{% endif %}">
+    <meta name="author" content="{{ webname.design_and_developer|default:'Education Institute' }}">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="{% if site_meta and site_meta.meta_title %}{{ site_meta.meta_title }}{% else %}{{ webname.name_headline }}{% endif %}">
+    <meta property="og:description" content="{% if site_meta and site_meta.meta_description %}{{ site_meta.meta_description }}{% else %}{{ webname.name_headline }} - একটি উন্নত শিক্ষা প্রতিষ্ঠান{% endif %}">
+    <meta property="og:image" content="{% if site_meta and site_meta.og_image %}{{ site_meta.og_image.url }}{% else %}{{ webname.institute_logo.url }}{% endif %}">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="bn_BD">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% if site_meta and site_meta.meta_title %}{{ site_meta.meta_title }}{% else %}{{ webname.name_headline }}{% endif %}">
+    <meta name="twitter:description" content="{% if site_meta and site_meta.meta_description %}{{ site_meta.meta_description }}{% else %}{{ webname.name_headline }}{% endif %}">
+    
+    <!-- Favicon -->
+    {% if site_meta and site_meta.favicon %}
+    <link rel="icon" type="image/png" href="{{ site_meta.favicon.url }}">
+    <link rel="shortcut icon" type="image/png" href="{{ site_meta.favicon.url }}">
+    {% else %}
+    <link rel="icon" type="image/png" href="{% static 'institute/img/favicon.png' %}">
+    {% endif %}
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    
     {% block title %}<title>{{webname.name_headline}}</title> {% endblock title %}
     
-
     <link rel="stylesheet" href="{% static 'institute/css/bootstrap.css' %}"> 
     <link rel="stylesheet" href="{% static 'institute/icons/bootstrap-icons.css' %}">
-    <link rel="stylesheet" href="{% static 'institute/css/style.css' %}?v=modern-2">
+    <link rel="stylesheet" href="{% static 'institute/css/style.css' %}?v=professional-v2">
     <style>
         @font-face {
             font-family: bangla;
@@ -21,7 +49,6 @@
         }
         .bg-bod {
             background-image: url("{% static 'institute/img/44444.jpg' %}"); 
-            /* background-repeat: no-repeat; */
             background-attachment: fixed;
           } 
         .table-wrapper {
@@ -42,15 +69,29 @@
           }
     </style>
     {% block extra_css %}{% endblock extra_css %}
+    
+    <!-- Google Analytics -->
+    {% if site_meta and site_meta.google_analytics_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ site_meta.google_analytics_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ site_meta.google_analytics_id }}');
+    </script>
+    {% endif %}
 </head>
 
 <body class="bg-bod site-shell">
+    <!-- Skip to content link (accessibility) -->
+    <a class="skip-link" href="#main-content">স্কিপ টু মেইন কন্টেন্ট</a>
+
     <header>
         <div class="header mb-0 mt-0 site-header">
             <div class="bg-success py-2 top-brand">
                 <div class="row align-items-center g-0 brand-row">
                     <div class="col-auto brand-logo-col">
-                        <img class="brand-logo" src="{{webname.institute_logo.url}}" width="60px" alt="" srcset="">
+                        <img class="brand-logo" src="{{webname.institute_logo.url}}" width="60px" alt="{{webname.name_headline}} - লোগো" srcset="" loading="lazy">
                     </div>
                     <div class="col brand-copy"><h2 class="text-center text-white bangla institute-title">{{webname.name_headline}} </h2>
                         <span class="d-flex justify-content-center text-white bangla institute-location">{{webname.location}}</span>
@@ -63,7 +104,6 @@
                 <nav class="bangla navbar navbar-expand-lg navbar-light navcol rounded site-nav" aria-label="Twelfth navbar example">
                     
 
-
                     <div class="container-fluid">
                         <a class="navbar-brand text-success d-flex text-sm-center" href="{% url 'homepage' %}"><i class="bi bi-house-door-fill px-1"></i>হোম পেজ</a>  
                         
@@ -73,11 +113,10 @@
                         </button>
                     
 
-
                       <div class="collapse navbar-collapse justify-content-lg-center text-center" id="nav1">
                         <ul class="navbar-nav align-items-lg-center">
                           <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">প্রতিষ্ঠান সম্পর্কে</a>
+                            <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'history' or request.resolver_match.url_name == 'speach' or request.resolver_match.url_name == 'lokko' %}active-page{% endif %}" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">প্রতিষ্ঠান সম্পর্কে</a>
                             <ul class="dropdown-menu text-center" aria-labelledby="aboutDropdown">
                               <li><a class="dropdown-item" href="{% url 'history' %}">প্রতিষ্ঠানের ইতিহাস</a></li>
                               <li><a class="dropdown-item" href="{% url 'speach' %}">অধ্যক্ষের বাণী</a></li>
@@ -85,32 +124,32 @@
                             </ul>
                           </li>
                           <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="peopleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">শিক্ষক ও কর্মচারী</a>
+                            <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'teachers_info' or request.resolver_match.url_name == 'staf' %}active-page{% endif %}" href="#" id="peopleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">শিক্ষক ও কর্মচারী</a>
                             <ul class="dropdown-menu text-center" aria-labelledby="peopleDropdown">
                               <li><a class="dropdown-item" href="{% url 'teachers_info' %}">শিক্ষকদের তালিকা</a></li>
                               <li><a class="dropdown-item" href="{% url 'staf' %}">কর্মচারী ও স্টাফের তালিকা</a></li>
                             </ul>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" href="{% url 'gallery' %}">ফটোগ্যালারি</a>
+                            <a class="nav-link {% if request.resolver_match.url_name == 'gallery' %}active-page{% endif %}" href="{% url 'gallery' %}">ফটোগ্যালারি</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" href="{% url 'onlineadm' %}">অনলাইন ভর্তি আবেদন</a>
+                            <a class="nav-link {% if request.resolver_match.url_name == 'onlineadm' %}active-page{% endif %}" href="{% url 'onlineadm' %}">অনলাইন ভর্তি আবেদন</a>
                           </li>
                           <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="noticeNewsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">নোটিশ ও নিউজ</a>
+                            <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'notice_board' or request.resolver_match.url_name == 'news' %}active-page{% endif %}" href="#" id="noticeNewsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">নোটিশ ও নিউজ</a>
                             <ul class="dropdown-menu text-center" aria-labelledby="noticeNewsDropdown">
                               <li><a class="dropdown-item" href="{% url 'notice_board' %}">নোটিশ</a></li>
                               <li><a class="dropdown-item" href="{% url 'news' %}">বিশেষ নিউজ</a></li>
                             </ul>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" href="{% url 'contact' %}">যোগাযোগ</a>
+                            <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active-page{% endif %}" href="{% url 'contact' %}">যোগাযোগ</a>
                           </li>
                           {% if user.is_authenticated %}
                           <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                              <img src="{% if students.students_image %}{{ students.students_image.url }}{% else %}https://www.svgrepo.com/show/382106/male-avatar-boy-face-man-user-9.svg{% endif %}" alt="" width="30px" srcset="">
+                              <img src="{% if students.students_image %}{{ students.students_image.url }}{% else %}https://www.svgrepo.com/show/382106/male-avatar-boy-face-man-user-9.svg{% endif %}" alt="Profile" width="30px" srcset="" loading="lazy">
                               {% if students.name %} {{ students.name|default_if_none:'N/A' }} {% else %} {{students.unique_roll|default_if_none:'N/A'}} {% endif %}
                             </a>
                             <ul class="dropdown-menu text-center" aria-labelledby="profileDropdown">
@@ -123,7 +162,7 @@
                           </li>
                           {% else %}
                           <li class="nav-item">
-                            <a class="nav-link" href="{% url 'students:dashobard_app' %}">ড্যাশবোর্ড</a>
+                            <a class="nav-link {% if request.resolver_match.url_name == 'dashobard_app' %}active-page{% endif %}" href="{% url 'students:dashobard_app' %}">ড্যাশবোর্ড</a>
                           </li>
                           {% endif %}
                         </ul>
@@ -135,24 +174,26 @@
 
         </div>
 
-
-
-        
-
-        <!--  -->
-        
-        
-   
-        <!--  -->
-
            
     </header>
-    <main>
+    
+    <!-- Breadcrumb navigation -->
+    <main id="main-content">
+        {% block breadcrumb %}
+        <div class="container-fluid breadcrumb-bar">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'homepage' %}"><i class="bi bi-house-door-fill me-1"></i>হোম</a></li>
+                    {% block extra_breadcrumb %}{% endblock %}
+                </ol>
+            </nav>
+        </div>
+        {% endblock %}
         
-        <div class=" mb-2 ">
+        <div class="mb-2 ">
             <div class="d-flex justify-content-between align-items-center breaking-news bg-success text-white">
             <div class="d-flex flex-row flex-grow-1 flex-fill justify-content-center bg-danger py-3 text-white px-1 news"><span class="d-flex align-items-center bangla"><i class="bi bi-megaphone-fill me-2"></i>বিশেষ নিউজ</span></div>
-            <marquee  class="bg-success text-white pt-3 pb-2 bangla news-scroll" behavior="scroll" onmouseover="this.stop()" onmouseout="this.start()" direction="left">
+            <marquee class="bg-success text-white pt-3 pb-2 bangla news-scroll" behavior="scroll" onmouseover="this.stop()" onmouseout="this.start()" direction="left">
                 
                 <h5>{% for a in marq %} &#x261E  
                     {% if a.img_or_pdf %}
@@ -171,7 +212,7 @@
         </div>
     </div>
 
-                
+               
             
                   
             {% block leftside %}
@@ -180,22 +221,35 @@
             {% endblock leftside %}
                    
 
-            
-        
+           
 
           
-
-            
-
 
             {% block rightside %}
 
             <div class="col-lg-4">
                 <aside class="speech-section ps-lg-0">
+                    
+                    <!-- Social Media Links -->
+                    {% if social_media %}
+                    <div class="card bangla side-panel">
+                        <h4 class="card-title text-center py-3 text-white bg-success">সামাজিক মাধ্যম</h4>
+                        <div class="card-body">
+                            <div class="social-sidebar">
+                                {% for sm in social_media %}
+                                <a href="{{ sm.url }}" class="social-icon-link" target="_blank" rel="noopener noreferrer" style="background: linear-gradient(135deg, var(--brand), #13a075);" aria-label="{{ sm.platform }}">
+                                    <i class="bi {{ sm.icon_class }}"></i>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     <div class="card bangla side-panel">
                         <h4 class="card-title text-center py-3 text-white bg-success">{{montri.title}}</h4>
                         <div class="card-body">
-                            <img src="{{montri.photo.url}}" width="100%" alt="">
+                            <img src="{{montri.photo.url}}" width="100%" alt="{{montri.title}}" loading="lazy">
                             <p class="card-text bangla pt-2 text-center">
                                 {{montri.texts}}
                             </p>
@@ -208,8 +262,8 @@
                             <div class="student-search">
                                 <form class="input-group" action="{% url 'students_info' %}" method="POST" >
                                     {% csrf_token %}
-                                    <input type="search" name="students_search3" id="form1" placeholder="Unique Roll" class="form-control" required>
-                                    <button type="submit" class="btn btn-success">
+                                    <input type="search" name="students_search3" id="form1" placeholder="Unique Roll" class="form-control" required aria-label="শিক্ষার্থীর ইউনিক রোল সার্চ করুন">
+                                    <button type="submit" class="btn btn-success" aria-label="সার্চ করুন">
                                         <i class="bi bi-search"></i> SEARCH
                                     </button>
                                 </form>
@@ -232,7 +286,7 @@
                                 <div class="carousel-inner">
                                     {% for g in gallery %}
                                     <div class="carousel-item {% if forloop.first %} active {% endif %}" data-bs-interval="3000">
-                                        <img src="{{g.gallery_photo.url}}" class="d-block w-100" alt="{{g.title}}">
+                                        <img src="{{g.gallery_photo.url}}" class="d-block w-100" alt="{{g.title}}" loading="lazy">
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -263,7 +317,7 @@
                     <div class="card bangla pb-1 side-panel">
                         <h4 class="card-title text-center py-3 text-white bg-success">জাতীয় সংগীত</h4>
                         <div class="card-body d-flex justify-content-center">
-                            <audio controls>
+                            <audio controls aria-label="জাতীয় সংগীত">
                                 <source src="{% static 'institute/audio/bd_national_anthem.mp3' %}" type="audio/mpeg">
                             </audio>
                         </div>
@@ -278,7 +332,7 @@
     </main>
     <footer>
        <div class="container-fluid bg-light pt-2">
-        <img src="{% static 'institute/img/footer.png' %}" width="100%" alt="">
+        <img src="{% static 'institute/img/footer.png' %}" width="100%" alt="" loading="lazy">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-6">
@@ -286,6 +340,17 @@
                         <span class="me-2 text-dark"><a class="text-dark" style="text-decoration:none" href="{% url 'complain' %}">অভিযোগ</a></span> 
                         <span class="mx-2 "><a class="text-dark" style="text-decoration:none" href="{% url 'contact' %}">যোগাযোগ</a></span>
                         <span class="mx-2 "><a class="text-dark" style="text-decoration:none" href="{% url 'complain' %}">পরামর্শ</a></span>
+                        
+                        <!-- Social Media in Footer -->
+                        {% if social_media %}
+                        <div class="d-flex gap-2 my-2">
+                            {% for sm in social_media %}
+                            <a href="{{ sm.url }}" target="_blank" rel="noopener noreferrer" class="text-dark" aria-label="{{ sm.platform }}">
+                                <i class="bi {{ sm.icon_class }} fs-5"></i>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                         
                         <h6 class="py-2">ডিজাইন ও ডেভেলপমেন্টঃ {{webname.design_and_developer|default_if_none:"-"}}</h6>
                         <h6 class="pb-2">কপিরাইট &copy;2025 {{webname.name_headline}}</h6>
@@ -301,14 +366,22 @@
                 </div>
             </div>
         </div>
-        <div><a class="bg-primary gotopbtn" href="#"> <i class="text-white display-6 bi-arrow-up-short"></i> </a>
+        <div><a class="bg-primary gotopbtn" href="#" aria-label="পেজের উপরে যান"> <i class="text-white display-6 bi-arrow-up-short"></i> </a>
         </div>
        </div>
 
     </footer>
+    
+    <!-- Cookie Consent Banner -->
+    <div id="cookieBanner" class="cookie-banner" role="alert" aria-live="polite">
+        <p><i class="bi bi-info-circle me-1"></i> এই ওয়েবসাইটটি ব্যবহারকারীর অভিজ্ঞতা উন্নত করতে কুকি ব্যবহার করে।</p>
+        <button class="cookie-btn" onclick="acceptCookies()">গ্রহণ করুন</button>
+    </div>
+    
     <script src="{% static 'institute/js/popper.js' %}"></script> 
     <script src="{% static 'institute/js/bootstrap.js' %}"></script>
     <script>
+        // Navbar toggle
         document.addEventListener('DOMContentLoaded', function () {
             var toggler = document.querySelector('[data-nav-toggle="#nav1"]');
             var menu = document.querySelector('#nav1');
@@ -331,6 +404,35 @@
             menu.addEventListener('hidden.bs.collapse', function () {
                 toggler.setAttribute('aria-expanded', 'false');
             });
+        });
+
+        // Scroll-triggered fade-in animation
+        document.addEventListener('DOMContentLoaded', function () {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animated');
+                    }
+                });
+            }, { threshold: 0.15 });
+            document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+        });
+
+        // Cookie consent
+        function acceptCookies() {
+            document.getElementById('cookieBanner').classList.remove('show');
+            localStorage.setItem('cookieConsent', 'accepted');
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!localStorage.getItem('cookieConsent')) {
+                document.getElementById('cookieBanner').classList.add('show');
+            }
+        });
+
+        // Smooth scroll for "back to top" button
+        document.querySelector('.gotopbtn')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     </script>
     <script src="{% static 'institute/js/jsmin.js' %}"></script>

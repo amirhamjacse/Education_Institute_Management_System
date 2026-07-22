@@ -2,7 +2,9 @@
 <title>{{webname.name_headline}} Homepage</title>
 {% endblock title %} 
 
-
+{% block extra_breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">হোম</li>
+{% endblock %}
 
 {% block leftside %} {% comment %} left side main things
 start from here {% endcomment %}
@@ -130,11 +132,112 @@ start from here {% endcomment %}
       </p> {% endcomment %}
       <!-- amader lokko end -->
 
+      <!-- ====== STATS COUNTER SECTION ====== -->
+      <div class="stats-section animate-on-scroll">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+          <div>
+            <span class="stat-number">{{ total_students|default:"0" }}</span>
+            <span class="stat-label">শিক্ষার্থী</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="bi bi-person-badge-fill"></i></div>
+          <div>
+            <span class="stat-number">{{ total_teachers|default:"0" }}</span>
+            <span class="stat-label">শিক্ষক</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="bi bi-person-workspace"></i></div>
+          <div>
+            <span class="stat-number">{{ total_staff|default:"0" }}</span>
+            <span class="stat-label">কর্মচারী</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="bi bi-megaphone-fill"></i></div>
+          <div>
+            <span class="stat-number">{{ total_notices|default:"0" }}</span>
+            <span class="stat-label">নোটিশ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== UPCOMING EVENTS ====== -->
+      {% if upcoming_events %}
+      <div class="animate-on-scroll">
+        <h4 class="section-heading-decorated bangla"><i class="bi bi-calendar-event-fill me-2 text-success"></i> আসন্ন ইভেন্ট</h4>
+        <div class="events-grid">
+          {% for event in upcoming_events %}
+          <div class="event-card">
+            <div class="event-date-badge">
+              <span class="day">{{ event.event_date|date:"d" }}</span>
+              <span class="month">{{ event.event_date|date:"M" }}</span>
+            </div>
+            <div class="event-body">
+              <h5 class="bangla">{{ event.title }}</h5>
+              {% if event.description %}<p class="bangla">{{ event.description|truncatewords:15 }}</p>{% endif %}
+              {% if event.location %}<p><i class="bi bi-geo-alt-fill me-1 text-success"></i> {{ event.location }}</p>{% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- ====== TESTIMONIALS ====== -->
+      {% if testimonials %}
+      <div class="animate-on-scroll">
+        <h4 class="section-heading-decorated bangla"><i class="bi bi-chat-quote-fill me-2 text-success"></i> সফলতার গল্প</h4>
+        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for t in testimonials %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+              <div class="testimonial-card">
+                <img src="{% if t.photo %}{{ t.photo.url }}{% else %}{% static 'institute/img/default-avatar.png' %}{% endif %}" alt="{{ t.name }}" class="testimonial-avatar" loading="lazy">
+                <p class="testimonial-text bangla">"{{ t.message }}"</p>
+                <div class="testimonial-name bangla">{{ t.name }}</div>
+                {% if t.designation %}<div class="text-muted small bangla">{{ t.designation }}</div>{% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev" style="filter: invert(1);">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next" style="filter: invert(1);">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- ====== DOWNLOAD CENTER ====== -->
+      {% if downloads %}
+      <div class="animate-on-scroll">
+        <h4 class="section-heading-decorated bangla"><i class="bi bi-download me-2 text-success"></i> ডাউনলোড সেন্টার</h4>
+        <div class="download-grid">
+          {% for d in downloads %}
+          <a href="{{ d.file.url }}" class="download-item" download>
+            <div class="download-icon"><i class="bi bi-file-earmark-arrow-down-fill"></i></div>
+            <div>
+              <div class="download-title bangla">{{ d.title }}</div>
+              {% if d.category %}<small class="text-muted">{{ d.category }}</small>{% endif %}
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
       <!-- amader porichiti start -->
-      <div class="bg-success pt-3 ps-2 pb-1 mt-1 section-title-bar">
+      <div class="bg-success pt-3 ps-2 pb-1 mt-1 section-title-bar animate-on-scroll">
         <h5 class="text-white bangla">অধ্যক্ষের বাণীঃ</h5>
       </div>
-      <p style="text-align: justify" class="bg-light py-2 bangla principal-message">
+      <p style="text-align: justify" class="bg-light py-2 bangla principal-message animate-on-scroll">
         {{qt.short_porichiti}}
       </p>
       <!-- amader pirichiti end -->

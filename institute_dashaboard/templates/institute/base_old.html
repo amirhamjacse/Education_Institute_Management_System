@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}<title>{{webname.name_headline}}</title> {% endblock title %}
+    
+
+    <link rel="stylesheet" href="{% static 'institute/css/bootstrap.css' %}"> 
+    <link rel="stylesheet" href="{% static 'institute/icons/bootstrap-icons.css' %}">
+    <link rel="stylesheet" href="{% static 'institute/css/style.css' %}?v=modern-2">
+    <style>
+        @font-face {
+            font-family: bangla;
+            src: url({% static 'institute/font/SolaimanLipi.ttf' %}); 
+        }
+        .bangla{
+            font-family: bangla;
+        }
+        .bg-bod {
+            background-image: url("{% static 'institute/img/44444.jpg' %}"); 
+            /* background-repeat: no-repeat; */
+            background-attachment: fixed;
+          } 
+        .table-wrapper {
+            overflow-x: scroll;
+            margin-top: 22px;     
+        }  
+        table {
+            min-width: max-content;  
+        }
+        .gotopbtn{
+            position: fixed; 
+            bottom: 10px;
+            right: 25px;
+            text-align: center;
+          } 
+          .nolinelink{
+            text-decoration: none
+          }
+    </style>
+    {% block extra_css %}{% endblock extra_css %}
+</head>
+
+<body class="bg-bod site-shell">
+    <header>
+        <div class="header mb-0 mt-0 site-header">
+            <div class="bg-success py-2 top-brand">
+                <div class="row align-items-center g-0 brand-row">
+                    <div class="col-auto brand-logo-col">
+                        <img class="brand-logo" src="{{webname.institute_logo.url}}" width="60px" alt="" srcset="">
+                    </div>
+                    <div class="col brand-copy"><h2 class="text-center text-white bangla institute-title">{{webname.name_headline}} </h2>
+                        <span class="d-flex justify-content-center text-white bangla institute-location">{{webname.location}}</span>
+                    </div>
+                   
+                </div>
+            </div>
+
+            <div class="">     
+                <nav class="bangla navbar navbar-expand-lg navbar-light navcol rounded site-nav" aria-label="Twelfth navbar example">
+                    
+
+
+                    <div class="container-fluid">
+                        <a class="navbar-brand text-success d-flex text-sm-center" href="{% url 'homepage' %}"><i class="bi bi-house-door-fill px-1"></i>হোম পেজ</a>  
+                        
+                        <button class="navbar-toggler site-nav-toggler" type="button" data-nav-toggle="#nav1" aria-controls="nav1" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                            <span class="nav-toggle-text">মেনু</span>
+                        </button>
+                    
+
+
+                      <div class="collapse navbar-collapse justify-content-lg-center text-center" id="nav1">
+                        <ul class="navbar-nav align-items-lg-center">
+                          <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">প্রতিষ্ঠান সম্পর্কে</a>
+                            <ul class="dropdown-menu text-center" aria-labelledby="aboutDropdown">
+                              <li><a class="dropdown-item" href="{% url 'history' %}">প্রতিষ্ঠানের ইতিহাস</a></li>
+                              <li><a class="dropdown-item" href="{% url 'speach' %}">অধ্যক্ষের বাণী</a></li>
+                              <li><a class="dropdown-item" href="{% url 'lokko' %}">লক্ষ্য উদ্দেশ্য</a></li>
+                            </ul>
+                          </li>
+                          <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="peopleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">শিক্ষক ও কর্মচারী</a>
+                            <ul class="dropdown-menu text-center" aria-labelledby="peopleDropdown">
+                              <li><a class="dropdown-item" href="{% url 'teachers_info' %}">শিক্ষকদের তালিকা</a></li>
+                              <li><a class="dropdown-item" href="{% url 'staf' %}">কর্মচারী ও স্টাফের তালিকা</a></li>
+                            </ul>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{% url 'gallery' %}">ফটোগ্যালারি</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{% url 'onlineadm' %}">অনলাইন ভর্তি আবেদন</a>
+                          </li>
+                          <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="noticeNewsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">নোটিশ ও নিউজ</a>
+                            <ul class="dropdown-menu text-center" aria-labelledby="noticeNewsDropdown">
+                              <li><a class="dropdown-item" href="{% url 'notice_board' %}">নোটিশ</a></li>
+                              <li><a class="dropdown-item" href="{% url 'news' %}">বিশেষ নিউজ</a></li>
+                            </ul>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{% url 'contact' %}">যোগাযোগ</a>
+                          </li>
+                          {% if user.is_authenticated %}
+                          <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              <img src="{% if students.students_image %}{{ students.students_image.url }}{% else %}https://www.svgrepo.com/show/382106/male-avatar-boy-face-man-user-9.svg{% endif %}" alt="" width="30px" srcset="">
+                              {% if students.name %} {{ students.name|default_if_none:'N/A' }} {% else %} {{students.unique_roll|default_if_none:'N/A'}} {% endif %}
+                            </a>
+                            <ul class="dropdown-menu text-center" aria-labelledby="profileDropdown">
+                              {% if students %}
+                              <li><a class="dropdown-item" href="{% url 'students_details' students.id %}"><i class="fas fa-user-circle"></i> প্রোফাইল</a></li>
+                              {% endif %}
+                              <li><a class="dropdown-item" href="{% url 'students:dashobard_app' %}"><i class="bi bi-speedometer"></i> ড্যাশবোর্ড</a></li>
+                              <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> লগ আউট</a></li>
+                            </ul>
+                          </li>
+                          {% else %}
+                          <li class="nav-item">
+                            <a class="nav-link" href="{% url 'students:dashobard_app' %}">ড্যাশবোর্ড</a>
+                          </li>
+                          {% endif %}
+                        </ul>
+                      </div>
+                    </div>
+                  </nav>
+            </div>
+           
+
+        </div>
+
+
+
+        
+
+        <!--  -->
+        
+        
+   
+        <!--  -->
+
+           
+    </header>
+    <main>
+        
+        <div class=" mb-2 ">
+            <div class="d-flex justify-content-between align-items-center breaking-news bg-success text-white">
+            <div class="d-flex flex-row flex-grow-1 flex-fill justify-content-center bg-danger py-3 text-white px-1 news"><span class="d-flex align-items-center bangla"><i class="bi bi-megaphone-fill me-2"></i>বিশেষ নিউজ</span></div>
+            <marquee  class="bg-success text-white pt-3 pb-2 bangla news-scroll" behavior="scroll" onmouseover="this.stop()" onmouseout="this.start()" direction="left">
+                
+                <h5>{% for a in marq %} &#x261E  
+                    {% if a.img_or_pdf %}
+                        <a style="text-decoration:none" class='text-white' href=" 
+                        {{a.img_or_pdf.url}}
+                        " download="{{a.img_or_pdf.url}}">{{a.title}}</a>
+                        {% else %}
+                        <a style="text-decoration:none" class='text-white' target="_blank" href="{{a.url_link}}">{{a.title}}</a>
+                        {% endif %}
+                    
+                    {% endfor %}
+                    <a class="text-dark alert alert-primary" href="{% url 'news' %}">সকল নিউজ</a> 
+                </h5>
+               
+            </marquee>
+        </div>
+    </div>
+
+                
+            
+                  
+            {% block leftside %}
+            
+            
+            {% endblock leftside %}
+                   
+
+            
+        
+
+          
+
+            
+
+
+            {% block rightside %}
+
+            <div class="col-lg-4">
+                <aside class="speech-section ps-lg-0">
+                    <div class="card bangla side-panel">
+                        <h4 class="card-title text-center py-3 text-white bg-success">{{montri.title}}</h4>
+                        <div class="card-body">
+                            <img src="{{montri.photo.url}}" width="100%" alt="">
+                            <p class="card-text bangla pt-2 text-center">
+                                {{montri.texts}}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card bangla side-panel">
+                        <h4 class="card-title text-center py-3 text-white bg-success">শিক্ষার্থীর তথ্য</h4>
+                        <div class="card-body">
+                            <div class="student-search">
+                                <form class="input-group" action="{% url 'students_info' %}" method="POST" >
+                                    {% csrf_token %}
+                                    <input type="search" name="students_search3" id="form1" placeholder="Unique Roll" class="form-control" required>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-search"></i> SEARCH
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bangla side-panel">
+                        <h4 class="card-title text-center py-3 text-white bg-success">গ্যালারি</h4>
+                        <div class="card-body">
+                            <div id="sideGalleryCarousel" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-indicators">
+                                    <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                    <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                                    <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                                    <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                                    <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                                    <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="5" aria-label="Slide 6"></button>
+                                </div>
+                                <div class="carousel-inner">
+                                    {% for g in gallery %}
+                                    <div class="carousel-item {% if forloop.first %} active {% endif %}" data-bs-interval="3000">
+                                        <img src="{{g.gallery_photo.url}}" class="d-block w-100" alt="{{g.title}}">
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide="prev">
+                                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                  <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide="next">
+                                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                  <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bangla side-panel">
+                        <h4 class="card-title text-center py-3 text-white bg-success">গুরুর্ত্বপুর্ণ লিংকঃ</h4>
+                        <ul class="important-links">
+                            {% for obj in important_link %}
+                            <li>
+                                <i class="bi bi-link pe-2 text-success"></i>
+                                <a target="_blank" href="{{ obj.url }}">{{ obj.name }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="card bangla pb-1 side-panel">
+                        <h4 class="card-title text-center py-3 text-white bg-success">জাতীয় সংগীত</h4>
+                        <div class="card-body d-flex justify-content-center">
+                            <audio controls>
+                                <source src="{% static 'institute/audio/bd_national_anthem.mp3' %}" type="audio/mpeg">
+                            </audio>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        {% endblock rightside %}
+        
+        
+    </main>
+    <footer>
+       <div class="container-fluid bg-light pt-2">
+        <img src="{% static 'institute/img/footer.png' %}" width="100%" alt="">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="bg-light float-lg-start bangla text-muted">
+                        <span class="me-2 text-dark"><a class="text-dark" style="text-decoration:none" href="{% url 'complain' %}">অভিযোগ</a></span> 
+                        <span class="mx-2 "><a class="text-dark" style="text-decoration:none" href="{% url 'contact' %}">যোগাযোগ</a></span>
+                        <span class="mx-2 "><a class="text-dark" style="text-decoration:none" href="{% url 'complain' %}">পরামর্শ</a></span>
+                        
+                        <h6 class="py-2">ডিজাইন ও ডেভেলপমেন্টঃ {{webname.design_and_developer|default_if_none:"-"}}</h6>
+                        <h6 class="pb-2">কপিরাইট &copy;2025 {{webname.name_headline}}</h6>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="bg-light bangla text-muted">
+                        
+                        
+                        <h6 class="py-2 text-center float-lg-end pe-2">পরিকল্পনা ও বাস্তবায়নেঃ {{webname.design_and_developer|default_if_none:"-"}}</h6>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div><a class="bg-primary gotopbtn" href="#"> <i class="text-white display-6 bi-arrow-up-short"></i> </a>
+        </div>
+       </div>
+
+    </footer>
+    <script src="{% static 'institute/js/popper.js' %}"></script> 
+    <script src="{% static 'institute/js/bootstrap.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toggler = document.querySelector('[data-nav-toggle="#nav1"]');
+            var menu = document.querySelector('#nav1');
+            if (!toggler || !menu) {
+                return;
+            }
+
+            toggler.addEventListener('click', function () {
+                if (window.bootstrap && window.bootstrap.Collapse) {
+                    window.bootstrap.Collapse.getOrCreateInstance(menu, { toggle: false }).toggle();
+                } else {
+                    menu.classList.toggle('show');
+                }
+                toggler.setAttribute('aria-expanded', menu.classList.contains('show') ? 'true' : 'false');
+            });
+
+            menu.addEventListener('shown.bs.collapse', function () {
+                toggler.setAttribute('aria-expanded', 'true');
+            });
+            menu.addEventListener('hidden.bs.collapse', function () {
+                toggler.setAttribute('aria-expanded', 'false');
+            });
+        });
+    </script>
+    <script src="{% static 'institute/js/jsmin.js' %}"></script>
+</body>
+</html>
