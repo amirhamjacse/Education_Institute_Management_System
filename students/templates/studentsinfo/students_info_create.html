@@ -310,8 +310,8 @@
     <div class="dashboard-shell">
         <div class="dashboard-hero">
             <span class="dashboard-eyebrow"><i class="bi bi-person-plus-fill"></i> Student Admission</span>
-            <h1>Add Student Information</h1>
-            <p>Complete the admission profile with student, family, contact, class, and enrollment details in one structured form.</p>
+            <h1>{% if is_update %}Edit Student Information{% else %}Add Student Information{% endif %}</h1>
+            <p>{% if is_update %}Update the student's profile details below.{% else %}Complete the admission profile with student, family, contact, class, and enrollment details in one structured form.{% endif %}</p>
             <div class="dashboard-meta">
                 <span><i class="bi bi-file-earmark-person"></i> Profile details</span>
                 <span><i class="bi bi-telephone-fill"></i> Contact data</span>
@@ -323,8 +323,8 @@
             <div class="dashboard-panel">
                 <div class="dashboard-panel-header">
                     <div>
-                        <h2>Student Information Form</h2>
-                        <small>Fill in each field carefully before submitting.</small>
+                        <h2>{% if is_update %}Edit Student Information{% else %}Student Information Form{% endif %}</h2>
+                        <small>{% if is_update %}Update the fields below and save changes.{% else %}Fill in each field carefully before submitting.{% endif %}</small>
                     </div>
                     <small>{{ webname.name_headline|default:"Education Institute" }}</small>
                 </div>
@@ -458,7 +458,7 @@
                                 </div>
 
                                 <div class="form-actions">
-                                    <button class="btn btn-primary" type="submit">Add</button>
+                                    <button class="btn btn-primary" type="submit">{% if is_update %}Update{% else %}Add{% endif %}</button>
                                 </div>
                             </div>
                         </form>

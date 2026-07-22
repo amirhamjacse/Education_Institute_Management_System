@@ -116,6 +116,46 @@ class StudentsCreateView(
 
 
 
+class StudentsUpdateView(
+    LoginRequiredMixin, UserPassesTestMixin,
+    PermissionRequiredMixin, UpdateView
+):
+
+    model = StudentsInfo
+    form_class = StudentsInfoForm
+    permission_required = 'students.change_studentsinfo'
+    template_name = 'studentsinfo/students_info_create.html'
+    success_url = reverse_lazy('students:students_list')
+    pk_url_kwarg = 'id'
+
+    def test_func(self):
+        return self.request.user.is_active
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['group'] = Group.objects.all()
+        context['is_update'] = True
+        return context
+
+
+class StudentsDeleteView(
+    LoginRequiredMixin, UserPassesTestMixin,
+    PermissionRequiredMixin, View
+):
+
+    model = StudentsInfo
+    permission_required = 'students.delete_studentsinfo'
+    success_url = reverse_lazy('students:students_list')
+
+    def test_func(self):
+        return self.request.user.is_active
+
+    def get(self, request, id):
+        student = self.model.objects.get(pk=id)
+        student.delete()
+        return redirect(self.success_url)
+
+
 class StudentsListView(
     LoginRequiredMixin, UserPassesTestMixin,
     PermissionRequiredMixin, View

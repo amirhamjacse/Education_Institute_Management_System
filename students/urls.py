@@ -32,6 +32,16 @@ urlpatterns = [
         name='students_list'
     ),
     path(
+        'edit/<int:id>/',
+        views.StudentsUpdateView.as_view(),
+        name='students_edit'
+    ),
+    path(
+        'delete/<int:id>/',
+        views.StudentsDeleteView.as_view(),
+        name='students_delete'
+    ),
+    path(
         'search/add/result',
         views.ListOfResultsAddView.as_view(),
         name='students_list_for_result'

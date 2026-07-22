@@ -1,4 +1,4 @@
-from .create_students import StudentsCreateView, StudentsListView
+from .create_students import StudentsCreateView, StudentsListView, StudentsUpdateView, StudentsDeleteView
 from .dashboard import (
     SDashboard, StudentsInfoDashboard, ResultsDashboard, StudentsDashboard
 )
@@ -13,7 +13,7 @@ from .students_dashboard import (
 
 
 __all__ = [
-    StudentsCreateView, StudentsListView, SDashboard,
+    StudentsCreateView, StudentsListView, StudentsUpdateView, StudentsDeleteView, SDashboard,
     ResultsCreateView, StudentsInfoDashboard, ListOfResultsAddView,
     ListOfResultscCeateResultView, ResultsDashboard, ShowResultView,
     SemesterResultView, SemesterResultViews, StudentsDashboard,

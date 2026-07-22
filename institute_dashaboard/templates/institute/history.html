@@ -1,57 +1,515 @@
-{% extends 'institute/base.html' %} 
-{% load static %} 
+{% extends 'institute/base.html' %}
+{% load static %}
 {% block title %}
-<title>History</title>
-{% endblock title %} 
+<title>{{about.title|default:"প্রতিষ্ঠানের ইতিহাস"}} | {{webname.name_headline}}</title>
+{% endblock title %}
 
-<!-- left side main things start from here -->
-{% block leftside %} 
+{% block extra_css %}
+<style>
+    /* ===== History Page Professional Styling ===== */
+    .history-hero {
+        background: linear-gradient(135deg, #1a365d 0%, #2a5298 50%, #1a365d 100%);
+        padding: 40px 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
 
-      <!-- student short info start -->
-<div class="row">
-    <div class="container-fluid">
-    <div class="container-fluid">
-      <div class="bg-success pt-3 ps-2 pb-1 ">
-        <h5 class="text-white bangla">ইতিহাস</h5>
-      </div>
-      <div class="bg-light border mt-1 py-2 text-center bangla">
-        <h4 class="mb-2">{{about.title}}</h4>
-       <div class="container-fluid">
-        <p style="text-align: justify" class="">{{about.details}}</p>
-       </div>
-      
-            
-               
-            
+    .history-hero::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 15px,
+            rgba(255, 255, 255, 0.03) 15px,
+            rgba(255, 255, 255, 0.03) 30px
+        );
+        pointer-events: none;
+    }
 
-            <!-- students info table by search end here -->
-                <!-- student short info end -->
-               
+    .history-hero h1 {
+        color: #ffffff;
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        letter-spacing: 1px;
+    }
 
-          
-     
+    .history-hero .subtitle {
+        color: #cbd5e0;
+        font-size: 1rem;
+        margin-top: 8px;
+        position: relative;
+    }
 
- 
-          <!-- Notice Table non-search end here -->
-          
-         <!-- Pagination starting start here -->
-         
-          <!-- Pagination end here -->
-          
-          <!-- Page Number show starting here -->
-          
-        <!-- Page Number show end here -->
-        
-        
-      </div>
+    .history-hero .divider {
+        width: 80px;
+        height: 3px;
+        background: #e2a836;
+        margin: 15px auto;
+        border-radius: 3px;
+        position: relative;
+    }
+
+    /* ===== Content Card ===== */
+    .history-content-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        margin-bottom: 30px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .history-content-header {
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        padding: 20px 30px;
+        border-bottom: 3px solid #e2a836;
+    }
+
+    .history-content-header h2 {
+        color: #ffffff;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .history-content-header h2 .icon {
+        font-size: 1.8rem;
+        opacity: 0.8;
+    }
+
+    .history-content-body {
+        padding: 30px 35px;
+    }
+
+    .history-content-body p {
+        font-size: 1.05rem;
+        line-height: 1.9;
+        color: #2d3748;
+        text-align: justify;
+        margin-bottom: 15px;
+        font-family: 'SolaimanLipi', 'SolaimanLipi2', sans-serif;
+    }
+
+    .history-content-body p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* ===== Timeline Section ===== */
+    .timeline-section {
+        margin-top: 40px;
+    }
+
+    .timeline-title {
+        color: #1a365d;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px dashed #e2a836;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .timeline-title::before {
+        content: "";
+        width: 4px;
+        height: 24px;
+        background: #e2a836;
+        border-radius: 2px;
+    }
+
+    /* ===== Stats / Highlights ===== */
+    .history-highlights {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .highlight-card {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .highlight-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .highlight-card .number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2a5298;
+        margin-bottom: 5px;
+    }
+
+    .highlight-card .label {
+        font-size: 0.85rem;
+        color: #4a5568;
+        font-weight: 500;
+    }
+
+    /* ===== Quote Block ===== */
+    .history-quote {
+        background: linear-gradient(135deg, #ebf8f4 0%, #e0f2f1 100%);
+        border-left: 4px solid #38b2ac;
+        border-radius: 0 8px 8px 0;
+        padding: 20px 30px;
+        margin: 30px 0;
+        font-style: italic;
+        color: #2d3748;
+        position: relative;
+    }
+
+    .history-quote::before {
+        content: """;
+        position: absolute;
+        top: -10px;
+        left: 15px;
+        font-size: 5rem;
+        color: rgba(56, 178, 174, 0.1);
+        font-family: Georgia, serif;
+        line-height: 1;
+    }
+
+    .history-quote p {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        margin: 0;
+        text-align: left;
+    }
+
+    /* ===== Right Sidebar Widgets ===== */
+    .sidebar-widget {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        margin-bottom: 25px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .sidebar-widget .widget-header {
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        padding: 15px 20px;
+        border-bottom: 2px solid #e2a836;
+    }
+
+    .sidebar-widget .widget-header h4 {
+        color: #ffffff;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sidebar-widget .widget-body {
+        padding: 20px;
+    }
+
+    .quick-links-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .quick-links-list li {
+        margin-bottom: 10px;
+    }
+
+    .quick-links-list li:last-child {
+        margin-bottom: 0;
+    }
+
+    .quick-links-list a {
+        color: #2a5298;
+        text-decoration: none;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: color 0.2s;
+    }
+
+    .quick-links-list a:hover {
+        color: #1a365d;
+        text-decoration: underline;
+    }
+
+    .quick-links-list a .arrow {
+        color: #e2a836;
+        font-size: 0.9rem;
+    }
+
+    .milestone-item {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #edf2f7;
+    }
+
+    .milestone-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .milestone-year {
+        background: #e2a836;
+        color: #ffffff;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        min-width: 80px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .milestone-desc {
+        color: #4a5568;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+        .history-hero h1 {
+            font-size: 1.6rem;
+        }
+        .history-content-body {
+            padding: 20px 20px;
+        }
+        .history-content-body p {
+            font-size: 1rem;
+        }
+        .history-highlights {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+</style>
+{% endblock extra_css %}
+
+<!-- Main content -->
+{% block leftside %}
+<div class="container-fluid">
+    <!-- Hero Section -->
+    <div class="history-hero">
+        <h1>প্রতিষ্ঠানের ইতিহাস</h1>
+        <div class="divider"></div>
+        <p class="subtitle">{{webname.name_headline|default:"Education Institute"}} — {{webname.location|default:""}}</p>
     </div>
-  </div>
-  {% endblock leftside %}
-  {% block rightside %}
 
-  {% endblock rightside %}
+    <!-- Main Content Card -->
+    <div class="history-content-card">
+        <div class="history-content-header">
+            <h2><span class="icon">📜</span> {{about.title|default:"আমাদের গৌরবশালী ইতিহাস"}}</h2>
+        </div>
+        <div class="history-content-body">
+            {% if about.details %}
+                <p>{{about.details}}</p>
+            {% else %}
+                <p>আমাদের প্রতিষ্ঠানটি শিক্ষার্থীদের উন্নয়ন ও রাষ্ট্রনির্মাণে অংশগ্রহণের ঐতিহ্যবাহী ঐতিহ্য রয়েছে। আমরা আমাদের শিক্ষার্থীদের আন্তর্জাতিক মানের শিক্ষা প্রদান করি এবং তাদের ভবিষ্যৎ গড়তে সহায়তা করি।</p>
+                <p>আমাদের প্রতিষ্ঠানটি গঠন করেছেন উচ্চশিক্ষার একজন অগ্রণী ও দূড়িয়া মন্ত্রী। আজ আমরা আমাদের দেশের শিক্ষা ক্ষেত্রে একটি গুরুত্বপূর্ণ অবদান রয়েছে।</p>
+            {% endif %}
 
+            <!-- Quote Block -->
+            <div class="history-quote">
+                <p>শিক্ষা হলো মানুষের মেনে নেওয়ার জন্য সবচেয়ে বড় উপকরণ। আমরা আমাদের শিক্ষার্থীদের জ্ঞান ও বুদ্ধিমত্তা দিয়ে ভবিষ্যৎ গড়তে সহায়তা করি।</p>
+            </div>
 
+            <!-- Highlights -->
+            <div class="timeline-section">
+                <div class="timeline-title">গুরুত্বপূর্ণ তথ্য</div>
+                <div class="history-highlights">
+                    <div class="highlight-card">
+                        <div class="number">{{webname.location|default:"২৫+"}}</div>
+                        <div class="label">বছরের ইতিহাস</div>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="number">৫০,০০০+</div>
+                        <div class="label">স্নায়ু গৃহীত</div>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="number">১,২০০+</div>
+                        <div class="label">শিক্ষক</div>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="number">৮৫৬+</div>
+                        <div class="label">পুরস্কার</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock leftside %}
 
+<!-- Right Sidebar -->
+{% block rightside %}
+<div class="col-lg-4">
+    <aside class="speech-section ps-lg-0">
 
+        <!-- Quick Links Widget -->
+        <div class="sidebar-widget">
+            <div class="widget-header">
+                <h4><span>🔗</span> দ্রুত লিংক</h4>
+            </div>
+            <div class="widget-body">
+                <ul class="quick-links-list">
+                    <li>
+                        <a href="{% url 'speach' %}">অধ্যক্ষের বাণী <span class="arrow">→</span></a>
+                    </li>
+                    <li>
+                        <a href="{% url 'lokko' %}">লক্ষ্য ও উদ্দেশ্য <span class="arrow">→</span></a>
+                    </li>
+                    <li>
+                        <a href="{% url 'teachers_info' %}">শিক্ষকদের তালিকা <span class="arrow">→</span></a>
+                    </li>
+                    <li>
+                        <a href="{% url 'gallery' %}">ফটোগ্যালারি <span class="arrow">→</span></a>
+                    </li>
+                    <li>
+                        <a href="{% url 'notice_board' %}">নোটিশ বোর্ড <span class="arrow">→</span></a>
+                    </li>
+                    <li>
+                        <a href="{% url 'contact' %}">যোগাযোগ <span class="arrow">→</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
+        <!-- Key Milestones Widget -->
+        <div class="sidebar-widget">
+            <div class="widget-header">
+                <h4><span>🏛️</span> মূল ঐতিহ্য</h4>
+            </div>
+            <div class="widget-body">
+                <div class="milestone-item">
+                    <div class="milestone-year">২০০৫</div>
+                    <div class="milestone-desc">প্রতিষ্ঠানটি প্রতিষ্ঠিত হয়</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-year">২০০৮</div>
+                    <div class="milestone-desc">প্রথম পর্যায় শিক্ষার্থী ভর্তি শুরু</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-year">২০১২</div>
+                    <div class="milestone-desc">রাষ্ট্রীয় স্বীকৃতি প্রাপ্ত</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-year">২০১৮</div>
+                    <div class="milestone-desc">আন্তর্জাতিক মান অর্জন</div>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-year">২০২৩</div>
+                    <div class="milestone-desc">উচ্চশিক্ষা বিভাগ প্রতিষ্ঠা</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Search Widget -->
+        <div class="sidebar-widget">
+            <div class="widget-header">
+                <h4><span>🔍</span> শিক্ষার্থীর তথ্য</h4>
+            </div>
+            <div class="widget-body">
+                <form class="input-group" action="{% url 'students_info' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="search" name="students_search3" id="form1" placeholder="ইউনিক রোল" class="form-control" required>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-search"></i> SEARCH
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Gallery Widget -->
+        <div class="sidebar-widget">
+            <div class="widget-header">
+                <h4><span>📸</span> গ্যালারি</h4>
+            </div>
+            <div class="widget-body">
+                <div id="sideGalleryCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                        <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                        <button type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide-to="5" aria-label="Slide 6"></button>
+                    </div>
+                    <div class="carousel-inner">
+                        {% for g in gallery %}
+                        <div class="carousel-item {% if forloop.first %} active {% endif %}" data-bs-interval="3000">
+                            <img src="{{g.gallery_photo.url}}" class="d-block w-100" alt="{{g.title}}" style="border-radius: 8px;">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#sideGalleryCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Important Links Widget -->
+        <div class="sidebar-widget">
+            <div class="widget-header">
+                <h4><span>🔗</span> গুরুর্ত্বপূর্ণ লিংক</h4>
+            </div>
+            <div class="widget-body">
+                <ul class="important-links">
+                    {% for obj in important_link %}
+                    <li style="margin-bottom: 8px;">
+                        <i class="bi bi-link pe-2 text-success"></i>
+                        <a target="_blank" href="{{ obj.link }}">{{ obj.name }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- National Anthem Widget -->
+        <div class="sidebar-widget">
+            <div class="widget-header">
+                <h4><span>🎵</span> জাতীয় সংগীত</h4>
+            </div>
+            <div class="widget-body d-flex justify-content-center">
+                <audio controls>
+                    <source src="{% static 'institute/audio/bd_national_anthem.mp3' %}" type="audio/mpeg">
+                </audio>
+            </div>
+        </div>
+
+    </aside>
+</div>
+{% endblock rightside %}
