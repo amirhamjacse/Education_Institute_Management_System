@@ -57,5 +57,13 @@ urlpatterns = [
          name='add_stuff'
         ),
 
+    path('attendance/teacher/',
+         views.TeacherAttendanceMarkView.as_view(),
+         name='teacher_attendance_mark'
+        ),
+    path('attendance/teacher/report/',
+         views.TeacherAttendanceReportView.as_view(),
+         name='teacher_attendance_report'
+        ),
 
 ]

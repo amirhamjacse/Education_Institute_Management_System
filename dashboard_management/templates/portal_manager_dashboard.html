@@ -161,6 +161,16 @@
                             <span class="portal-card-footer">Open <i class="bi bi-arrow-right"></i></span>
                         </div>
                     </a>
+
+                    <a class="portal-card portal-card-gold" href="{% url 'dashboard_management:teacher_attendance_mark' %}" role="button" aria-label="Teacher Attendance" data-bs-toggle="tooltip" title="Teacher Attendance">
+                        <div class="portal-card-inner">
+                            <span class="portal-icon"><i class="bi bi-person-check-fill"></i></span>
+                            <span class="portal-code">TA</span>
+                            <h3>Teacher Attendance</h3>
+                            <p>Mark daily attendance for teachers and staff.</p>
+                            <span class="portal-card-footer">Open <i class="bi bi-arrow-right"></i></span>
+                        </div>
+                    </a>
                 </div>
 
                 <div class="shortcut-grid">
@@ -170,6 +180,7 @@
                     <a class="shortcut-link" href="{% url 'dashboard_management:news_adding' %}" role="button" aria-label="News" data-bs-toggle="tooltip" title="News"><i class="bi bi-newspaper"></i><span>News</span></a>
                     <a class="shortcut-link" href="{% url 'dashboard_management:student_id_cards' %}" role="button" aria-label="Student ID Cards" data-bs-toggle="tooltip" title="Student ID Cards"><i class="bi bi-person-vcard-fill"></i><span>ID Cards</span></a>
                     <a class="shortcut-link" href="{% url 'students:attendance_query' %}" role="button" aria-label="Student Attendance" data-bs-toggle="tooltip" title="Student Attendance"><i class="bi bi-calendar2-check-fill"></i><span>Student Attendance</span></a>
+                    <a class="shortcut-link" href="{% url 'dashboard_management:teacher_attendance_mark' %}" role="button" aria-label="Teacher Attendance" data-bs-toggle="tooltip" title="Teacher Attendance"><i class="bi bi-person-check-fill"></i><span>Teacher Attendance</span></a>
                 </div>
             </div>
 

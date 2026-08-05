@@ -6,8 +6,15 @@ from .models import (
     Sochib, DG_or_Chairman, Upo_Montri, SineBoard,Students_Information, 
     Teachers_Information, Other_Employee_Information, Gallery,
     Cultural_Program, Sports, Web_Heading, ImportantLink, Transaction, PaymentGateway,
-    Event, Testimonial, Download, SocialMedia, SiteMeta
+    Event, Testimonial, Download, SocialMedia, SiteMeta, TeacherAttendance
 )
+
+
+@admin.register(TeacherAttendance)
+class TeacherAttendanceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'teacher', 'date', 'status', 'marked_by', 'created_at')
+    list_filter = ('status', 'date')
+    search_fields = ('teacher__teachers_name',)
 
 
 class TransactionAdmin(admin.ModelAdmin):

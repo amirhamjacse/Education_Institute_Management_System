@@ -12,6 +12,9 @@ from .assigned_classes import (
 from .id_card import (
     StudentIDCardView
 )
+from .teacher_attendance import (
+    TeacherAttendanceMarkView, TeacherAttendanceReportView
+)
 __all__ = [
     OnlineAdmissionProcess,
     PortalManagerDashboard,
@@ -24,4 +27,6 @@ __all__ = [
     AddTeacherView,
     AddStuff,
     StudentIDCardView,
+    TeacherAttendanceMarkView,
+    TeacherAttendanceReportView,
 ]

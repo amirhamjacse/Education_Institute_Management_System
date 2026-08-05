@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 # Create your models here.jfd
@@ -58,6 +59,34 @@ class Teachers_Information(models.Model):
     email = models.EmailField(max_length=150)
     designation = models.CharField(max_length=150)
     teachers_photo = models.FileField(upload_to='Teachers_Photo/', default='empty-profile.png')
+
+class TeacherAttendance(models.Model):
+    STATUS_CHOICES = (
+        ('present', 'Present'),
+        ('absent', 'Absent'),
+        ('late', 'Late'),
+        ('leave', 'Leave'),
+    )
+    teacher = models.ForeignKey(
+        Teachers_Information, on_delete=models.CASCADE,
+        related_name='attendances'
+    )
+    date = models.DateField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='present')
+    remarks = models.CharField(max_length=255, blank=True, null=True)
+    marked_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='teacher_attendance_marked'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('teacher', 'date')
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.teacher.teachers_name} - {self.date} - {self.status}"
+
 
 class Other_Employee_Information(models.Model):
     Others_name = models.CharField(max_length=150)

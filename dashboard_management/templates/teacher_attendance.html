@@ -1,0 +1,149 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+{% block title %}
+<title>Teacher Attendance</title>
+{% endblock title %}
+
+{% block leftside %}
+<style>
+    .portal-dashboard { padding: 8px 0 12px; }
+    .dashboard-shell { overflow: hidden; background: #f7faf8; border: 1px solid #dbe7e0; border-radius: 12px; box-shadow: 0 22px 54px rgba(18, 52, 38, 0.12); }
+    .dashboard-hero { position: relative; padding: clamp(18px, 3vw, 30px); color: #fff; background: linear-gradient(135deg, rgba(4, 91, 53, 0.96), rgba(8, 114, 67, 0.84)), url("{% static 'institute/img/4444.jpg' %}") center/cover; }
+    .dashboard-hero::after { content: ""; position: absolute; inset: auto 0 0 0; height: 1px; background: rgba(255, 255, 255, 0.24); }
+    .dashboard-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid rgba(255, 255, 255, 0.42); border-radius: 999px; background: rgba(255, 255, 255, 0.16); font-weight: 800; }
+    .dashboard-hero h1 { max-width: 820px; margin: 12px 0 6px; color: #fff; font-size: clamp(1.7rem, 3vw, 2.8rem); font-weight: 900; line-height: 1.08; overflow-wrap: anywhere; }
+    .dashboard-hero p { max-width: 720px; margin: 0; color: rgba(255, 255, 255, 0.9); font-size: 1rem; line-height: 1.55; }
+    .dashboard-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .dashboard-meta span { display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.16); color: #fff; font-weight: 800; backdrop-filter: blur(8px); }
+    .dashboard-content { padding: clamp(12px, 2vw, 18px); }
+    .dashboard-panel { background: #fff; border: 1px solid #dfe8e3; border-radius: 10px; box-shadow: 0 14px 34px rgba(18, 52, 38, 0.08); }
+    .dashboard-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #e7eee9; }
+    .dashboard-panel-header h2 { margin: 0; color: #1b2838; font-weight: 900; }
+    .dashboard-panel-header small { color: #667085; font-weight: 700; }
+    .date-bar { display: flex; align-items: flex-end; gap: 12px; padding: 16px; flex-wrap: wrap; }
+    .date-bar label { display: block; margin-bottom: 6px; font-weight: 800; color: #1b2838; font-size: 0.85rem; }
+    .date-bar input { min-height: 44px; border-radius: 8px; border: 2px solid #d6e2db; padding: 6px 10px; }
+    .date-bar .btn { min-height: 44px; border-radius: 8px; font-weight: 800; }
+    .table-section { padding: 0 16px 16px; }
+    .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #e7eee9; }
+    .table { margin: 0; min-width: max-content; }
+    .table thead th { background: #f5f8f6; color: #1b2838; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 2px solid #dbe7e0; padding: 12px 14px; white-space: nowrap; }
+    .table tbody td { padding: 10px 14px; vertical-align: middle; color: #34443c; border-color: #edf3ef; }
+    .status-select { min-width: 130px; min-height: 42px; border-radius: 8px; border: 2px solid #d6e2db; padding: 6px 10px; font-weight: 700; }
+    .status-select:focus { border-color: #087243; outline: none; box-shadow: 0 0 0 0.2rem rgba(8, 114, 67, 0.12); }
+    .teacher-avatar { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; border: 2px solid #e3ece6; background: #f0f5f2; }
+    .teacher-avatar-placeholder { width: 38px; height: 38px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #e3ece6, #d6e2db); color: #667085; font-size: 1rem; font-weight: 900; }
+    .submit-bar { padding: 16px 0 0; display: flex; justify-content: center; }
+    .submit-bar .btn { min-width: 240px; min-height: 48px; border-radius: 999px; font-weight: 800; box-shadow: 0 14px 24px rgba(8, 114, 67, 0.22); }
+    .messages-container { padding: 0 16px 16px; }
+    .messages-container .alert { border-radius: 10px; font-weight: 600; border: none; margin: 0; }
+</style>
+
+<section class="portal-dashboard bangla">
+    <div class="dashboard-shell">
+        <div class="dashboard-hero">
+            <span class="dashboard-eyebrow"><i class="bi bi-calendar2-check-fill"></i> Teacher Attendance</span>
+            <h1>Mark Teacher Attendance</h1>
+            <p>Pick a date and record each teacher's status.</p>
+            <div class="dashboard-meta">
+                <span><i class="bi bi-people-fill"></i> {{ object_list|length }} teachers</span>
+                <span><i class="bi bi-calendar-event"></i> {{ date }}</span>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="dashboard-panel">
+                <div class="dashboard-panel-header">
+                    <div>
+                        <h2>Attendance Sheet</h2>
+                        <small>{{ webname.name_headline|default:"Institute Portal" }}</small>
+                    </div>
+                    <a href="{% url 'dashboard_management:teacher_attendance_report' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-bar-chart-line-fill"></i> View Report
+                    </a>
+                </div>
+
+                {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                    <div class="alert {{ message.tags }} d-flex align-items-center gap-2" role="alert">
+                        <i class="bi {% if message.tags == 'alert-success' %}bi-check-circle-fill{% elif message.tags == 'alert-danger' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="get" class="date-bar">
+                    <div>
+                        <label>Date</label>
+                        <input type="date" name="date" value="{{ date|date:'Y-m-d' }}">
+                    </div>
+                    <button class="btn btn-secondary" type="submit"><i class="bi bi-arrow-repeat"></i> Load</button>
+                </form>
+
+                <div class="table-section">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="date" value="{{ date|date:'Y-m-d' }}">
+                        <div class="table-wrapper">
+                            <table class="table table-hover table-bordered mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Photo</th>
+                                        <th>Name</th>
+                                        <th>Designation</th>
+                                        <th style="min-width:150px;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for row in object_list %}
+                                <tr>
+                                    <td class="text-center fw-bold text-muted" style="width:40px;">
+                                        {{ forloop.counter }}
+                                    </td>
+                                    <td>
+                                        {% if row.teacher.teachers_photo %}
+                                        <img src="{{ row.teacher.teachers_photo.url }}" class="teacher-avatar" alt="{{ row.teacher.teachers_name }}">
+                                        {% else %}
+                                        <span class="teacher-avatar-placeholder"><i class="bi bi-person-fill"></i></span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="fw-semibold">{{ row.teacher.teachers_name|default:'-' }}</td>
+                                    <td>{{ row.teacher.designation|default:'-' }}</td>
+                                    <td>
+                                        <input type="hidden" name="tid" value="{{ row.teacher.id }}">
+                                        <select name="status_{{ row.teacher.id }}" class="status-select">
+                                            {% for value, label in status_choices %}
+                                            <option value="{{ value }}" {% if row.status == value %}selected{% endif %}>{{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        <i class="bi bi-person-x fs-3 d-block mb-2"></i>
+                                        No teachers found. Add teachers first.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="submit-bar">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-check2-circle"></i> Save Attendance
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock leftside %}
+
+{% block rightside %}
+{% endblock rightside %}
