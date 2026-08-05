@@ -455,6 +455,26 @@
                             <span class="portal-card-footer">Open workspace <i class="bi bi-arrow-right"></i></span>
                         </div>
                     </a>
+
+                    <a class="portal-card portal-card-blue" href="{% url 'students:attendance_query' %}">
+                        <div class="portal-card-inner">
+                            <span class="portal-icon"><i class="bi bi-calendar2-check-fill"></i></span>
+                            <span class="portal-code">TA</span>
+                            <h3>Take Attendance</h3>
+                            <p>Mark daily attendance for a class and section.</p>
+                            <span class="portal-card-footer">Open workspace <i class="bi bi-arrow-right"></i></span>
+                        </div>
+                    </a>
+
+                    <a class="portal-card portal-card-green" href="{% url 'students:attendance_report' %}">
+                        <div class="portal-card-inner">
+                            <span class="portal-icon"><i class="bi bi-bar-chart-line-fill"></i></span>
+                            <span class="portal-code">AR</span>
+                            <h3>Attendance Report</h3>
+                            <p>Review attendance history by class, section, and date range.</p>
+                            <span class="portal-card-footer">Open workspace <i class="bi bi-arrow-right"></i></span>
+                        </div>
+                    </a>
                 </div>
 
                 <div class="shortcut-grid">
@@ -462,6 +482,8 @@
                     <a class="shortcut-link" href="{% url 'students:show_result' %}"><i class="bi bi-graph-up-arrow"></i><span>Exam Wise Result</span></a>
                     <a class="shortcut-link" href="{% url 'students_info' %}"><i class="bi bi-search"></i><span>Search Students</span></a>
                     <a class="shortcut-link" href="{% url 'dashboard_management:assigned_class_teacher' %}"><i class="bi bi-mortarboard-fill"></i><span>Assigned Classes</span></a>
+                    <a class="shortcut-link" href="{% url 'students:attendance_query' %}"><i class="bi bi-calendar2-check-fill"></i><span>Take Attendance</span></a>
+                    <a class="shortcut-link" href="{% url 'students:attendance_report' %}"><i class="bi bi-bar-chart-line-fill"></i><span>Attendance Report</span></a>
                 </div>
             </div>
 

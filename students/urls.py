@@ -101,4 +101,19 @@ urlpatterns = [
         views.StudentsResultSpecific.as_view(),
         name='students_specific_result'
     ),
+    path(
+        'attendance/mark/',
+        views.AttendanceQueryView.as_view(),
+        name='attendance_query'
+    ),
+    path(
+        'attendance/mark/<int:clas_nm>/<int:clas_sec>/<str:att_date>/',
+        views.AttendanceMarkView.as_view(),
+        name='attendance_mark'
+    ),
+    path(
+        'attendance/report/',
+        views.AttendanceReportView.as_view(),
+        name='attendance_report'
+    ),
 ]

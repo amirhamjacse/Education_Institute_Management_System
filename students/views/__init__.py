@@ -11,6 +11,9 @@ from .students_dashboard import (
     StudentsSubjects, StudentsRoutine, StudentsClassRegister,
     StudentsResultSpecific
 )
+from .attendance import (
+    AttendanceQueryView, AttendanceMarkView, AttendanceReportView
+)
 
 
 __all__ = [
@@ -19,5 +22,6 @@ __all__ = [
     ListOfResultscCeateResultView, ResultsDashboard, ShowResultView,
     SemesterResultView, SemesterResultViews, StudentsDashboard,
     StudentsSubjects, StudentsRoutine, StudentsClassRegister,
-    StudentsResultSpecific, ResultsAddedSuccessView
+    StudentsResultSpecific, ResultsAddedSuccessView,
+    AttendanceQueryView, AttendanceMarkView, AttendanceReportView,
 ]

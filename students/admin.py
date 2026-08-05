@@ -302,8 +302,29 @@ class ClassYearAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'class_year',
-        
+
     )
+
+
+class AttendanceAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'id',
+        'student',
+        'class_name',
+        'section',
+        'date',
+        'status',
+        'marked_by',
+        'created_time',
+    )
+    list_filter = (
+        'status',
+        'date',
+        'class_name',
+        'section',
+    )
+    search_fields = ('student__name', 'student__unique_roll')
 
 
 
@@ -320,3 +341,4 @@ _register(models.Exam, ExamAdmin)
 _register(models.ExamYear, ExamYearAdmin)
 _register(models.ResultInfo, ResultInfoAdmin)
 _register(models.StudentsInfo, StudentsInfoAdmin)
+_register(models.Attendance, AttendanceAdmin)

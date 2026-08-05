@@ -6,6 +6,7 @@ from .class_studn import ClassName, SectionClas, ClassYear, Session
 from .exam import Exam, ExamYear
 from .result import ResultInfo
 from .subject import Subjects
+from .attendance import Attendance
 
 __all__ = [
     CommonFields,
@@ -17,4 +18,5 @@ __all__ = [
     Subjects,
     ClassYear,
     SectionClas,
+    Attendance,
 ]
