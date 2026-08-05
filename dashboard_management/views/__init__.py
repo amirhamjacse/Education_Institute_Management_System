@@ -9,6 +9,9 @@ from .portal_management import (
 from .assigned_classes import (
     AssignClassesToTeacher
 )
+from .id_card import (
+    StudentIDCardView
+)
 __all__ = [
     OnlineAdmissionProcess,
     PortalManagerDashboard,
@@ -19,5 +22,6 @@ __all__ = [
     DeleteNews,
     GalleryView,
     AddTeacherView,
-    AddStuff
+    AddStuff,
+    StudentIDCardView,
 ]

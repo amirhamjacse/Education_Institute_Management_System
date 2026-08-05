@@ -22,6 +22,11 @@ urlpatterns = [
         name='assigned_class_teacher'
     ),
     path(
+        'portelmanager/id-cards',
+        views.StudentIDCardView.as_view(),
+        name='student_id_cards'
+    ),
+    path(
         'notice/adding',
         views.ADDNotice.as_view(),
         name='notice_adding'

@@ -1,0 +1,139 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Student ID Cards | {{ webname.name_headline|default:"Institute Portal" }}</title>
+{% endblock title %}
+
+{% block leftside %}
+<style>
+    .idcard-page { padding: 8px 0 24px; }
+    .idcard-hero { position: relative; padding: clamp(16px, 3vw, 26px); color: #fff; border-radius: 12px; background: linear-gradient(135deg, rgba(4, 91, 53, 0.96), rgba(8, 114, 67, 0.84)), url("{% static 'institute/img/4444.jpg' %}") center/cover; margin-bottom: 16px; }
+    .idcard-hero h1 { margin: 6px 0 4px; color: #fff; font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 900; }
+    .idcard-hero p { margin: 0; color: rgba(255,255,255,0.9); }
+    .idcard-eyebrow { display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border:1px solid rgba(255,255,255,0.42); border-radius:999px; background:rgba(255,255,255,0.16); font-weight:800; font-size: 0.85rem; }
+
+    .idcard-filter { background:#fff; border:1px solid #dfe8e3; border-radius:10px; box-shadow:0 14px 34px rgba(18,52,38,0.08); padding:16px; margin-bottom:18px; display:flex; flex-wrap:wrap; align-items:end; gap:12px; }
+    .idcard-filter .form-group { min-width: 200px; flex: 1 1 200px; }
+    .idcard-filter label { font-weight:800; color:#1b2838; margin-bottom:6px; display:block; font-size:0.88rem; }
+    .idcard-filter select { width:100%; padding:9px 10px; border:1px solid #dfe8e3; border-radius:8px; }
+    .idcard-filter .btn-print { background: linear-gradient(135deg,#087243,#0f8b63); color:#fff; border:none; padding:10px 18px; border-radius:8px; font-weight:800; }
+    .idcard-filter .btn-print:hover { color:#fff; opacity:0.92; }
+    .idcard-count { color:#667085; font-weight:700; align-self:center; margin-left:auto; }
+
+    .idcard-empty { background:#fff; border:1px dashed #dfe8e3; border-radius:10px; padding:40px; text-align:center; color:#667085; font-weight:700; }
+
+    .idcard-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:18px; }
+
+    .id-card { position:relative; width:100%; max-width:290px; margin:0 auto; border-radius:14px; overflow:hidden; background:#fff; border:1px solid #dfe8e3; box-shadow:0 12px 28px rgba(18,52,38,0.1); page-break-inside: avoid; break-inside: avoid; }
+    .id-card-head { background: linear-gradient(135deg,#087243,#0f8b63); color:#fff; padding:10px 12px; display:flex; align-items:center; gap:8px; }
+    .id-card-head img.logo { width:32px; height:32px; object-fit:contain; background:#fff; border-radius:6px; padding:2px; }
+    .id-card-head .inst-name { font-weight:900; font-size:0.86rem; line-height:1.2; overflow-wrap:anywhere; }
+    .id-card-head .inst-tag { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; opacity:0.9; }
+
+    .id-card-photo { display:flex; justify-content:center; padding:14px 0 6px; background:#f5f8f6; }
+    .id-card-photo img { width:92px; height:92px; object-fit:cover; border-radius:50%; border:3px solid #fff; box-shadow:0 4px 14px rgba(18,52,38,0.18); background:#e4ece7; }
+
+    .id-card-body { padding:8px 14px 14px; text-align:center; }
+    .id-card-body h3 { margin:2px 0 6px; font-size:1.02rem; font-weight:900; color:#1b2838; }
+    .id-card-table { width:100%; margin-top:6px; font-size:0.8rem; color:#34443c; }
+    .id-card-table td { padding:2px 0; }
+    .id-card-table td.k { font-weight:800; color:#667085; width:42%; text-align:left; }
+    .id-card-table td.v { text-align:left; font-weight:700; }
+
+    .id-card-foot { border-top:1px dashed #dfe8e3; margin-top:8px; padding-top:8px; display:flex; justify-content:space-between; align-items:center; font-size:0.68rem; color:#667085; }
+    .id-card-foot .sig { border-top:1px solid #b7c3bb; padding-top:2px; margin-top:14px; }
+
+    @media print {
+        .idcard-hero, .idcard-filter, .navbar, .breadcrumb, nav, footer, .no-print { display:none !important; }
+        .idcard-grid { grid-template-columns: repeat(3, 1fr); gap:14px; }
+        .id-card { box-shadow:none; border:1px solid #999; }
+        body { background:#fff; }
+    }
+</style>
+
+<section class="idcard-page bangla">
+    <div class="idcard-hero no-print">
+        <span class="idcard-eyebrow"><i class="bi bi-person-vcard-fill"></i> Portal Manager</span>
+        <h1>Student ID Cards</h1>
+        <p>Select a class (and optionally a section) to generate ID cards for all students in that class.</p>
+    </div>
+
+    <form method="get" class="idcard-filter no-print" id="idcard-filter-form">
+        <div class="form-group">
+            <label for="class_name">Class</label>
+            <select name="class_name" id="class_name" onchange="document.getElementById('idcard-filter-form').submit();">
+                <option value="">-- Select Class --</option>
+                {% for c in classes %}
+                    <option value="{{ c.id }}" {% if selected_class_id|stringformat:"s" == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% if selected_class_id %}
+        <div class="form-group">
+            <label for="section">Section</label>
+            <select name="section" id="section" onchange="document.getElementById('idcard-filter-form').submit();">
+                <option value="">All Sections</option>
+                {% for s in sections %}
+                    <option value="{{ s.id }}" {% if selected_section_id|stringformat:"s" == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+
+        {% if selected_class_id %}
+        <span class="idcard-count">{{ id_card_students|length }} student{{ id_card_students|length|pluralize }}</span>
+        <button type="button" class="btn-print" onclick="window.print();"><i class="bi bi-printer-fill"></i> Print Cards</button>
+        {% endif %}
+    </form>
+
+    {% if not selected_class_id %}
+        <div class="idcard-empty no-print">
+            <i class="bi bi-person-vcard" style="font-size:2rem;"></i>
+            <p class="mt-2 mb-0">Choose a class above to view and print student ID cards.</p>
+        </div>
+    {% elif not id_card_students %}
+        <div class="idcard-empty">
+            <i class="bi bi-person-x" style="font-size:2rem;"></i>
+            <p class="mt-2 mb-0">No students found for the selected class{% if selected_section_id %}/section{% endif %}.</p>
+        </div>
+    {% else %}
+        <div class="idcard-grid">
+            {% for student in id_card_students %}
+            <div class="id-card">
+                <div class="id-card-head">
+                    {% if webname.institute_logo %}
+                        <img class="logo" src="{{ webname.institute_logo.url }}" alt="logo">
+                    {% endif %}
+                    <div>
+                        <div class="inst-name">{{ webname.name_headline|default:"Institute Name" }}</div>
+                        <div class="inst-tag">Student ID Card</div>
+                    </div>
+                </div>
+                <div class="id-card-photo">
+                    <img src="{% if student.students_image %}{{ student.students_image.url }}{% else %}https://www.svgrepo.com/show/382106/male-avatar-boy-face-man-user-9.svg{% endif %}" alt="{{ student.name }}">
+                </div>
+                <div class="id-card-body">
+                    <h3>{{ student.name }}</h3>
+                    <table class="id-card-table">
+                        <tr><td class="k">Roll</td><td class="v">{{ student.unique_roll|default:"-" }}</td></tr>
+                        <tr><td class="k">Class</td><td class="v">{{ student.class_name.name|default:"-" }}</td></tr>
+                        <tr><td class="k">Section</td><td class="v">{{ student.section_class.name|default:"-" }}</td></tr>
+                        <tr><td class="k">Session</td><td class="v">{{ student.session|default:"-" }}</td></tr>
+                        <tr><td class="k">Blood Group</td><td class="v">{{ student.blood_group|default:"-" }}</td></tr>
+                    </table>
+                    <div class="id-card-foot">
+                        <span>{{ webname.location|default:"" }}</span>
+                        <span class="sig">Authorized Signature</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+{% endblock leftside %}
+
+{% block rightside %}
+{% endblock rightside %}
