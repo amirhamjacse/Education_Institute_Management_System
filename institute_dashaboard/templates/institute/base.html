@@ -14,7 +14,7 @@
     <!-- Open Graph / Social Media -->
     <meta property="og:title" content="{% if site_meta and site_meta.meta_title %}{{ site_meta.meta_title }}{% else %}{{ webname.name_headline }}{% endif %}">
     <meta property="og:description" content="{% if site_meta and site_meta.meta_description %}{{ site_meta.meta_description }}{% else %}{{ webname.name_headline }} - একটি উন্নত শিক্ষা প্রতিষ্ঠান{% endif %}">
-    <meta property="og:image" content="{% if site_meta and site_meta.og_image %}{{ site_meta.og_image.url }}{% else %}{{ webname.institute_logo.url }}{% endif %}">
+    <meta property="og:image" content="{% if site_meta and site_meta.og_image %}{{ site_meta.og_image.url }}{% elif webname.institute_logo %}{{ webname.institute_logo.url }}{% endif %}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="bn_BD">
     
@@ -91,7 +91,7 @@
             <div class="bg-success py-2 top-brand">
                 <div class="row align-items-center g-0 brand-row">
                     <div class="col-auto brand-logo-col">
-                        <img class="brand-logo" src="{{webname.institute_logo.url}}" width="60px" alt="{{webname.name_headline}} - লোগো" srcset="" loading="lazy">
+                        <img class="brand-logo" src="{% if webname.institute_logo %}{{ webname.institute_logo.url }}{% else %}https://www.svgrepo.com/show/530471/institution.svg{% endif %}" width="60px" alt="{{webname.name_headline}} - লোগো" srcset="" loading="lazy">
                     </div>
                     <div class="col brand-copy"><h2 class="text-center text-white bangla institute-title">{{webname.name_headline}} </h2>
                         <span class="d-flex justify-content-center text-white bangla institute-location">{{webname.location}}</span>
