@@ -1,0 +1,85 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+{% block title %}
+<title>Fee Collection Report</title>
+{% endblock title %}
+
+{% block leftside %}
+<style>
+{% include 'fees/_styles.html' %}
+</style>
+
+<section class="portal-dashboard bangla">
+    <div class="dashboard-shell">
+        <div class="dashboard-hero">
+            <span class="dashboard-eyebrow"><i class="bi bi-bar-chart-line-fill"></i> Fee Management</span>
+            <h1>Fee Collection Report</h1>
+            <p>Total invoiced, collected, and outstanding amounts, filterable by class, session, and date range.</p>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="dashboard-panel">
+                <div class="dashboard-panel-header">
+                    <div><h2>Filters</h2></div>
+                </div>
+                <form method="get" class="filter-bar">
+                    <div>
+                        <label>Class</label>
+                        <select name="class_name">
+                            <option value="">All classes</option>
+                            {% for c in classes %}
+                            <option value="{{ c.id }}" {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Session</label>
+                        <input type="text" name="session" value="{{ selected_session|default:'' }}" placeholder="e.g. 2025-2026">
+                    </div>
+                    <div>
+                        <label>From date</label>
+                        <input type="date" name="start_date" value="{{ start_date }}">
+                    </div>
+                    <div>
+                        <label>To date</label>
+                        <input type="date" name="end_date" value="{{ end_date }}">
+                    </div>
+                    <div style="align-self:end;">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel-fill"></i> Filter</button>
+                    </div>
+                </form>
+
+                <div class="summary-cards">
+                    <div class="summary-card"><strong>{{ total_invoiced }}</strong><span>Total Invoiced</span></div>
+                    <div class="summary-card collected"><strong>{{ total_collected }}</strong><span>Total Collected</span></div>
+                    <div class="summary-card due"><strong>{{ total_due }}</strong><span>Total Due</span></div>
+                </div>
+
+                <div class="dashboard-panel-header">
+                    <div><h2>By Class</h2></div>
+                </div>
+                <div class="table-section">
+                    <div class="table-wrapper">
+                        <table class="table table-hover table-bordered mb-0">
+                            <thead><tr><th>Class</th><th>Invoiced</th></tr></thead>
+                            <tbody>
+                            {% for row in by_class %}
+                            <tr>
+                                <td class="fw-semibold">{{ row.class_name__name|default:'-' }}</td>
+                                <td>{{ row.invoiced }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="2" class="text-center py-4 text-muted">No invoices match the selected filters.</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock leftside %}
+
+{% block rightside %}
+{% endblock rightside %}

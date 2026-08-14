@@ -1,0 +1,84 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}
+<title>Ad-hoc Invoice</title>
+{% endblock title %}
+
+{% block leftside %}
+<style>
+{% include 'fees/_styles.html' %}
+</style>
+
+<section class="portal-dashboard bangla">
+    <div class="dashboard-shell">
+        <div class="dashboard-hero">
+            <span class="dashboard-eyebrow"><i class="bi bi-person-plus-fill"></i> Fee Management</span>
+            <h1>Ad-hoc Invoice</h1>
+            <p>Create a one-off invoice for a single student, not tied to any fee structure — e.g. a fine or a special charge.</p>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="dashboard-panel">
+                <div class="dashboard-panel-header">
+                    <div>
+                        <h2>Invoice Details</h2>
+                    </div>
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'fees:invoice_generate_query' %}"><i class="bi bi-receipt"></i> Bulk Generate Instead</a>
+                </div>
+                {% include 'fees/_messages.html' %}
+                <div class="form-section">
+                    <div class="form-card">
+                        <form method="post" class="form-section">
+                            {% csrf_token %}
+                            <div class="form-grid">
+                                <div class="form-group-card full">
+                                    <label>Student <span class="text-danger">*</span></label>
+                                    {% render_field form.student|add_class:'form-control' %}
+                                    {{ form.student.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Fee Head <span class="text-danger">*</span></label>
+                                    {% render_field form.fee_head|add_class:'form-control' %}
+                                    {{ form.fee_head.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Amount <span class="text-danger">*</span></label>
+                                    {% render_field form.amount|add_class:'form-control' %}
+                                    {{ form.amount.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Discount</label>
+                                    {% render_field form.discount|add_class:'form-control' %}
+                                    {{ form.discount.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Due Date <span class="text-danger">*</span></label>
+                                    {% render_field form.due_date|add_class:'form-control' %}
+                                    {{ form.due_date.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Period Label</label>
+                                    {% render_field form.period_label|add_class:'form-control' %}
+                                    {{ form.period_label.errors }}
+                                </div>
+                                <div class="form-group-card full">
+                                    <label>Remarks</label>
+                                    {% render_field form.remarks|add_class:'form-control' %}
+                                    {{ form.remarks.errors }}
+                                </div>
+                                <div class="form-actions">
+                                    <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle"></i> Create Invoice</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock leftside %}
+
+{% block rightside %}
+{% endblock rightside %}

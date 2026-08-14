@@ -1,0 +1,115 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+{% block title %}
+<title>Invoices</title>
+{% endblock title %}
+
+{% block leftside %}
+<style>
+{% include 'fees/_styles.html' %}
+</style>
+
+<section class="portal-dashboard bangla">
+    <div class="dashboard-shell">
+        <div class="dashboard-hero">
+            <span class="dashboard-eyebrow"><i class="bi bi-receipt"></i> Fee Management</span>
+            <h1>Invoices</h1>
+            <p>Search and filter every invoice generated for students.</p>
+            <div class="dashboard-meta">
+                <span><i class="bi bi-plus-circle"></i> <a href="{% url 'fees:invoice_generate_query' %}" class="text-white">Generate Invoices</a></span>
+                <span><i class="bi bi-exclamation-triangle"></i> <a href="{% url 'fees:invoice_overdue' %}" class="text-white">Overdue</a></span>
+                <span><i class="bi bi-bar-chart-line"></i> <a href="{% url 'fees:fee_report' %}" class="text-white">Report</a></span>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="dashboard-panel">
+                <div class="dashboard-panel-header">
+                    <div>
+                        <h2>All Invoices</h2>
+                        <small>{{ page_obj.paginator.count }} total</small>
+                    </div>
+                </div>
+                {% include 'fees/_messages.html' %}
+                <form method="get" class="filter-bar">
+                    <div>
+                        <label>Search</label>
+                        <input type="text" name="q" value="{{ search }}" placeholder="Name, roll, or invoice no.">
+                    </div>
+                    <div>
+                        <label>Class</label>
+                        <select name="class_name">
+                            <option value="">All classes</option>
+                            {% for c in classes %}
+                            <option value="{{ c.id }}" {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Section</label>
+                        <select name="section">
+                            <option value="">All sections</option>
+                            {% for s in sections %}
+                            <option value="{{ s.id }}" {% if selected_section == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="">All statuses</option>
+                            {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="align-self:end;">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel-fill"></i> Filter</button>
+                    </div>
+                </form>
+
+                <div class="table-section">
+                    <div class="table-wrapper">
+                        <table class="table table-hover table-bordered mb-0">
+                            <thead>
+                                <tr><th>Invoice No</th><th>Student</th><th>Class</th><th>Fee Head</th><th>Amount</th><th>Due</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                            {% for invoice in page_obj %}
+                            <tr onclick="window.location='{% url 'fees:invoice_detail' invoice.pk %}'" style="cursor:pointer;">
+                                <td class="fw-semibold">{{ invoice.invoice_no }}</td>
+                                <td>{{ invoice.student.name|default:'-' }} <span class="badge-roll">{{ invoice.student.unique_roll|default:'-' }}</span></td>
+                                <td>{{ invoice.class_name|default:'-' }}</td>
+                                <td>{{ invoice.fee_head }}</td>
+                                <td>{{ invoice.net_amount }}</td>
+                                <td>{{ invoice.due_date }}</td>
+                                <td><span class="status-badge {{ invoice.status }}">{{ invoice.get_status_display }}</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="7" class="text-center py-4 text-muted">No invoices match the selected filters.</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if page_obj.has_other_pages %}
+                    <nav class="mt-3">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                            {% endif %}
+                            <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+                            {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock leftside %}
+
+{% block rightside %}
+{% endblock rightside %}

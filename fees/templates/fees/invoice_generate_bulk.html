@@ -1,0 +1,77 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+{% block title %}
+<title>Generate Invoices - {{ class }}</title>
+{% endblock title %}
+
+{% block leftside %}
+<style>
+{% include 'fees/_styles.html' %}
+</style>
+
+<section class="portal-dashboard bangla">
+    <div class="dashboard-shell">
+        <div class="dashboard-hero">
+            <span class="dashboard-eyebrow"><i class="bi bi-receipt-cutoff"></i> Invoice Generation</span>
+            <h1>{{ class }}{% if section %} - {{ section }}{% endif %}</h1>
+            <p>{{ fee_structure.fee_head }} &middot; {{ period }} &middot; Amount {{ fee_structure.amount }} &middot; Due {{ due_date }}</p>
+            <div class="dashboard-meta">
+                <span><i class="bi bi-people-fill"></i> {{ object_list|length }} students</span>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="dashboard-panel">
+                <div class="dashboard-panel-header">
+                    <div>
+                        <h2>Roster</h2>
+                        <small>Already-invoiced students are pre-unchecked and disabled to avoid duplicate invoices.</small>
+                    </div>
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'fees:invoice_generate_query' %}"><i class="bi bi-arrow-left"></i> Change Criteria</a>
+                </div>
+                {% include 'fees/_messages.html' %}
+                <div class="table-section">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="table-wrapper">
+                            <table class="table table-hover table-bordered mb-0">
+                                <thead>
+                                    <tr><th></th><th>#</th><th>Name</th><th>Roll</th><th>Status</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for row in object_list %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="sid" value="{{ row.student.id }}"
+                                               {% if not row.already_invoiced %}checked{% else %}disabled{% endif %}>
+                                    </td>
+                                    <td class="text-muted">{{ forloop.counter }}</td>
+                                    <td class="fw-semibold">{{ row.student.name|default:'-' }}</td>
+                                    <td><span class="badge-roll">{{ row.student.unique_roll|default:'-' }}</span></td>
+                                    <td>
+                                        {% if row.already_invoiced %}
+                                        <span class="status-badge cancelled">Already Invoiced</span>
+                                        {% else %}
+                                        <span class="status-badge unpaid">Will Generate</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center py-4 text-muted">No students found for this class/section/session.</td></tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle"></i> Generate Invoices</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock leftside %}
+
+{% block rightside %}
+{% endblock rightside %}

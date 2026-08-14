@@ -1,0 +1,10 @@
+{% if messages %}
+<div class="messages-container">
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} d-flex align-items-center gap-2" role="alert">
+        <i class="bi {% if message.tags == 'alert-success' %}bi-check-circle-fill{% elif message.tags == 'alert-danger' %}bi-exclamation-triangle-fill{% elif message.tags == 'alert-warning' %}bi-exclamation-circle-fill{% else %}bi-info-circle-fill{% endif %}"></i>
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

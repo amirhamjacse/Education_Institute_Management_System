@@ -9,9 +9,11 @@ Audit of gaps found in the current codebase (as of 2026-08-05).
   - Teacher side: `institute_dashaboard.TeacherAttendance` model, date-based marking at `dashboard_management:teacher_attendance_mark` plus `dashboard_management:teacher_attendance_report`. Linked from the Portal Manager Dashboard.
   - Both use Django's auto-generated model permissions (`add_attendance` / `view_attendance`, staff-only for teacher attendance) and are registered in the admin.
 
+- **Fee & invoice management** (2026-08-14) — new `fees` app: `FeeHead`/`FeeStructure` lookup tables (per class + session + frequency), `Invoice`/`Payment` models with staff-recorded payments (cash/bank/mobile banking — no online checkout), bulk invoice generation per class/section/period plus ad-hoc single-student invoices, a filterable/paginated invoice list, an invoice detail view with payment history, payment recording (`select_for_update`-guarded against concurrent posting), payment voiding, a printable receipt, an overdue-invoices view, and a collection report (total invoiced/collected/due, by class). Linked from the Portal Manager Dashboard. Uses Django's auto-generated model permissions (`fees.add_invoice`, `fees.add_payment`, `fees.view_invoice`, etc.) — assignable to regular staff, unlike `dashboard_management`'s permission gap below.
+  - **Deferred**: online payment checkout (the existing SSLCommerz integration in `institute_dashaboard/views.py` is dead code — its callback URLs have no matching route and `Transaction` is never written to; wiring it up is a separate task), student/parent self-service dues view (blocked on `StudentsInfo`↔`Core.User` linking, see below), SMS/email due-date reminders (no notification layer exists), scheduled/automatic recurring invoice generation (no Celery — use the manual "generate for period" bulk action instead), expense tracking (a separate finance concern from fee collection).
+
 ## Core functionality gaps
 
-- **Recurring fee / invoice management** — only a one-off `admission_fee` field on `OnlineAdmission` (`institute_dashaboard/models.py:138`). No tuition fee, dues, invoices, or payment history per student.
 - **Real class routine / timetable** — `StudentsRoutine` (`students/views/students_dashboard.py:46`) just lists all students; there's no actual period/subject/time-slot model behind it.
 - **Library management** — no book/borrowing models.
 - **Transport management** — no vehicle/route models.
@@ -40,8 +42,8 @@ Audit of gaps found in the current codebase (as of 2026-08-05).
 
 ## Suggested priority
 
-1. Link `StudentsInfo` / `Teachers_Information` to `Core.User` so students and teachers can self-login.
-2. Build recurring fee/invoice management, reusing the existing SSLCommerz integration.
+1. Link `StudentsInfo` / `Teachers_Information` to `Core.User` so students and teachers can self-login — this also unblocks a student/parent self-service dues view on top of the new `fees` app.
+2. Fix the dead SSLCommerz callback routing in `institute_dashaboard` so online payment (admission fee today, invoice payment tomorrow) actually works end to end.
 3. Reconcile the duplicate models between `institute_dashaboard` and `students`.
-4. Fill in real test coverage for the untested apps (including the new attendance views).
+4. Fill in real test coverage for the untested apps (including the new attendance and fee-management views).
 5. Harden production settings (env-based `SECRET_KEY`/`DEBUG`, security headers, email backend).

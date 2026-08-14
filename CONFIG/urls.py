@@ -46,6 +46,7 @@ urlpatterns = [
     path('news/', views.newspage, name='news'),
     path('news/', views.newspage, name='news'),
     path('student/', include('students.urls')),
+    path('fees/', include('fees.urls')),
     path("accounts/", include("django.contrib.auth.urls")),
     path('auth/signup/', SignupView.as_view(), name='signup'),
     path('auth/login/', LoginView.as_view(), name='login'),

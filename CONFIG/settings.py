@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'institute_dashaboard',
     'students',
+    'fees',
     'django_admin_generator',
     'Core',
     'django_prometheus',

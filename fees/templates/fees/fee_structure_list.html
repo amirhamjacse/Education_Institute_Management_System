@@ -1,0 +1,84 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+{% block title %}
+<title>Fee Structures</title>
+{% endblock title %}
+
+{% block leftside %}
+<style>
+{% include 'fees/_styles.html' %}
+</style>
+
+<section class="portal-dashboard bangla">
+    <div class="dashboard-shell">
+        <div class="dashboard-hero">
+            <span class="dashboard-eyebrow"><i class="bi bi-diagram-3-fill"></i> Fee Management</span>
+            <h1>Fee Structures</h1>
+            <p>The fee amount charged per class, per session, at a given frequency.</p>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="dashboard-panel">
+                <div class="dashboard-panel-header">
+                    <div>
+                        <h2>Configured Fee Structures</h2>
+                        <small>{{ structures|length }} entries</small>
+                    </div>
+                    <div class="action-row">
+                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'fees:fee_head_list' %}"><i class="bi bi-tags"></i> Fee Heads</a>
+                        <a class="btn btn-primary btn-sm" href="{% url 'fees:fee_structure_add' %}"><i class="bi bi-plus-circle"></i> Add Structure</a>
+                    </div>
+                </div>
+                {% include 'fees/_messages.html' %}
+                <form method="get" class="filter-bar">
+                    <div>
+                        <label>Class</label>
+                        <select name="class_name">
+                            <option value="">All classes</option>
+                            {% for c in classes %}
+                            <option value="{{ c.id }}" {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Session</label>
+                        <input type="text" name="session" value="{{ selected_session|default:'' }}" placeholder="e.g. 2025-2026">
+                    </div>
+                    <div style="align-self:end;">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel-fill"></i> Filter</button>
+                    </div>
+                </form>
+                <div class="table-section">
+                    <div class="table-wrapper">
+                        <table class="table table-hover table-bordered mb-0">
+                            <thead>
+                                <tr><th>Class</th><th>Fee Head</th><th>Session</th><th>Frequency</th><th>Amount</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                            {% for structure in structures %}
+                            <tr>
+                                <td class="fw-semibold">{{ structure.class_name }}</td>
+                                <td>{{ structure.fee_head }}</td>
+                                <td>{{ structure.session }}</td>
+                                <td>{{ structure.get_frequency_display }}</td>
+                                <td>{{ structure.amount }}</td>
+                                <td>
+                                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'fees:fee_structure_edit' structure.pk %}"><i class="bi bi-pencil"></i> Edit</a>
+                                    <a class="btn btn-sm btn-outline-primary" href="{% url 'fees:invoice_generate_query' %}"><i class="bi bi-receipt"></i> Generate</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" class="text-center py-4 text-muted">No fee structures match the selected filters.</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock leftside %}
+
+{% block rightside %}
+{% endblock rightside %}

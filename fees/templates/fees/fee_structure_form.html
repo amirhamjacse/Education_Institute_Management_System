@@ -1,0 +1,75 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}
+<title>{% if is_edit %}Edit{% else %}Add{% endif %} Fee Structure</title>
+{% endblock title %}
+
+{% block leftside %}
+<style>
+{% include 'fees/_styles.html' %}
+</style>
+
+<section class="portal-dashboard bangla">
+    <div class="dashboard-shell">
+        <div class="dashboard-hero">
+            <span class="dashboard-eyebrow"><i class="bi bi-diagram-3-fill"></i> Fee Management</span>
+            <h1>{% if is_edit %}Edit Fee Structure{% else %}Add Fee Structure{% endif %}</h1>
+            <p>Set the fee amount for a class, session, and billing frequency.</p>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="dashboard-panel">
+                <div class="dashboard-panel-header">
+                    <div>
+                        <h2>Fee Structure Details</h2>
+                        <small>All fields are required.</small>
+                    </div>
+                </div>
+                {% include 'fees/_messages.html' %}
+                <div class="form-section">
+                    <div class="form-card">
+                        <form method="post" class="form-section">
+                            {% csrf_token %}
+                            <div class="form-grid">
+                                <div class="form-group-card">
+                                    <label>Fee Head <span class="text-danger">*</span></label>
+                                    {% render_field form.fee_head|add_class:'form-control' %}
+                                    {{ form.fee_head.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Class <span class="text-danger">*</span></label>
+                                    {% render_field form.class_name|add_class:'form-control' %}
+                                    {{ form.class_name.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Session <span class="text-danger">*</span></label>
+                                    {% render_field form.session|add_class:'form-control'|attr:'placeholder:e.g. 2025-2026' %}
+                                    {{ form.session.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Frequency <span class="text-danger">*</span></label>
+                                    {% render_field form.frequency|add_class:'form-control' %}
+                                    {{ form.frequency.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Amount <span class="text-danger">*</span></label>
+                                    {% render_field form.amount|add_class:'form-control' %}
+                                    {{ form.amount.errors }}
+                                </div>
+                                <div class="form-actions">
+                                    <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle"></i> Save</button>
+                                    <a class="btn btn-outline-secondary ms-2" href="{% url 'fees:fee_structure_list' %}">Cancel</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock leftside %}
+
+{% block rightside %}
+{% endblock rightside %}

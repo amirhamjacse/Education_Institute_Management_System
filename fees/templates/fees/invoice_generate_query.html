@@ -1,0 +1,78 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}
+<title>Generate Invoices</title>
+{% endblock title %}
+
+{% block leftside %}
+<style>
+{% include 'fees/_styles.html' %}
+</style>
+
+<section class="portal-dashboard bangla">
+    <div class="dashboard-shell">
+        <div class="dashboard-hero">
+            <span class="dashboard-eyebrow"><i class="bi bi-receipt-cutoff"></i> Fee Management</span>
+            <h1>Generate Invoices</h1>
+            <p>Pick a class, an existing fee structure, and a billing period to bulk-generate invoices.</p>
+            <div class="dashboard-meta">
+                <span><i class="bi bi-diagram-3"></i> <a href="{% url 'fees:fee_structure_list' %}" class="text-white">Manage fee structures</a></span>
+                <span><i class="bi bi-person-plus"></i> <a href="{% url 'fees:invoice_adhoc' %}" class="text-white">Ad-hoc single invoice</a></span>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="dashboard-panel">
+                <div class="dashboard-panel-header">
+                    <div>
+                        <h2>Select Criteria</h2>
+                        <small>Students already invoiced for this fee structure and period will be skipped automatically.</small>
+                    </div>
+                </div>
+                {% include 'fees/_messages.html' %}
+                <div class="form-section">
+                    <div class="form-card">
+                        <form method="post" class="form-section">
+                            {% csrf_token %}
+                            <div class="form-grid">
+                                <div class="form-group-card">
+                                    <label>Class <span class="text-danger">*</span></label>
+                                    {% render_field form.class_name|add_class:'form-control' %}
+                                    {{ form.class_name.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Section</label>
+                                    {% render_field form.section|add_class:'form-control' %}
+                                    {{ form.section.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Fee Structure <span class="text-danger">*</span></label>
+                                    {% render_field form.fee_structure|add_class:'form-control' %}
+                                    {{ form.fee_structure.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Period</label>
+                                    {% render_field form.period_label|add_class:'form-control' %}
+                                    {{ form.period_label.errors }}
+                                </div>
+                                <div class="form-group-card">
+                                    <label>Due Date <span class="text-danger">*</span></label>
+                                    {% render_field form.due_date|add_class:'form-control' %}
+                                    {{ form.due_date.errors }}
+                                </div>
+                                <div class="form-actions">
+                                    <button class="btn btn-primary" type="submit"><i class="bi bi-arrow-right-circle"></i> Preview Roster</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock leftside %}
+
+{% block rightside %}
+{% endblock rightside %}
