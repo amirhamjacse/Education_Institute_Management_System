@@ -65,11 +65,45 @@ class Students_InformationAdmin(admin.ModelAdmin):
 
 @admin.register(Teachers_Information)
 class Teachers_InformationAdmin(admin.ModelAdmin):
-    list_display = ['id','teachers_name','phone_number', 'email', 'designation', 'teachers_photo']
+    list_display = ['id','teachers_name','phone_number', 'email', 'designation', 'teachers_photo', 'user']
+    actions = ['create_login_accounts']
+
+    @admin.action(description='Create login accounts for selected teachers')
+    def create_login_accounts(self, request, queryset):
+        from Core.utils import create_logins_for_rows
+        created = create_logins_for_rows(
+            queryset, prefix='TCH', group_name='Teacher',
+            phone_attr='phone_number',
+        )
+        if not created:
+            self.message_user(request, 'Selected teachers already have a login account.')
+            return
+        lines = '; '.join(f'{row}: {uid} / {pw}' for row, uid, pw in created)
+        self.message_user(
+            request,
+            f'Created {len(created)} login(s). Share these securely: {lines}',
+        )
 
 @admin.register(Other_Employee_Information)
 class Other_Employee_InformationAdmin(admin.ModelAdmin):
-    list_display = ['id','Others_name','phone_number', 'email', 'designation', 'Others_photo']
+    list_display = ['id','Others_name','phone_number', 'email', 'designation', 'Others_photo', 'user']
+    actions = ['create_login_accounts']
+
+    @admin.action(description='Create login accounts for selected staff')
+    def create_login_accounts(self, request, queryset):
+        from Core.utils import create_logins_for_rows
+        created = create_logins_for_rows(
+            queryset, prefix='STF', group_name='Staff',
+            phone_attr='phone_number',
+        )
+        if not created:
+            self.message_user(request, 'Selected staff already have a login account.')
+            return
+        lines = '; '.join(f'{row}: {uid} / {pw}' for row, uid, pw in created)
+        self.message_user(
+            request,
+            f'Created {len(created)} login(s). Share these securely: {lines}',
+        )
 
 @admin.register(Gallery)
 class GalleryAdmin(admin.ModelAdmin):

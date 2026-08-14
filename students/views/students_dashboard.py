@@ -132,6 +132,7 @@ class StudentsResultSpecific(
             'section':section,
             'exam_nm':exam,
             'exm_years':exm_year,
+            'students': getattr(request.user, 'student_profile', None),
         }
         return render(request, self.template_name, context)
 
@@ -141,6 +142,11 @@ class StudentsResultSpecific(
         selected_exam_year_id = request.POST.get('exam_year')
         selected_exam_type_id = request.POST.get('exam_type')
         unique_id = request.POST.get('unique_id')
+        own_profile = getattr(request.user, 'student_profile', None)
+        if own_profile:
+            # Self-service students can only ever see their own results,
+            # regardless of what roll number was submitted.
+            unique_id = own_profile.unique_roll
         session = ClassYear.objects.filter(id=selected_session_id).last()
         class_nm = ClassName.objects.filter(id=selected_class_id).last()
         # section = SectionClas.objects.all().last()

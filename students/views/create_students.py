@@ -8,12 +8,14 @@ from django.contrib.auth.mixins import (
     PermissionRequiredMixin
 )
 import calendar
+from django.contrib import messages
 from django.contrib.auth.models import Group
 from datetime import datetime
 from students.models.students_info import StudentsInfo
 from students.forms.studentscreateform import StudentsInfoForm
 from students.forms.result_input import ResultInputForm
-from Core.models import UserManager, User
+from Core.models import User
+from Core.utils import generate_temp_password
 
 # prfx = self.subscription
 #             # print(prfx, prfx.subs_type, prfx.subs_type.prefixs, 'shdddd')
@@ -85,33 +87,37 @@ class StudentsCreateView(
 
     def post(self, request, *args, **kwargs):
         form = StudentsInfoForm(request.POST, request.FILES)
-        user_manager = UserManager
-        # print(form, 'form-----------------------')
         if form.is_valid():
             student_info_ins = form.save(commit=False)
             if student_info_ins.unique_roll:
-                user = user_manager.create_user(
-                    self=UserManager,
-                    user_id=str(student_info_ins.unique_roll),
-                    password=str(student_info_ins.personal_mobile_number),
-                )
+                user_id = str(student_info_ins.unique_roll)
             else:
                 user_id = generate_user_id(prefix=student_info_ins.section_class)
-                # print(user_id, 'id------------------------')
-                user = user_manager.create_user(
-                    self=UserManager,
-                    user_id=str(user_id),
-                    password=str(student_info_ins.personal_mobile_number),
-                )
                 student_info_ins.unique_roll = user_id
+
+            temp_password = generate_temp_password()
+            user = User.objects.create_user(
+                user_id=user_id,
+                password=temp_password,
+                phone=student_info_ins.personal_mobile_number,
+            )
+            student_info_ins.user = user
             student_info_ins.save()
-            print(user,)
-            group = Group.objects.get(id=1)
-            group.user_set.add(user)
-            # user.groups.add(group)
-            print(group, 'group')
+
+            group, _ = Group.objects.get_or_create(name='Student')
+            user.groups.add(group)
+
+            messages.success(
+                request,
+                f'Student created. Login ID: {user_id}  '
+                f'Temporary password: {temp_password} — '
+                f'share this securely with the student.'
+            )
         else:
-            print(form.errors, 'Student Create Error')
+            messages.error(request, 'Please correct the errors below and try again.')
+            return render(request, self.template_name, {
+                'form': form, 'group': Group.objects.all(),
+            })
         return redirect('students:students_list')
 
 

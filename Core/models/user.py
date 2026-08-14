@@ -110,7 +110,7 @@ class UserManager(BaseUserManager):
             f"{self.__class__.__name__}.{_getframe().f_code.co_name} "
             f"Creating user: user_id={user_id}, extra_fields={extra_fields}"
         )
-        return self._create_user(User, user_id, password, **extra_fields)
+        return self._create_user(user_id, password, **extra_fields)
 
     def create_staffuser(self, user_id, password=None, **extra_fields):
         """Creates and returns a new staffuser using an user_id address"""

@@ -105,6 +105,18 @@ class InvoiceReceiptPrintView(
     def test_func(self):
         return self.request.user.is_active
 
+    def has_permission(self):
+        # Staff with fees.view_invoice can print any receipt; a student can
+        # only print their own, without needing that blanket permission.
+        if super().has_permission():
+            return True
+        student_profile = getattr(self.request.user, 'student_profile', None)
+        if student_profile is None:
+            return False
+        return Invoice.objects.filter(
+            pk=self.kwargs.get('pk'), student=student_profile
+        ).exists()
+
     def get(self, request, pk):
         invoice = get_object_or_404(
             Invoice.objects.select_related('student', 'class_name', 'section', 'fee_head'),

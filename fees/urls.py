@@ -18,6 +18,7 @@ urlpatterns = [
     path('invoices/generate/adhoc/', views.AdHocInvoiceCreateView.as_view(), name='invoice_adhoc'),
 
     path('invoices/', views.InvoiceListView.as_view(), name='invoice_list'),
+    path('invoices/mine/', views.MyInvoicesView.as_view(), name='my_invoices'),
     path('invoices/<int:pk>/', views.InvoiceDetailView.as_view(), name='invoice_detail'),
     path('invoices/<int:pk>/receipt/', views.InvoiceReceiptPrintView.as_view(), name='invoice_receipt'),
     path('invoices/overdue/', views.OverdueInvoiceListView.as_view(), name='invoice_overdue'),

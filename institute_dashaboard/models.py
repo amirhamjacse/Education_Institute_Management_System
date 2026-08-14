@@ -59,6 +59,11 @@ class Teachers_Information(models.Model):
     email = models.EmailField(max_length=150)
     designation = models.CharField(max_length=150)
     teachers_photo = models.FileField(upload_to='Teachers_Photo/', default='empty-profile.png')
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, verbose_name="Login Account",
+        related_name='teacher_profile'
+    )
 
 class TeacherAttendance(models.Model):
     STATUS_CHOICES = (
@@ -94,6 +99,11 @@ class Other_Employee_Information(models.Model):
     email = models.EmailField(max_length=150)
     designation = models.CharField(max_length=150)
     Others_photo = models.FileField(upload_to='Other_Employee_Photo/')
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, verbose_name="Login Account",
+        related_name='staff_profile'
+    )
 
 class Gallery(models.Model):
     title = models.CharField(max_length=100)

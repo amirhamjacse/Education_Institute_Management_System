@@ -257,6 +257,7 @@ class StudentsInfoAdmin(admin.ModelAdmin):
         'section_class',
         'exam',
         'subjects',
+        'user',
     )
     list_filter = (
         'is_active',
@@ -296,6 +297,23 @@ class StudentsInfoAdmin(admin.ModelAdmin):
         'subjects',
     )
     search_fields = ('name',)
+    actions = ['create_login_accounts']
+
+    @admin.action(description='Create login accounts for selected students')
+    def create_login_accounts(self, request, queryset):
+        from Core.utils import create_logins_for_rows
+        created = create_logins_for_rows(
+            queryset, prefix='STU', group_name='Student',
+            phone_attr='personal_mobile_number',
+        )
+        if not created:
+            self.message_user(request, 'Selected students already have a login account.')
+            return
+        lines = '; '.join(f'{row}: {uid} / {pw}' for row, uid, pw in created)
+        self.message_user(
+            request,
+            f'Created {len(created)} login(s). Share these securely: {lines}',
+        )
 
 class ClassYearAdmin(admin.ModelAdmin):
 

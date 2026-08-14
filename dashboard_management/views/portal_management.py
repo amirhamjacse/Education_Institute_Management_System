@@ -17,6 +17,10 @@ from django.contrib.auth.mixins import (
 )
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.models import Group
+
+from Core.models import User
+from Core.utils import generate_temp_password, generate_prefixed_user_id
 
 
 class PortalManagerDashboard(
@@ -184,8 +188,15 @@ class GalleryView(View):
         return redirect('gallery_list')  # Adjust the URL as needed
 
 
-class AddTeacherView(View):
+class AddTeacherView(
+    LoginRequiredMixin, UserPassesTestMixin,
+    PermissionRequiredMixin, View
+):
     template_name = 'add_teacher.html'
+    permission_required = 'institute_dashaboard.add_teachers_information'
+
+    def test_func(self):
+        return self.request.user.is_active
 
     def get(self, request):
         form = TeacherForm()
@@ -194,14 +205,39 @@ class AddTeacherView(View):
     def post(self, request):
         form = TeacherForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Teacher added successfully!')
+            teacher = form.save(commit=False)
+
+            user_id = generate_prefixed_user_id('TCH')
+            temp_password = generate_temp_password()
+            user = User.objects.create_user(
+                user_id=user_id, password=temp_password,
+                phone=teacher.phone_number,
+            )
+            teacher.user = user
+            teacher.save()
+
+            group, _ = Group.objects.get_or_create(name='Teacher')
+            user.groups.add(group)
+
+            messages.success(
+                request,
+                f'Teacher added. Login ID: {user_id}  '
+                f'Temporary password: {temp_password} — '
+                f'share this securely with the teacher.'
+            )
             return redirect('teachers_info')  # Adjust the URL name as needed
         return render(request, self.template_name, {'form': form})
 
 
-class AddStuff(View):
+class AddStuff(
+    LoginRequiredMixin, UserPassesTestMixin,
+    PermissionRequiredMixin, View
+):
     template_name = 'add_stuff.html'
+    permission_required = 'institute_dashaboard.add_other_employee_information'
+
+    def test_func(self):
+        return self.request.user.is_active
 
     def get(self, request):
         form = StuffForm()
@@ -210,8 +246,26 @@ class AddStuff(View):
     def post(self, request):
         form = StuffForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Stuff added successfully!')
+            staff = form.save(commit=False)
+
+            user_id = generate_prefixed_user_id('STF')
+            temp_password = generate_temp_password()
+            user = User.objects.create_user(
+                user_id=user_id, password=temp_password,
+                phone=staff.phone_number,
+            )
+            staff.user = user
+            staff.save()
+
+            group, _ = Group.objects.get_or_create(name='Staff')
+            user.groups.add(group)
+
+            messages.success(
+                request,
+                f'Stuff added. Login ID: {user_id}  '
+                f'Temporary password: {temp_password} — '
+                f'share this securely with the staff member.'
+            )
             return redirect('staf')  # Adjust the URL name as needed
         return render(request, self.template_name, {'form': form})
 

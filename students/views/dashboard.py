@@ -13,7 +13,7 @@ from django.contrib.auth.mixins import (
 
 class SDashboard(
     LoginRequiredMixin, UserPassesTestMixin,
-    # PermissionRequiredMixin, 
+    # PermissionRequiredMixin,
     TemplateView
 ):
     template_name = 'studentsinfo/dashobard.html'
@@ -21,14 +21,19 @@ class SDashboard(
 
     def test_func(self):
         return self.request.user.is_active
-    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['students'] = getattr(self.request.user, 'student_profile', None)
+        return context
+
 
 class StudentsInfoDashboard(
     LoginRequiredMixin, UserPassesTestMixin,
     PermissionRequiredMixin, TemplateView
 ):
     template_name = 'studentsinfo/stdn_info_dashboard.html'
-    permission_required = 'students.view_students'
+    permission_required = 'students.view_studentsinfo'
 
     def test_func(self):
         return self.request.user.is_active
@@ -44,22 +49,30 @@ class StudentsInfoDashboard(
 
 class ResultsDashboard(
     LoginRequiredMixin, UserPassesTestMixin,
-    PermissionRequiredMixin, TemplateView
+    TemplateView
 ):
     template_name = 'result/result_dashboard.html'
-    permission_required = 'students.view_students'
 
     def test_func(self):
-        return self.request.user.is_active
+        user = self.request.user
+        return user.is_active and (
+            user.groups.filter(name='Teacher').exists() or user.is_superuser
+        )
 
 
 class StudentsDashboard(
     LoginRequiredMixin, UserPassesTestMixin,
-    # PermissionRequiredMixin, 
     TemplateView
 ):
     template_name = 'studentsinfo/students_dashboard.html'
-    permission_required = 'students.view_students'
 
     def test_func(self):
-        return self.request.user.is_active
+        user = self.request.user
+        return user.is_active and (
+            user.groups.filter(name='Student').exists() or user.is_superuser
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['students'] = getattr(self.request.user, 'student_profile', None)
+        return context

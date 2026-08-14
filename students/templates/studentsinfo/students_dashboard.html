@@ -152,6 +152,7 @@
                     <a class="shortcut-link" href="{% url 'students:students_routine' %}"><i class="bi bi-calendar-week"></i><span>Class Routine</span></a>
                     {% if students %}
                     <a class="shortcut-link" href="{% url 'students:students_class_register' students.id %}"><i class="bi bi-person-plus-fill"></i><span>Register For new class/Course</span></a>
+                    <a class="shortcut-link" href="{% url 'fees:my_invoices' %}"><i class="bi bi-cash-coin"></i><span>My Invoices</span></a>
                     {% endif %}
                 </div>
             </div>

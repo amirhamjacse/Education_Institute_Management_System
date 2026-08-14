@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from .commonfields import CommonFields
 from django.utils.translation import gettext_lazy as _
@@ -98,6 +99,11 @@ class StudentsInfo(CommonFields):
     subjects =  models.ForeignKey(
         Subjects, on_delete = models.SET_NULL, null=True,
         verbose_name="Result Info", related_name="subjects"
+    )
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, verbose_name="Login Account",
+        related_name='student_profile'
     )
 
 

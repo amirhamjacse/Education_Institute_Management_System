@@ -7,6 +7,7 @@ from .invoice_generate import (
 )
 from .invoice_list import InvoiceListView
 from .invoice_detail import InvoiceDetailView, InvoiceReceiptPrintView
+from .my_invoices import MyInvoicesView
 from .overdue import OverdueInvoiceListView
 from .report import FeeCollectionReportView
 
@@ -21,6 +22,7 @@ __all__ = [
     InvoiceListView,
     InvoiceDetailView,
     InvoiceReceiptPrintView,
+    MyInvoicesView,
     OverdueInvoiceListView,
     FeeCollectionReportView,
 ]
