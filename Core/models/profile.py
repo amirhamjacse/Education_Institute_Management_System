@@ -111,7 +111,7 @@ class Profile(ExportModelOperationsMixin('profile'), models.Model):
 
     def __str__(self):
         """String representation of Profile model"""
-        return self.user.email if self.user.email else "Email not available"
+        return self.user.email if self.user and self.user.email else ''
 
 
 @receiver(post_save, sender=User)

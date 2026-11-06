@@ -1,13 +1,13 @@
 from .admission_dashboard import (
-    OnlineAdmissionProcess
-    )
+    OnlineAdmissionProcess, OnlineAdmissionEnrollView, OnlineAdmissionHoldToggleView
+)
 
 from .portal_management import (
     PortalManagerDashboard, ADDNotice, DeleteNotice, AddNews,
     DeleteNews, GalleryView, AddTeacherView, AddStuff
 )
 from .assigned_classes import (
-    AssignClassesToTeacher
+    AssignClassesToTeacher, DeleteTeacherAssignmentView
 )
 from .id_card import (
     StudentIDCardView

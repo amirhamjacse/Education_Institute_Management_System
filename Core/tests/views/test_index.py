@@ -3,6 +3,7 @@
 from http import HTTPStatus
 # DJANGO IMPORTS
 from django.test import Client, TestCase
+from django.urls import reverse
 # CORE IMPORTS
 from Core.tests.samples import sample_user
 from Core.tests.utils import suppress_warnings
@@ -14,17 +15,18 @@ class IndexPublicTests(TestCase):
     def setUp(self):
         """setup"""
         self.client = Client()
+        self.url = reverse('core:index')
 
     def test_index_template(self):
         """Tests index view template use"""
-        response = self.client.get('/')
+        response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)  # 200 OK
         self.assertTemplateUsed(response, 'index.html')
 
     def test_public_view(self):
         """Tests index view for anonymous users"""
-        response = self.client.get('/')
+        response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)  # 200 OK
         self.assertTrue(response.wsgi_request.user.is_anonymous)
@@ -33,15 +35,15 @@ class IndexPublicTests(TestCase):
     @suppress_warnings
     def test_other_methods(self):
         """tests all methods other than get"""
-        response = self.client.post('/')  # 405 method not allowed
+        response = self.client.post(self.url)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
-        response = self.client.put('/')  # 405 method not allowed
+        response = self.client.put(self.url)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
-        response = self.client.patch('/')  # 405 method not allowed
+        response = self.client.patch(self.url)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
-        response = self.client.delete('/')  # 405 method not allowed
+        response = self.client.delete(self.url)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
-        response = self.client.trace('/')  # 405 method not allowed
+        response = self.client.trace(self.url)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
 
 
@@ -52,18 +54,19 @@ class IndexPrivateTest(TestCase):
         """setup"""
         self.user = sample_user()
         self.client = Client()
-        self.client.login(email='user@sample.com', password='samplepwd')
+        self.client.force_login(self.user)
+        self.url = reverse('core:index')
 
     def test_index_template(self):
         """Tests index view template use"""
-        response = self.client.get('/')
+        response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)  # 200 OK
         self.assertTemplateUsed(response, 'index.html')
 
     def test_private_view(self):
         """Tests index view for authenticated users"""
-        response = self.client.get('/')
+        response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)  # 200 OK
         self.assertFalse(response.wsgi_request.user.is_anonymous)
@@ -72,13 +75,13 @@ class IndexPrivateTest(TestCase):
     @suppress_warnings
     def test_other_methods(self):
         """Tests all methods other than get"""
-        response = self.client.post('/')  # 405 method not allowed
+        response = self.client.post(self.url)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
-        response = self.client.put('/')  # 405 method not allowed
+        response = self.client.put(self.url)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
-        response = self.client.patch('/')  # 405 method not allowed
+        response = self.client.patch(self.url)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
-        response = self.client.delete('/')  # 405 method not allowed
+        response = self.client.delete(self.url)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
-        response = self.client.trace('/')  # 405 method not allowed
+        response = self.client.trace(self.url)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)

@@ -1,89 +1,116 @@
-{% extends 'institute/base.html' %} 
-{% load static %} 
-{% load widget_tweaks %}
-{% block title %}
-<title>Students Dashboard</title>
-{% endblock title %} 
+{% extends 'dashboard/admin_base.html' %}
+{% load static %}
 
-<!-- left side main things start from here -->
-{% block leftside %} 
-<style>
-    body{
-        margin-top:20px;
-        background:#FAFAFA;
-    }
-    .order-card {
-        color: #fff;
-    }
-    
-    .bg-c-blue {
-        background: linear-gradient(45deg,#4099ff,#73b4ff);
-    }
-    
-    .bg-c-green {
-        background: linear-gradient(45deg,#2ed8b6,#59e0c5);
-    }
-    
-    .bg-c-yellow {
-        background: linear-gradient(45deg,#FFB64D,#ffcb80);
-    }
-    
-    .bg-c-pink {
-        background: linear-gradient(45deg,#FF5370,#ff869a);
-    }
-    
-    
-    .card {
-        border-radius: 5px;
-        -webkit-box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
-        box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
-        border: none;
-        margin-bottom: 30px;
-        -webkit-transition: all 0.3s ease-in-out;
-        transition: all 0.3s ease-in-out;
-    }
-    
-    .card .card-block {
-        padding: 25px;
-    }
-    
-    .order-card i {
-        font-size: 26px;
-    }
-    
-    .f-left {
-        float: left;
-    }
-    
-    .f-right {
-        float: right;
-    }
-</style>
+{% block title %}Add New Teacher | Admin Console{% endblock title %}
+{% block breadcrumb_current %}Add Teacher{% endblock %}
 
-<body>
-<div class="container mt-5">
-    <h2 class="text-center">Add Teacher</h2>
-    
-    {% if messages %}
-        <div class="mt-3">
-            {% for message in messages %}
-                <div class="alert alert-success" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-dark mb-1">
+                    <i class="bi bi-person-plus text-success me-2"></i>Register New Teacher
+                </h1>
+                <p class="text-muted mb-0 small">Create a faculty member profile and issue portal credentials.</p>
+            </div>
+            <a href="{% url 'dashboard_management:portal_manager_board' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to Console
+            </a>
         </div>
-    {% endif %}
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Add Teacher</button>
-    </form>
+        <!-- Form Card -->
+        <div class="card border-0 shadow-sm" style="border-radius: 14px; overflow: hidden;">
+            <div class="card-header bg-white py-3 px-4 border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill small">
+                        <i class="bi bi-shield-lock me-1"></i> Staff Authentication
+                    </span>
+                    <span class="text-muted small">Auto-generated login user ID (TCH-XXXXX) & credentials</span>
+                </div>
+            </div>
+
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger shadow-sm border-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div>{{ form.non_field_errors }}</div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.teachers_name.id_for_label }}" class="form-label fw-bold text-dark small">
+                            Full Name <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-person"></i></span>
+                            {{ form.teachers_name }}
+                        </div>
+                        {% if form.teachers_name.errors %}<div class="text-danger small mt-1">{{ form.teachers_name.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.phone_number.id_for_label }}" class="form-label fw-bold text-dark small">
+                                Phone Number <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-telephone"></i></span>
+                                {{ form.phone_number }}
+                            </div>
+                            {% if form.phone_number.errors %}<div class="text-danger small mt-1">{{ form.phone_number.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.email.id_for_label }}" class="form-label fw-bold text-dark small">
+                                Email Address <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                                {{ form.email }}
+                            </div>
+                            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.designation.id_for_label }}" class="form-label fw-bold text-dark small">
+                            Designation / Subject Specialization <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-briefcase"></i></span>
+                            {{ form.designation }}
+                        </div>
+                        <div class="form-text small text-muted">e.g. Senior Lecturer - Mathematics, Assistant Professor, etc.</div>
+                        {% if form.designation.errors %}<div class="text-danger small mt-1">{{ form.designation.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.teachers_photo.id_for_label }}" class="form-label fw-bold text-dark small">
+                            Profile Photograph
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-image"></i></span>
+                            {{ form.teachers_photo }}
+                        </div>
+                        <div class="form-text small text-muted">Upload high-res headshot (JPG, PNG). Max 2MB recommended.</div>
+                        {% if form.teachers_photo.errors %}<div class="text-danger small mt-1">{{ form.teachers_photo.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-end gap-3 pt-3 border-top">
+                        <a href="{% url 'dashboard_management:portal_manager_board' %}" class="btn btn-light px-4">Cancel</a>
+                        <button type="submit" class="btn btn-success px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Register Teacher</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-</body>
-</html>
-{% endblock leftside %}
-{% block rightside %}
-
-{% endblock rightside %}
+{% endblock content %}

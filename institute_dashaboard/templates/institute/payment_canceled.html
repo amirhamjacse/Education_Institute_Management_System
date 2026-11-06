@@ -1,0 +1,29 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+{% block title %}<title>Payment Canceled</title>{% endblock title %}
+
+{% block leftside %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow border-0 rounded-4 text-center overflow-hidden">
+                <div class="card-header bg-secondary text-white py-4">
+                    <div class="rounded-circle bg-white text-secondary d-inline-flex align-items-center justify-content-center mb-2 shadow" style="width: 70px; height: 70px;">
+                        <i class="fas fa-ban fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-0">Payment Canceled</h4>
+                    <p class="small text-white-50 mb-0">You have canceled the payment process.</p>
+                </div>
+                <div class="card-body p-4 text-start">
+                    <p class="text-muted small mb-4">No funds were deducted. Your application remains saved in our system.</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'onlineadm' %}" class="btn btn-primary"><i class="fas fa-file-alt me-1"></i> Return to Admission</a>
+                        <a href="{% url 'homepage' %}" class="btn btn-outline-secondary"><i class="fas fa-home me-1"></i> Go to Homepage</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock leftside %}
+{% block rightside %}{% endblock rightside %}

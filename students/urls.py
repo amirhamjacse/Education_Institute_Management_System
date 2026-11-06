@@ -1,5 +1,6 @@
 from django.urls import path
 from students import views
+from students.views import routine_views, library_views, operations_views, parent_views
 
 app_name = 'students'
 
@@ -88,8 +89,28 @@ urlpatterns = [
     ),
     path(
         'routine/',
-        views.StudentsRoutine.as_view(),
+        routine_views.RoutineView.as_view(),
         name='students_routine'
+    ),
+    path(
+        'routine/delete/<int:pk>/',
+        routine_views.DeleteRoutineSlotView.as_view(),
+        name='delete_routine_slot'
+    ),
+    path(
+        'admit-cards/',
+        routine_views.AdmitCardListView.as_view(),
+        name='admit_cards'
+    ),
+    path(
+        'admit-cards/<int:pk>/print/',
+        routine_views.AdmitCardPrintView.as_view(),
+        name='admit_card_print'
+    ),
+    path(
+        'admit-cards/print/',
+        routine_views.AdmitCardPrintView.as_view(),
+        name='admit_card_print_all'
     ),
     path(
         'register/<int:stu_id>/class',
@@ -115,5 +136,59 @@ urlpatterns = [
         'attendance/report/',
         views.AttendanceReportView.as_view(),
         name='attendance_report'
+    ),
+    # Library
+    path(
+        'library/catalog/',
+        library_views.BookCatalogView.as_view(),
+        name='library_catalog'
+    ),
+    path(
+        'library/issues/',
+        library_views.BookIssueManageView.as_view(),
+        name='library_issues'
+    ),
+    path(
+        'library/return/<int:pk>/',
+        library_views.BookReturnActionView.as_view(),
+        name='library_return'
+    ),
+    path(
+        'library/my-books/',
+        library_views.MyBooksView.as_view(),
+        name='my_library_books'
+    ),
+    # Transport & Hostel
+    path(
+        'transport/',
+        operations_views.TransportManagementView.as_view(),
+        name='transport_list'
+    ),
+    path(
+        'hostel/',
+        operations_views.HostelManagementView.as_view(),
+        name='hostel_list'
+    ),
+    # Leave Management (HR)
+    path(
+        'leave/apply/',
+        operations_views.LeaveApplicationView.as_view(),
+        name='leave_apply'
+    ),
+    path(
+        'leave/manage/',
+        operations_views.LeaveApprovalDashboardView.as_view(),
+        name='leave_manage'
+    ),
+    path(
+        'leave/action/<int:pk>/',
+        operations_views.LeaveApprovalDashboardView.as_view(),
+        name='leave_action'
+    ),
+    # Parent & Guardian Portal
+    path(
+        'parents/',
+        parent_views.ParentPortalView.as_view(),
+        name='parent_portal'
     ),
 ]

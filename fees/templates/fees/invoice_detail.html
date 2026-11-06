@@ -111,8 +111,9 @@
                                     {% render_field payment_form.remarks|add_class:'form-control' %}
                                     {{ payment_form.remarks.errors }}
                                 </div>
-                                <div class="form-actions">
+                                <div class="form-actions d-flex gap-2">
                                     <button class="btn btn-primary" type="submit"><i class="bi bi-cash-coin"></i> Record Payment</button>
+                                    <a href="{% url 'fees:pay_online_invoice' invoice.pk %}" class="btn btn-outline-success"><i class="fas fa-credit-card me-1"></i> Pay via SSLCommerz</a>
                                 </div>
                             </div>
                         </form>

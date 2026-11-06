@@ -1,123 +1,171 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
-{% block title %}
-<title>Teacher Attendance Report</title>
-{% endblock title %}
 
-{% block leftside %}
-<style>
-    .portal-dashboard { padding: 8px 0 12px; }
-    .dashboard-shell { overflow: hidden; background: #f7faf8; border: 1px solid #dbe7e0; border-radius: 12px; box-shadow: 0 22px 54px rgba(18, 52, 38, 0.12); }
-    .dashboard-hero { position: relative; padding: clamp(18px, 3vw, 30px); color: #fff; background: linear-gradient(135deg, rgba(4, 91, 53, 0.96), rgba(8, 114, 67, 0.84)), url("{% static 'institute/img/4444.jpg' %}") center/cover; }
-    .dashboard-hero::after { content: ""; position: absolute; inset: auto 0 0 0; height: 1px; background: rgba(255, 255, 255, 0.24); }
-    .dashboard-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid rgba(255, 255, 255, 0.42); border-radius: 999px; background: rgba(255, 255, 255, 0.16); font-weight: 800; }
-    .dashboard-hero h1 { max-width: 820px; margin: 12px 0 6px; color: #fff; font-size: clamp(1.7rem, 3vw, 2.8rem); font-weight: 900; line-height: 1.08; overflow-wrap: anywhere; }
-    .dashboard-hero p { max-width: 720px; margin: 0; color: rgba(255, 255, 255, 0.9); font-size: 1rem; line-height: 1.55; }
-    .dashboard-content { padding: clamp(12px, 2vw, 18px); }
-    .dashboard-panel { background: #fff; border: 1px solid #dfe8e3; border-radius: 10px; box-shadow: 0 14px 34px rgba(18, 52, 38, 0.08); }
-    .dashboard-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #e7eee9; }
-    .dashboard-panel-header h2 { margin: 0; color: #1b2838; font-weight: 900; }
-    .filter-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px; }
-    .filter-bar label { display: block; margin-bottom: 6px; font-weight: 800; color: #1b2838; font-size: 0.85rem; }
-    .filter-bar input { width: 100%; min-height: 44px; border-radius: 8px; border: 2px solid #d6e2db; padding: 6px 10px; }
-    .filter-bar .btn { min-height: 44px; border-radius: 8px; font-weight: 800; width: 100%; }
-    .summary-cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; padding: 0 16px 16px; }
-    .summary-card { padding: 14px; border-radius: 10px; border: 1px solid #e7eee9; background: #f7faf8; text-align: center; }
-    .summary-card strong { display: block; font-size: 1.5rem; font-weight: 900; color: #1b2838; }
-    .summary-card span { color: #667085; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; }
-    .summary-card.present strong { color: #087243; }
-    .summary-card.absent strong { color: #c92f5d; }
-    .summary-card.late strong { color: #c27803; }
-    .summary-card.leave strong { color: #2879f3; }
-    .table-section { padding: 0 16px 16px; }
-    .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #e7eee9; }
-    .table { margin: 0; min-width: max-content; }
-    .table thead th { background: #f5f8f6; color: #1b2838; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 2px solid #dbe7e0; padding: 12px 14px; white-space: nowrap; }
-    .table tbody td { padding: 10px 14px; vertical-align: middle; color: #34443c; border-color: #edf3ef; }
-    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-weight: 800; font-size: 0.8rem; }
-    .status-badge.present { background: #eaf4ef; color: #087243; }
-    .status-badge.absent { background: #fdeaef; color: #c92f5d; }
-    .status-badge.late { background: #fdf3e3; color: #c27803; }
-    .status-badge.leave { background: #eaf1fd; color: #2879f3; }
-    @media (max-width: 767.98px) { .filter-bar, .summary-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-</style>
+{% block title %}Teacher Attendance Report | Admin Console{% endblock title %}
+{% block breadcrumb_current %}Teacher Attendance Report{% endblock %}
 
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-bar-chart-line-fill"></i> Teacher Attendance Report</span>
-            <h1>Attendance Records</h1>
-            <p>Filter by date range to review teacher attendance history.</p>
-        </div>
+{% block content %}
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">
+            <i class="bi bi-bar-chart-line text-success me-2"></i>Teacher Attendance Report
+        </h1>
+        <p class="text-muted mb-0 small">Review and filter historical faculty attendance logs across custom date ranges.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'dashboard_management:teacher_attendance_mark' %}" class="btn btn-primary d-inline-flex align-items-center gap-2 shadow-sm">
+            <i class="bi bi-pencil-square"></i>
+            <span>Mark Daily Attendance</span>
+        </a>
+    </div>
+</div>
 
-        <div class="dashboard-content">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>Filters</h2>
-                    </div>
-                    <a href="{% url 'dashboard_management:teacher_attendance_mark' %}" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-pencil-square"></i> Mark Attendance
-                    </a>
+<!-- Date Range Filter Card -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+    <div class="card-body p-4">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="startDate" class="form-label fw-bold text-dark small">From Date</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-calendar"></i></span>
+                    <input type="date" id="startDate" name="start_date" class="form-control border-start-0" value="{{ start_date|default:'' }}">
                 </div>
-                <form method="get" class="filter-bar">
-                    <div>
-                        <label>From date</label>
-                        <input type="date" name="start_date" value="{{ start_date|default:'' }}">
-                    </div>
-                    <div>
-                        <label>To date</label>
-                        <input type="date" name="end_date" value="{{ end_date|default:'' }}">
-                    </div>
-                    <div style="align-self:end;">
-                        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel-fill"></i> Filter</button>
-                    </div>
-                </form>
-
-                <div class="summary-cards">
-                    <div class="summary-card"><strong>{{ summary.total }}</strong><span>Total</span></div>
-                    <div class="summary-card present"><strong>{{ summary.present }}</strong><span>Present</span></div>
-                    <div class="summary-card absent"><strong>{{ summary.absent }}</strong><span>Absent</span></div>
-                    <div class="summary-card late"><strong>{{ summary.late }}</strong><span>Late</span></div>
-                    <div class="summary-card leave"><strong>{{ summary.leave }}</strong><span>Leave</span></div>
+            </div>
+            <div class="col-md-4">
+                <label for="endDate" class="form-label fw-bold text-dark small">To Date</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-calendar-check"></i></span>
+                    <input type="date" id="endDate" name="end_date" class="form-control border-start-0" value="{{ end_date|default:'' }}">
                 </div>
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button class="btn btn-secondary flex-grow-1 fw-semibold" type="submit">
+                    <i class="bi bi-funnel-fill me-1"></i> Filter Records
+                </button>
+                <a href="{% url 'dashboard_management:teacher_attendance_report' %}" class="btn btn-outline-secondary" title="Reset Filters">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 
-                <div class="table-section">
-                    <div class="table-wrapper">
-                        <table class="table table-hover table-bordered mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Teacher</th>
-                                    <th>Designation</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for record in records %}
-                            <tr>
-                                <td>{{ record.date }}</td>
-                                <td class="fw-semibold">{{ record.teacher.teachers_name|default:'-' }}</td>
-                                <td>{{ record.teacher.designation|default:'-' }}</td>
-                                <td><span class="status-badge {{ record.status }}">{{ record.get_status_display }}</span></td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">
-                                    <i class="bi bi-calendar-x fs-3 d-block mb-2"></i>
-                                    No attendance records match the selected filters.
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+<!-- KPI Metrics Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm h-100" style="border-radius: 12px; border-left: 4px solid #64748b !important;">
+            <div class="card-body p-3 text-center">
+                <div class="small text-muted fw-bold text-uppercase mb-1" style="font-size: 0.72rem;">Total Logs</div>
+                <div class="h3 fw-bold text-dark mb-0">{{ summary.total|default:"0" }}</div>
             </div>
         </div>
     </div>
-</section>
-{% endblock leftside %}
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm h-100" style="border-radius: 12px; border-left: 4px solid #10b981 !important;">
+            <div class="card-body p-3 text-center">
+                <div class="small text-success fw-bold text-uppercase mb-1" style="font-size: 0.72rem;">Present</div>
+                <div class="h3 fw-bold text-success mb-0">{{ summary.present|default:"0" }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm h-100" style="border-radius: 12px; border-left: 4px solid #ef4444 !important;">
+            <div class="card-body p-3 text-center">
+                <div class="small text-danger fw-bold text-uppercase mb-1" style="font-size: 0.72rem;">Absent</div>
+                <div class="h3 fw-bold text-danger mb-0">{{ summary.absent|default:"0" }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm h-100" style="border-radius: 12px; border-left: 4px solid #f59e0b !important;">
+            <div class="card-body p-3 text-center">
+                <div class="small text-warning fw-bold text-uppercase mb-1" style="font-size: 0.72rem;">Late</div>
+                <div class="h3 fw-bold text-warning mb-0">{{ summary.late|default:"0" }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md">
+        <div class="card border-0 shadow-sm h-100" style="border-radius: 12px; border-left: 4px solid #3b82f6 !important;">
+            <div class="card-body p-3 text-center">
+                <div class="small text-primary fw-bold text-uppercase mb-1" style="font-size: 0.72rem;">On Leave</div>
+                <div class="h3 fw-bold text-primary mb-0">{{ summary.leave|default:"0" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
 
-{% block rightside %}
-{% endblock rightside %}
+<!-- Attendance Records Table -->
+<div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+    <div class="card-header bg-white py-3 px-4 border-bottom d-flex align-items-center justify-content-between">
+        <h5 class="mb-0 fw-bold text-dark">
+            Attendance Log Records
+        </h5>
+        <span class="badge bg-light text-muted border px-2 py-1 small">
+            Showing {{ records|length }} Record{{ records|length|pluralize }}
+        </span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light text-uppercase small text-muted">
+                <tr>
+                    <th class="ps-4" style="width: 140px;">Date</th>
+                    <th>Teacher Name</th>
+                    <th>Designation</th>
+                    <th class="pe-4 text-end" style="width: 140px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td class="ps-4">
+                        <div class="fw-semibold text-dark">{{ record.date|date:"Y-m-d" }}</div>
+                        <small class="text-muted">{{ record.date|date:"D" }}</small>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-dark">{{ record.teacher.teachers_name|default:'-' }}</div>
+                        <small class="text-muted"><i class="bi bi-envelope me-1"></i>{{ record.teacher.email|default:"No email" }}</small>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark border px-2 py-1">
+                            {{ record.teacher.designation|default:'Faculty' }}
+                        </span>
+                    </td>
+                    <td class="pe-4 text-end">
+                        {% if record.status == 'P' %}
+                        <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill fw-semibold">
+                            <i class="bi bi-check-circle me-1"></i> Present
+                        </span>
+                        {% elif record.status == 'A' %}
+                        <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-semibold">
+                            <i class="bi bi-x-circle me-1"></i> Absent
+                        </span>
+                        {% elif record.status == 'L' %}
+                        <span class="badge bg-warning-subtle text-warning px-3 py-1 rounded-pill fw-semibold">
+                            <i class="bi bi-clock-history me-1"></i> Late
+                        </span>
+                        {% elif record.status == 'LEAVE' or record.status == 'LV' %}
+                        <span class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill fw-semibold">
+                            <i class="bi bi-calendar2-minus me-1"></i> Leave
+                        </span>
+                        {% else %}
+                        <span class="badge bg-secondary-subtle text-secondary px-3 py-1 rounded-pill fw-semibold">
+                            {{ record.get_status_display|default:record.status }}
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-5 text-muted">
+                        <i class="bi bi-calendar-x fs-1 d-block text-secondary mb-2"></i>
+                        <h6 class="fw-bold text-dark">No Attendance Records Found</h6>
+                        <p class="small text-muted mb-0">No records match the selected date filters. Adjust your dates or mark attendance first.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}

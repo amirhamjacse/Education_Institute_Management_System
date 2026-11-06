@@ -1,0 +1,155 @@
+{% extends 'dashboard/admin_base.html' %}
+{% load static %}
+
+{% block title %}Library Catalog | {{ webname.name_headline|default:"Institute Management System" }}{% endblock title %}
+{% block breadcrumb_current %}Library Catalog{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-book-half text-info"></i> Library Books &amp; Resources
+        </h2>
+        <p class="text-muted small mb-0">Browse and search academic textbooks, reference titles, and check shelf availability.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'students:my_library_books' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+            <i class="bi bi-bookmark-check"></i> My Borrowed Books
+        </a>
+        {% if request.user.is_staff %}
+        <a href="{% url 'students:library_issues' %}" class="btn btn-dark btn-sm d-inline-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left-right"></i> Circulation Desk
+        </a>
+        <button type="button" class="btn btn-admin-primary btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addBookModal">
+            <i class="bi bi-plus-circle"></i> Add New Book
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Search & Filters Card -->
+<div class="admin-card mb-4">
+    <div class="admin-card-body py-3">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-7">
+                <label class="form-label small text-secondary fw-semibold mb-1">Search Keywords</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="q" class="form-control" placeholder="Search by book title, author, ISBN, or publisher..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-secondary fw-semibold mb-1">Category</label>
+                <select name="category" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for c in categories %}
+                    <option value="{{ c.id }}" {% if selected_cat == c.id|stringformat:'s' %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-dark w-100 py-2">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Books Grid -->
+<div class="row g-3">
+    {% for b in books %}
+    <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="admin-card h-100 d-flex flex-column shadow-xs">
+            <div class="p-3 d-flex gap-3 align-items-start">
+                {% if b.book_image %}
+                <img src="{{ b.book_image.url }}" alt="{{ b.title }}" style="width: 60px; height: 85px; object-fit: cover;" class="rounded shadow-xs">
+                {% else %}
+                <div class="rounded shadow-xs d-flex align-items-center justify-content-center text-white" style="width: 60px; height: 85px; background: linear-gradient(135deg, #0284c7, #38bdf8); flex-shrink: 0;">
+                    <i class="bi bi-book fs-3"></i>
+                </div>
+                {% endif %}
+                <div class="flex-grow-1 overflow-hidden">
+                    <span class="badge bg-light text-secondary border small mb-1">{{ b.category.name|default:"General" }}</span>
+                    <h6 class="fw-bold text-dark mb-1 text-truncate" title="{{ b.title }}">{{ b.title }}</h6>
+                    <p class="small text-muted mb-0 text-truncate">By {{ b.author }}</p>
+                    {% if b.isbn %}<p class="small text-muted mb-0 font-monospace" style="font-size: 0.75rem;">ISBN: {{ b.isbn }}</p>{% endif %}
+                </div>
+            </div>
+            <div class="mt-auto px-3 py-2 bg-light border-top d-flex justify-content-between align-items-center">
+                <span class="small text-muted"><i class="bi bi-geo-alt me-1"></i>{{ b.rack_location|default:"Shelf A" }}</span>
+                {% if b.available_copies > 0 %}
+                <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle">
+                    {{ b.available_copies }} of {{ b.quantity }} Available
+                </span>
+                {% else %}
+                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle">All Checked Out</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="admin-card text-center py-5">
+            <i class="bi bi-book fs-1 text-secondary mb-2 d-block"></i>
+            <h5 class="text-secondary fw-semibold">No books found</h5>
+            <p class="text-muted small">No library volumes match your search keyword or selected category.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal: Add New Book -->
+{% if request.user.is_staff %}
+<div class="modal fade" id="addBookModal" tabindex="-1" aria-labelledby="addBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <form method="POST" action="{% url 'students:library_catalog' %}">
+                {% csrf_token %}
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="addBookModalLabel"><i class="bi bi-plus-circle me-2"></i>Catalog New Book</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">Book Title <span class="text-danger">*</span></label>
+                        <input type="text" name="title" class="form-control" required placeholder="e.g. Higher Algebra">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">Author(s) <span class="text-danger">*</span></label>
+                        <input type="text" name="author" class="form-control" required placeholder="e.g. Hall & Knight">
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Category</label>
+                            <select name="category" class="form-select">
+                                <option value="">Select Category</option>
+                                {% for c in categories %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Total Copies</label>
+                            <input type="number" name="quantity" class="form-control" value="5" min="1">
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">ISBN Number</label>
+                            <input type="text" name="isbn" class="form-control" placeholder="978-...">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Shelf Location</label>
+                            <input type="text" name="rack_location" class="form-control" value="Shelf A1">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-admin-primary btn-sm px-4">Save to Catalog</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock content %}

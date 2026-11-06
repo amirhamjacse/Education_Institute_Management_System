@@ -1,0 +1,169 @@
+{% extends 'dashboard/admin_base.html' %}
+{% load static %}
+
+{% block title %}Library Circulation &amp; Issues | {{ webname.name_headline|default:"Institute Management System" }}{% endblock title %}
+{% block breadcrumb_current %}Book Circulation Desk{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-journal-arrow-down text-primary"></i> Library Circulation &amp; Return Desk
+        </h2>
+        <p class="text-muted small mb-0">Issue books to students, track return deadlines, collect overdue fines, and record book returns.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'students:library_catalog' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+            <i class="bi bi-book"></i> Book Catalog
+        </a>
+        <button type="button" class="btn btn-admin-primary btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#issueModal">
+            <i class="bi bi-plus-circle"></i> Issue Book to Student
+        </button>
+    </div>
+</div>
+
+<!-- Circulation Records Table Card -->
+<div class="admin-card shadow-sm border-0">
+    <div class="admin-card-header bg-white py-3">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="fw-bold text-dark mb-0">Circulation Records</h5>
+            <span class="badge bg-secondary bg-opacity-10 text-secondary border">{{ issues.count }} Records</span>
+        </div>
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="?status=ISSUED" class="btn btn-{% if current_status == 'ISSUED' %}primary{% else %}outline-secondary{% endif %}">Active Issues</a>
+            <a href="?status=OVERDUE" class="btn btn-{% if current_status == 'OVERDUE' %}danger{% else %}outline-secondary{% endif %}">Overdue Loans</a>
+            <a href="?status=RETURNED" class="btn btn-{% if current_status == 'RETURNED' %}success{% else %}outline-secondary{% endif %}">Returned</a>
+            <a href="?status=ALL" class="btn btn-{% if current_status == 'ALL' %}dark{% else %}outline-secondary{% endif %}">All History</a>
+        </div>
+    </div>
+
+    <div class="admin-card-body p-0">
+        <div class="table-responsive">
+            <table class="table admin-table mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-3">Book Title</th>
+                        <th>Borrower</th>
+                        <th>Issue Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Fine Amount</th>
+                        <th>Status</th>
+                        <th class="text-end pe-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for issue in issues %}
+                    <tr>
+                        <td class="ps-3">
+                            <div class="fw-bold text-dark">{{ issue.book.title }}</div>
+                            <small class="text-muted">By {{ issue.book.author }} &bull; {{ issue.book.rack_location|default:"Shelf A" }}</small>
+                        </td>
+                        <td>
+                            {% if issue.student %}
+                            <div class="fw-semibold text-dark">{{ issue.student.name }}</div>
+                            <small class="text-muted">Roll: {{ issue.student.unique_roll }} &bull; Class {{ issue.student.class_name.name }}</small>
+                            {% else %}
+                            <div class="text-secondary">{{ issue.user.get_full_name|default:issue.user.user_id }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="small">{{ issue.issue_date }}</td>
+                        <td class="small fw-semibold text-danger">{{ issue.due_date }}</td>
+                        <td class="small text-muted">{{ issue.return_date|default:"&mdash;" }}</td>
+                        <td>
+                            {% if issue.fine_amount > 0 %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle">
+                                ৳{{ issue.fine_amount }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted small">&mdash;</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if issue.status == 'ISSUED' %}
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle">Issued</span>
+                            {% elif issue.status == 'RETURNED' %}
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle">Returned</span>
+                            {% elif issue.status == 'OVERDUE' %}
+                            <span class="badge bg-danger">Overdue</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ issue.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-3">
+                            {% if issue.status != 'RETURNED' %}
+                            <form action="{% url 'students:library_return' issue.id %}" method="POST" class="d-inline" onsubmit="return confirm('Process return for this book?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1">
+                                    <i class="bi bi-box-arrow-in-down"></i> Return
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted small"><i class="bi bi-check2 text-success"></i> Settled</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-journal-check fs-2 text-secondary d-block mb-2"></i>
+                            No circulation records found in this category.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Issue Book to Student -->
+<div class="modal fade" id="issueModal" tabindex="-1" aria-labelledby="issueModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <form method="POST" action="{% url 'students:library_issues' %}">
+                {% csrf_token %}
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="issueModalLabel"><i class="bi bi-hand-thumbs-up me-2"></i>Issue Book to Student</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">Select Book <span class="text-danger">*</span></label>
+                        <select name="book" class="form-select" required>
+                            <option value="">Choose Available Book...</option>
+                            {% for b in books %}
+                            <option value="{{ b.id }}">{{ b.title }} ({{ b.available_copies }} left - {{ b.rack_location|default:"Shelf" }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">Select Student <span class="text-danger">*</span></label>
+                        <select name="student" class="form-select" required>
+                            <option value="">Choose Student...</option>
+                            {% for s in students_list %}
+                            <option value="{{ s.id }}">{{ s.name }} (Roll: {{ s.unique_roll }} &bull; Class {{ s.class_name.name }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">Loan Duration (Days)</label>
+                        <select name="days" class="form-select">
+                            <option value="7">7 Days (1 Week)</option>
+                            <option value="14" selected>14 Days (2 Weeks)</option>
+                            <option value="21">21 Days (3 Weeks)</option>
+                            <option value="30">30 Days (1 Month)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Confirm Loan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

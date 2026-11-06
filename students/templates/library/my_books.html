@@ -1,0 +1,82 @@
+{% extends 'dashboard/admin_base.html' %}
+{% load static %}
+
+{% block title %}My Borrowed Books | {{ webname.name_headline|default:"Institute Management System" }}{% endblock title %}
+{% block breadcrumb_current %}My Library Loans{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-bookmark-check-fill text-info"></i> My Borrowed Library Books
+        </h2>
+        <p class="text-muted small mb-0">Track your active library loans, return due dates, and settlement history.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'students:library_catalog' %}" class="btn btn-admin-primary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-search"></i> Browse Library Catalog
+        </a>
+    </div>
+</div>
+
+<div class="admin-card shadow-sm border-0">
+    <div class="admin-card-header bg-white py-3">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="fw-bold text-dark mb-0">Personal Loan History</h5>
+            <span class="badge bg-secondary bg-opacity-10 text-secondary border">{{ my_issues.count }} Records</span>
+        </div>
+    </div>
+    <div class="admin-card-body p-0">
+        <div class="table-responsive">
+            <table class="table admin-table mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-3">Book Title</th>
+                        <th>Author</th>
+                        <th>Borrow Date</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th class="pe-3">Overdue Fine</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for issue in my_issues %}
+                    <tr>
+                        <td class="ps-3">
+                            <div class="fw-bold text-dark">{{ issue.book.title }}</div>
+                            <div class="small text-muted font-monospace">ISBN: {{ issue.book.isbn|default:"N/A" }} &bull; {{ issue.book.rack_location|default:"Shelf" }}</div>
+                        </td>
+                        <td>{{ issue.book.author }}</td>
+                        <td class="small">{{ issue.issue_date }}</td>
+                        <td class="small fw-semibold {% if issue.status == 'OVERDUE' %}text-danger{% else %}text-secondary{% endif %}">{{ issue.due_date }}</td>
+                        <td>
+                            {% if issue.status == 'ISSUED' %}
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle">Currently Borrowed</span>
+                            {% elif issue.status == 'RETURNED' %}
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle">Returned</span>
+                            {% elif issue.status == 'OVERDUE' %}
+                            <span class="badge bg-danger">Overdue</span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-3">
+                            {% if issue.fine_amount > 0 %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle fw-bold">৳{{ issue.fine_amount }}</span>
+                            {% else %}
+                            <span class="text-muted small">&mdash;</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-book fs-2 text-secondary d-block mb-2"></i>
+                            You do not currently have any active or past library book loans.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

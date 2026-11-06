@@ -142,6 +142,46 @@
                         </div>
                     </a>
                     {% endif %}
+
+                    <a class="portal-card portal-card-featured portal-card-blue" href="{% url 'students:admit_cards' %}">
+                        <div class="portal-card-inner">
+                            <span class="portal-icon"><i class="bi bi-card-checklist"></i></span>
+                            <span class="portal-code">ADM</span>
+                            <h3>Exam Admit Card</h3>
+                            <p>Download or print your exam admit card, seat plan, and exam roll.</p>
+                            <span class="portal-card-footer">View admit cards <i class="bi bi-arrow-right"></i></span>
+                        </div>
+                    </a>
+
+                    <a class="portal-card portal-card-featured portal-card-teal" href="{% url 'students:my_library_books' %}">
+                        <div class="portal-card-inner">
+                            <span class="portal-icon"><i class="bi bi-book-half"></i></span>
+                            <span class="portal-code">LIB</span>
+                            <h3>My Borrowed Books</h3>
+                            <p>View currently borrowed books, issue &amp; return due dates, and catalog.</p>
+                            <span class="portal-card-footer">View library status <i class="bi bi-arrow-right"></i></span>
+                        </div>
+                    </a>
+
+                    <a class="portal-card portal-card-featured portal-card-gold" href="{% url 'students:transport_list' %}">
+                        <div class="portal-card-inner">
+                            <span class="portal-icon"><i class="bi bi-bus-front-fill"></i></span>
+                            <span class="portal-code">TRN</span>
+                            <h3>Transport &amp; Bus Routes</h3>
+                            <p>Bus routes, vehicle details, stoppage timings, and allocations.</p>
+                            <span class="portal-card-footer">View routes <i class="bi bi-arrow-right"></i></span>
+                        </div>
+                    </a>
+
+                    <a class="portal-card portal-card-featured portal-card-green" href="{% url 'students:leave_apply' %}">
+                        <div class="portal-card-inner">
+                            <span class="portal-icon"><i class="bi bi-calendar2-heart-fill"></i></span>
+                            <span class="portal-code">LV</span>
+                            <h3>Apply for Leave</h3>
+                            <p>Submit leave applications and monitor status approvals.</p>
+                            <span class="portal-card-footer">Apply now <i class="bi bi-arrow-right"></i></span>
+                        </div>
+                    </a>
                 </div>
 
                 <div class="shortcut-grid">
@@ -150,8 +190,13 @@
                     {% endif %}
                     <a class="shortcut-link" href="{% url 'students:students_specific_result' %}"><i class="bi bi-graph-up-arrow"></i><span>My Result</span></a>
                     <a class="shortcut-link" href="{% url 'students:students_routine' %}"><i class="bi bi-calendar-week"></i><span>Class Routine</span></a>
+                    <a class="shortcut-link" href="{% url 'students:admit_cards' %}"><i class="bi bi-card-checklist"></i><span>Admit Card</span></a>
+                    <a class="shortcut-link" href="{% url 'students:my_library_books' %}"><i class="bi bi-book"></i><span>My Books</span></a>
+                    <a class="shortcut-link" href="{% url 'students:transport_list' %}"><i class="bi bi-bus-front-fill"></i><span>Transport</span></a>
+                    <a class="shortcut-link" href="{% url 'students:hostel_list' %}"><i class="bi bi-buildings"></i><span>Hostel</span></a>
+                    <a class="shortcut-link" href="{% url 'students:leave_apply' %}"><i class="bi bi-calendar-plus"></i><span>Apply Leave</span></a>
                     {% if students %}
-                    <a class="shortcut-link" href="{% url 'students:students_class_register' students.id %}"><i class="bi bi-person-plus-fill"></i><span>Register For new class/Course</span></a>
+                    <a class="shortcut-link" href="{% url 'students:students_class_register' students.id %}"><i class="bi bi-person-plus-fill"></i><span>Register Class</span></a>
                     <a class="shortcut-link" href="{% url 'fees:my_invoices' %}"><i class="bi bi-cash-coin"></i><span>My Invoices</span></a>
                     {% endif %}
                 </div>

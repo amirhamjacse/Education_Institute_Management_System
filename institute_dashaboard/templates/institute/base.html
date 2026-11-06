@@ -136,6 +136,19 @@
                           <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'onlineadm' %}active-page{% endif %}" href="{% url 'onlineadm' %}">অনলাইন ভর্তি আবেদন</a>
                           </li>
+                          <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'parents_portal' %}active-page{% endif %}" href="{% url 'parents_portal' %}"><i class="bi bi-people-fill me-1"></i>অভিভাবক কর্নার</a>
+                          </li>
+                          <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="academicDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">একাডেমিক সেবা</a>
+                            <ul class="dropdown-menu text-center" aria-labelledby="academicDropdown">
+                              <li><a class="dropdown-item" href="{% url 'students:students_routine' %}"><i class="bi bi-calendar-week me-1"></i>ক্লাস রুটিন</a></li>
+                              <li><a class="dropdown-item" href="{% url 'students:library_catalog' %}"><i class="bi bi-book me-1"></i>লাইব্রেরি ক্যাটালগ</a></li>
+                              <li><a class="dropdown-item" href="{% url 'students:admit_cards' %}"><i class="bi bi-card-checklist me-1"></i>এডমিট কার্ড</a></li>
+                              <li><a class="dropdown-item" href="{% url 'students:transport_list' %}"><i class="bi bi-bus-front me-1"></i>পরিবহন সুবিধা</a></li>
+                              <li><a class="dropdown-item" href="{% url 'students:hostel_list' %}"><i class="bi bi-building me-1"></i>হোস্টেল / ছাত্রাবাস</a></li>
+                            </ul>
+                          </li>
                           <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'notice_board' or request.resolver_match.url_name == 'news' %}active-page{% endif %}" href="#" id="noticeNewsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">নোটিশ ও নিউজ</a>
                             <ul class="dropdown-menu text-center" aria-labelledby="noticeNewsDropdown">
@@ -153,7 +166,7 @@
                               {% if students.name %} {{ students.name|default_if_none:'N/A' }} {% else %} {{students.unique_roll|default_if_none:'N/A'}} {% endif %}
                             </a>
                             <ul class="dropdown-menu text-center" aria-labelledby="profileDropdown">
-                              {% if students %}
+                              {% if students and students.id %}
                               <li><a class="dropdown-item" href="{% url 'students_details' students.id %}"><i class="fas fa-user-circle"></i> প্রোফাইল</a></li>
                               {% endif %}
                               <li><a class="dropdown-item" href="{% url 'students:dashobard_app' %}"><i class="bi bi-speedometer"></i> ড্যাশবোর্ড</a></li>

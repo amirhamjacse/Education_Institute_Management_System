@@ -1,0 +1,12 @@
+{% load widget_tweaks %}
+<div class="input-group">
+    {% if icon %}
+    <span class="input-group-text"><i class="{{ icon }}"></i></span>
+    {% endif %}
+    {% render_field formfld class="form-control" placeholder=placeholder %}
+</div>
+{% if formfld.errors %}
+    {% for error in formfld.errors %}
+        <div class="text-danger small">{{ error }}</div>
+    {% endfor %}
+{% endif %}

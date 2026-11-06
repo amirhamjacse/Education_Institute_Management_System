@@ -547,29 +547,47 @@ def sslcommerz_payment_gateway(
         )
         return None
 
-    cradentials = {'store_id': store_id,
-            'store_pass': store_pass, 'issandbox': True} 
-            
-    sslcommez = SSLCOMMERZ(cradentials)
+    credentials = {
+        'store_id': store_id,
+        'store_pass': store_pass,
+        'issandbox': True
+    }
+
+    sslcommez = SSLCOMMERZ(credentials)
+    tran_id = generator_trangection_id()
+
+    # Dynamic callback URLs using current host/port
+    success_url = request.build_absolute_uri('/payment/success/')
+    fail_url = request.build_absolute_uri('/payment/faild/')
+    cancel_url = request.build_absolute_uri('/payment/cancel/')
+    ipn_url = request.build_absolute_uri('/payment/ipn/')
+
+    # Extract real customer info if provided in request POST or fallback cleanly
+    post_data = getattr(request, 'POST', {})
+    cus_email = post_data.get('email') or post_data.get('student_email') or 'student@demo-institute.test'
+    cus_phone = post_data.get('student_number') or post_data.get('phone') or '01700000000'
+    cus_add1 = post_data.get('present_address') or post_data.get('address') or 'Dhaka, Bangladesh'
+
     body = {}
     body['total_amount'] = amount
     body['currency'] = "BDT"
-    body['tran_id'] = generator_trangection_id()
-    body['success_url'] = 'http://localhost:8000/payment/success/'
-    body['fail_url'] = 'http://localhost:8000/payment/payment/faild/'
-    body['cancel_url'] = 'http://localhost:8000/payment'
+    body['tran_id'] = tran_id
+    body['success_url'] = success_url
+    body['fail_url'] = fail_url
+    body['cancel_url'] = cancel_url
+    body['ipn_url'] = ipn_url
     body['emi_option'] = 0
     body['cus_name'] = name
-    body['cus_email'] = 'request.data["email"]'
-    body['cus_phone'] = 'request.data["phone"]'
-    body['cus_add1'] = 'request.data["address"]'
-    body['cus_city'] = 'request.data["address"]'
-    body['cus_country'] = 'Bangladesh'
+    body['cus_email'] = cus_email
+    body['cus_phone'] = cus_phone
+    body['cus_add1'] = cus_add1
+    body['cus_city'] = "Dhaka"
+    body['cus_country'] = "Bangladesh"
     body['shipping_method'] = "NO"
     body['multi_card_name'] = ""
     body['num_of_item'] = 1
-    body['product_name'] = "Test"
-    body['product_category'] = "Test Category"
+    body['product_name'] = "Academic Fee / Admission"
+    body['product_category'] = "Education"
     body['product_profile'] = "general"
     body['value_a'] = name
 
@@ -601,3 +619,98 @@ def sslcommerz_payment_gateway(
         return None
 
     return gateway_url
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+
+
+@csrf_exempt
+def payment_success(request):
+    """Callback for SSLCommerz successful payment"""
+    data = request.POST if request.method == 'POST' else request.GET
+    tran_id = data.get('tran_id')
+    val_id = data.get('val_id', '')
+    amount = data.get('amount') or data.get('total_amount') or 0
+    card_type = data.get('card_type', 'ONLINE')
+    bank_tran_id = data.get('bank_tran_id', '')
+    status = data.get('status', 'VALID')
+    card_no = data.get('card_no', '')
+    currency = data.get('currency', 'BDT')
+
+    # Save transaction record
+    if tran_id:
+        Transaction.objects.update_or_create(
+            tran_id=tran_id,
+            defaults={
+                'name': data.get('value_a') or data.get('cus_name', 'Student Payment'),
+                'amount': amount,
+                'val_id': val_id,
+                'card_type': card_type,
+                'store_amount': data.get('store_amount', amount),
+                'card_no': card_no,
+                'bank_tran_id': bank_tran_id,
+                'status': status,
+                'tran_date': timezone.now(),
+                'currency': currency,
+                'card_issuer': data.get('card_issuer', 'SSLCommerz'),
+                'card_brand': data.get('card_brand', 'SSLCommerz'),
+                'card_issuer_country': data.get('card_issuer_country', 'Bangladesh'),
+                'card_issuer_country_code': data.get('card_issuer_country_code', 'BD'),
+                'currency_rate': data.get('currency_rate', 1.0),
+                'verify_sign': data.get('verify_sign', ''),
+                'verify_sign_sha2': data.get('verify_sign_sha2', ''),
+                'risk_level': data.get('risk_level', '0'),
+                'risk_title': data.get('risk_title', 'Safe'),
+            }
+        )
+
+    webheading = Web_Heading.objects.last()
+    return render(request, 'institute/payment_success.html', {
+        'webname': webheading,
+        'tran_id': tran_id,
+        'val_id': val_id,
+        'amount': amount,
+        'bank_tran_id': bank_tran_id,
+        'card_type': card_type,
+        'status': status,
+    })
+
+
+@csrf_exempt
+def payment_failed(request):
+    """Callback for SSLCommerz failed payment"""
+    data = request.POST if request.method == 'POST' else request.GET
+    tran_id = data.get('tran_id')
+    amount = data.get('amount', 0)
+    webheading = Web_Heading.objects.last()
+    return render(request, 'institute/payment_failed.html', {
+        'webname': webheading,
+        'tran_id': tran_id,
+        'amount': amount,
+        'error': data.get('error', 'The payment transaction could not be completed.')
+    })
+
+
+@csrf_exempt
+def payment_canceled(request):
+    """Callback for SSLCommerz canceled payment"""
+    data = request.POST if request.method == 'POST' else request.GET
+    tran_id = data.get('tran_id')
+    webheading = Web_Heading.objects.last()
+    return render(request, 'institute/payment_canceled.html', {
+        'webname': webheading,
+        'tran_id': tran_id,
+    })
+
+
+@csrf_exempt
+def payment_ipn(request):
+    """Instant Payment Notification (IPN) Webhook"""
+    data = request.POST if request.method == 'POST' else request.GET
+    tran_id = data.get('tran_id')
+    status = data.get('status', '')
+    if tran_id and status:
+        Transaction.objects.filter(tran_id=tran_id).update(status=status)
+    from django.http import HttpResponse
+    return HttpResponse("IPN_RECEIVED")

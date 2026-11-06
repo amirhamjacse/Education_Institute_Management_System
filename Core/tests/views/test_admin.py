@@ -10,8 +10,8 @@ from Core.tests.samples import sample_user, sample_staffuser, sample_superuser
 
 
 USER_MODEL = get_user_model()
-ADMIN_URL = f"/{settings.ADMIN_URL}"
-LOGIN_URL = f"{ADMIN_URL}/login"
+ADMIN_URL = f"/{settings.ADMIN_URL.strip('/')}/"
+LOGIN_URL = f"{ADMIN_URL}login/"
 
 
 class AdminPublicTests(TestCase):
@@ -24,8 +24,8 @@ class AdminPublicTests(TestCase):
         """Tests that anonymous user is redirected to login"""
         response = self.client.get(ADMIN_URL, follow=True)
         self.assertRedirects(
-            response, f"{LOGIN_URL}/?next={ADMIN_URL}/",
-            status_code=HTTPStatus.MOVED_PERMANENTLY,
+            response, f"{LOGIN_URL}?next={ADMIN_URL}",
+            status_code=HTTPStatus.FOUND,
             target_status_code=HTTPStatus.OK
         )
 
@@ -38,27 +38,27 @@ class UserListPrivateTests(TestCase):
         self.staffuser = sample_staffuser()
         self.superuser = sample_superuser()
         self.client = Client()
-        self.client.login(email="user@sample.com", password="samplepwd")
+        self.client.force_login(self.user)
 
     def test_user_view(self):
         """Tests Admin View for normal user"""
         response = self.client.get(ADMIN_URL, follow=True)
         self.assertRedirects(
-            response, f"{LOGIN_URL}/?next={ADMIN_URL}/",
-            status_code=HTTPStatus.MOVED_PERMANENTLY,
+            response, f"{LOGIN_URL}?next={ADMIN_URL}",
+            status_code=HTTPStatus.FOUND,
             target_status_code=HTTPStatus.OK
         )
 
     def test_staff_user_view(self):
         """Tests Admin View for staffuser"""
-        self.client.login(email="staff@email.com", password="staffpass")
+        self.client.force_login(self.staffuser)
 
         response = self.client.get(ADMIN_URL, follow=True)
         self.assertEqual(response.status_code, HTTPStatus.OK)  # 200 OK
 
     def test_super_user_view(self):
         """Tests Admin View for superuser"""
-        self.client.login(email="super@email.com", password="superpass")
+        self.client.force_login(self.superuser)
 
         response = self.client.get(ADMIN_URL, follow=True)
         self.assertEqual(response.status_code, HTTPStatus.OK)  # 200 OK

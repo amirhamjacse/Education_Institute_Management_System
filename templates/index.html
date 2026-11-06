@@ -1,0 +1,12 @@
+{% extends 'institute/base.html' %}
+{% block title %}<title>Institute Management</title>{% endblock title %}
+{% block leftside %}
+<div class="container py-4">
+    <div class="p-5 mb-4 bg-light rounded-3 text-center border shadow-sm">
+        <h1 class="display-5 fw-bold text-primary">Education Institute Management System</h1>
+        <p class="lead text-muted">Comprehensive management portal for students, teachers, staff, and administration.</p>
+        <a href="{% url 'homepage' %}" class="btn btn-primary btn-lg"><i class="fas fa-home me-1"></i> Visit Institute Home</a>
+    </div>
+</div>
+{% endblock leftside %}
+{% block rightside %}{% endblock rightside %}

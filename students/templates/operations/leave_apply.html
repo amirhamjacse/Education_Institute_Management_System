@@ -1,0 +1,117 @@
+{% extends 'dashboard/admin_base.html' %}
+{% load static %}
+
+{% block title %}Apply for Leave | {{ webname.name_headline|default:"Institute Management System" }}{% endblock title %}
+{% block breadcrumb_current %}Apply for Leave{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-calendar-plus text-primary"></i> Leave Application Desk
+        </h2>
+        <p class="text-muted small mb-0">Submit staff or faculty leave requests and monitor administrative approval progress.</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if request.user.is_staff %}
+        <a href="{% url 'students:leave_manage' %}" class="btn btn-dark btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-calendar2-heart"></i> Staff Leave Approval Desk
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Application Form -->
+    <div class="col-lg-5">
+        <div class="admin-card shadow-sm border-0">
+            <div class="admin-card-header bg-white py-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-pencil-square text-primary me-2"></i>New Leave Request</h5>
+            </div>
+            <div class="admin-card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">Leave Category <span class="text-danger">*</span></label>
+                        <select name="leave_type" class="form-select" required>
+                            <option value="">Select Leave Category...</option>
+                            {% for lt in leave_types %}
+                            <option value="{{ lt.id }}">{{ lt.name }} (Allowance: {{ lt.days_allowed }} days)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Start Date <span class="text-danger">*</span></label>
+                            <input type="date" name="start_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">End Date <span class="text-danger">*</span></label>
+                            <input type="date" name="end_date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small text-secondary">Reason for Leave <span class="text-danger">*</span></label>
+                        <textarea name="reason" rows="4" class="form-control" placeholder="Provide reason or context for requested leave..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-admin-primary w-100 py-2 d-inline-flex align-items-center justify-content-center gap-1">
+                        <i class="bi bi-send-fill"></i> Submit Leave Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Recent Applications -->
+    <div class="col-lg-7">
+        <div class="admin-card shadow-sm border-0">
+            <div class="admin-card-header bg-white py-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history text-secondary me-2"></i>Your Submitted Applications</h5>
+            </div>
+            <div class="admin-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table admin-table mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-3">Category</th>
+                                <th>Dates</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th class="pe-3">Admin Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for my_l in my_leaves %}
+                            <tr>
+                                <td class="ps-3">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle fw-semibold">{{ my_l.leave_type.name }}</span>
+                                </td>
+                                <td class="small">{{ my_l.start_date }} &rarr; {{ my_l.end_date }}</td>
+                                <td class="small text-muted text-truncate" style="max-width: 180px;">{{ my_l.reason }}</td>
+                                <td>
+                                    {% if my_l.status == 'PENDING' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif my_l.status == 'APPROVED' %}
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle">Approved</span>
+                                    {% elif my_l.status == 'REJECTED' %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-muted pe-3">{{ my_l.admin_remarks|default:"&mdash;" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-2 text-secondary d-block mb-2"></i>
+                                    You have not submitted any leave requests yet.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

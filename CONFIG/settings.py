@@ -145,3 +145,11 @@ LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = '/student/dashboard/'
 LOGOUT_REDIRECT_URL = '/student/dashboard/'
 AUTH_USER_MODEL = 'Core.User'
+ADMIN_URL = 'admin/'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DBBACKUP_STORAGE_OPTIONS = {'location': '/tmp'}
+AUTHENTICATION_BACKENDS = [
+    'Core.backends.UserIdOrEmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+

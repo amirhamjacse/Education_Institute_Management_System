@@ -503,6 +503,30 @@
                         <span>My Invoices</span>
                     </a>
                     {% endif %}
+                    <a class="shortcut-link" href="{% url 'students:students_routine' %}">
+                        <i class="bi bi-calendar-week"></i>
+                        <span>Routine</span>
+                    </a>
+                    <a class="shortcut-link" href="{% url 'students:admit_cards' %}">
+                        <i class="bi bi-card-checklist"></i>
+                        <span>Admit Cards</span>
+                    </a>
+                    <a class="shortcut-link" href="{% url 'students:library_catalog' %}">
+                        <i class="bi bi-book-half"></i>
+                        <span>Library</span>
+                    </a>
+                    <a class="shortcut-link" href="{% url 'students:transport_list' %}">
+                        <i class="bi bi-bus-front-fill"></i>
+                        <span>Transport</span>
+                    </a>
+                    <a class="shortcut-link" href="{% url 'students:hostel_list' %}">
+                        <i class="bi bi-buildings"></i>
+                        <span>Hostels</span>
+                    </a>
+                    <a class="shortcut-link" href="{% url 'parents_portal' %}">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Parent Portal</span>
+                    </a>
                     <a class="shortcut-link" href="{% url 'notice_board' %}">
                         <i class="bi bi-bell-fill"></i>
                         <span>Notices</span>

@@ -113,10 +113,8 @@ class UserUpdateView(
         # tests if the user is the same as the object he is trying to update
         is_owner = (obj == self.request.user) and self.request.user.is_active
 
-        # tests if user instance is_staff/is_superuser, then staff not allowed
-        staff_allowed = True
-        if obj.is_staff or obj.is_superuser:
-            staff_allowed = False
+        # tests if requesting user is staff and target is not staff/superuser
+        staff_allowed = self.request.user.is_staff and self.request.user.is_active and not (obj.is_staff or obj.is_superuser)
 
         # tests for is_superuser and is_active
         is_superuser = self.request.user.is_superuser and \

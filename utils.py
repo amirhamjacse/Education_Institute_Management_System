@@ -10,7 +10,7 @@ import tempfile
 # # for specific app utils, please create utils.py in your app directory
 # # functions here will be used project-wide, may be in multiples apps
 
-# logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def test_user(user, allow_staff=True, allow_other=True):

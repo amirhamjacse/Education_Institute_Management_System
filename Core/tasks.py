@@ -8,7 +8,17 @@ import logging
 from django.core.management import call_command
 from django.utils import timezone
 # CELERY IMPORTS
-from celery import shared_task
+try:
+    from celery import shared_task
+except ImportError:
+    def shared_task(func=None, **kwargs):
+        if func is None:
+            def decorator(f):
+                f.run = f
+                return f
+            return decorator
+        func.run = func
+        return func
 
 
 logger = logging.getLogger(__name__)

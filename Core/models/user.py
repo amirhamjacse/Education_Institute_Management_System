@@ -75,61 +75,54 @@ class UserManager(BaseUserManager):
     #     return self._create_user(email, password, **extra_fields)
 
 
-    def _create_user(self, user_id, password=None, **extra_fields):
-        """Creates and returns a new user using an email address"""
-        if not user_id:  # check for an empty email
-            logger.error(  # prints class and function name
+    def _create_user(self, user_id=None, password=None, **extra_fields):
+        """Creates and returns a new user using a user_id or email address"""
+        if not user_id:
+            user_id = extra_fields.get('email')
+        if not user_id:
+            logger.error(
                 f"{self.__class__.__name__}.{_getframe().f_code.co_name} "
-                f"User must set an user_id"
+                f"User must set a user_id or email"
             )
-            raise AttributeError("User must set an user_id")
-        else:  # normalizes the provided email
-            # user_id = self.normalize_email(user_id)
-            logger.debug(  # prints class and function name
-                f"{self.__class__.__name__}.{_getframe().f_code.co_name} "
-                f"Normalized user_id: {user_id}"
-            )
+            raise AttributeError("User must set a user_id or email")
 
-        # create user
-        # print(self, type(self), user_id, 'what-----------------')
-        user = User(user_id=user_id, **extra_fields)
-        user.set_password(password)  # hashes/encrypts password
-        user.save()  # safe for multiple databases
-        # user.save(using=self._db)  # safe for multiple databases
-        logger.debug(  # prints class and function name
+        if user_id and '@' in str(user_id) and 'email' not in extra_fields:
+            extra_fields['email'] = str(user_id)
+
+        if 'email' in extra_fields and extra_fields['email']:
+            extra_fields['email'] = self.normalize_email(extra_fields['email'])
+
+        user = self.model(user_id=user_id, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        logger.debug(
             f"{self.__class__.__name__}.{_getframe().f_code.co_name} "
             f"User created: {user}"
         )
         return user
 
-    def create_user(self, user_id, password=None, **extra_fields):
-        """Creates and returns a new user using an user_id address"""
+    def create_user(self, user_id=None, password=None, **extra_fields):
+        """Creates and returns a new user"""
+        if user_id is None and 'email' in extra_fields:
+            user_id = extra_fields.get('email')
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
-        logger.debug(  # prints class and function name
-            f"{self.__class__.__name__}.{_getframe().f_code.co_name} "
-            f"Creating user: user_id={user_id}, extra_fields={extra_fields}"
-        )
         return self._create_user(user_id, password, **extra_fields)
 
-    def create_staffuser(self, user_id, password=None, **extra_fields):
-        """Creates and returns a new staffuser using an user_id address"""
+    def create_staffuser(self, user_id=None, password=None, **extra_fields):
+        """Creates and returns a new staffuser"""
+        if user_id is None and 'email' in extra_fields:
+            user_id = extra_fields.get('email')
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', False)
-        logger.debug(  # prints class and function name
-            f"{self.__class__.__name__}.{_getframe().f_code.co_name} "
-            f"Creating staffuser: email={user_id}, extra_fields={extra_fields}"
-        )
         return self._create_user(user_id, password, **extra_fields)
 
-    def create_superuser(self, user_id, password=None, **extra_fields):
-        """Creates and returns a new superuser using an user_id address"""
+    def create_superuser(self, user_id=None, password=None, **extra_fields):
+        """Creates and returns a new superuser"""
+        if user_id is None and 'email' in extra_fields:
+            user_id = extra_fields.get('email')
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        logger.debug(  # prints class and function name
-            f"{self.__class__.__name__}.{_getframe().f_code.co_name} "
-            f"Creating superuser: user_id={user_id}, extra_fields={extra_fields}"
-        )
         return self._create_user(user_id, password, **extra_fields)
 
 
@@ -173,6 +166,11 @@ class User(AbstractBaseUser, PermissionsMixin,
     objects = UserManager()  # uses the custom manager
 
     USERNAME_FIELD = 'user_id'  # overrides username to email field
+
+    @property
+    def username(self):
+        """Compatibility property for username lookups."""
+        return self.user_id or self.email or ''
 
     def get_full_name(self):
         """Returns full name of User

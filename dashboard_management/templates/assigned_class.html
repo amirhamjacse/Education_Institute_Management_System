@@ -1,116 +1,191 @@
-{% extends 'institute/base.html' %} 
-{% load static %} 
-{% load widget_tweaks %}
-{% block title %}
-<title>Students Dashboard</title>
-{% endblock title %} 
+{% extends 'dashboard/admin_base.html' %}
+{% load static %}
 
-<!-- left side main things start from here -->
-{% block leftside %} 
-<style>
-    body{
-        margin-top:20px;
-        background:#FAFAFA;
-    }
-    .order-card {
-        color: #fff;
-    }
-    
-    .bg-c-blue {
-        background: linear-gradient(45deg,#4099ff,#73b4ff);
-    }
-    
-    .bg-c-green {
-        background: linear-gradient(45deg,#2ed8b6,#59e0c5);
-    }
-    
-    .bg-c-yellow {
-        background: linear-gradient(45deg,#FFB64D,#ffcb80);
-    }
-    
-    .bg-c-pink {
-        background: linear-gradient(45deg,#FF5370,#ff869a);
-    }
-    
-    
-    .card {
-        border-radius: 5px;
-        -webkit-box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
-        box-shadow: 0 1px 2.94px 0.06px rgba(4,26,55,0.16);
-        border: none;
-        margin-bottom: 30px;
-        -webkit-transition: all 0.3s ease-in-out;
-        transition: all 0.3s ease-in-out;
-    }
-    
-    .card .card-block {
-        padding: 25px;
-    }
-    
-    .order-card i {
-        font-size: 26px;
-    }
-    
-    .f-left {
-        float: left;
-    }
-    
-    .f-right {
-        float: right;
-    }
-</style>
+{% block title %}Teacher Subject & Class Assignments | {{ webname.name_headline|default:"Institute Management System" }}{% endblock title %}
+{% block breadcrumb_current %}Faculty Subject Allocation{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assigned Classes</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-diagram-3-fill text-primary"></i> Faculty Class &amp; Subject Allocation
+        </h2>
+        <p class="text-muted small mb-0">Assign curriculum subjects and classroom sections to teaching faculty members.</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if request.user.is_staff %}
+        <button type="button" class="btn btn-admin-primary btn-sm d-inline-flex align-items-center gap-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#assignModal">
+            <i class="bi bi-plus-circle"></i> Assign Faculty to Subject
+        </button>
+        {% endif %}
+    </div>
+</div>
 
-<div class="container mt-5">
-    <h2 class="text-center">Assigned Classes</h2>
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <div class="card">
-                <div class="card-body">
-                    {% comment %} <h5 class="card-title">Classes for Teacher: John Doe</h5> {% endcomment %}
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Class One - Mathematics
-                            <span class="badge bg-primary rounded-pill">Assigned</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Class Two - Science
-                            <span class="badge bg-primary rounded-pill">Assigned</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Class Three - English
-                            <span class="badge bg-primary rounded-pill">Assigned</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Class Four - History
-                            <span class="badge bg-primary rounded-pill">Assigned</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Class Five - Geography
-                            <span class="badge bg-primary rounded-pill">Assigned</span>
-                        </li>
-                    </ul>
-                </div>
+<!-- Filter by Teacher -->
+<div class="admin-card mb-4">
+    <div class="admin-card-body py-3">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label small text-secondary fw-semibold mb-1">Filter by Teacher</label>
+                <select name="teacher" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Teaching Faculty</option>
+                    {% for t in teachers %}
+                    <option value="{{ t.id }}" {% if selected_teacher_id == t.id|stringformat:'s' %}selected{% endif %}>
+                        {{ t.teachers_name }} ({{ t.designation|default:"Teacher" }})
+                    </option>
+                    {% endfor %}
+                </select>
             </div>
+            <div class="col-md-3">
+                <a href="{% url 'dashboard_management:assign_teacher_classes' %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Filter
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Assignments Table Card -->
+<div class="admin-card shadow-sm border-0">
+    <div class="admin-card-header bg-white py-3">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="fw-bold text-dark mb-0">Active Subject Allocations</h5>
+            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle">{{ assignments.count }}</span>
+        </div>
+    </div>
+    <div class="admin-card-body p-0">
+        <div class="table-responsive">
+            <table class="table admin-table mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-3">Teacher / Faculty Member</th>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th>Assigned Subject</th>
+                        <th>Academic Session</th>
+                        <th class="text-end pe-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in assignments %}
+                    <tr>
+                        <td class="ps-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="sidebar-user-avatar" style="width: 38px; height: 38px; font-size: 0.9rem; background: linear-gradient(135deg, #2563eb, #60a5fa);">
+                                    {{ a.teacher.teachers_name|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ a.teacher.teachers_name }}</div>
+                                    <div class="small text-muted">{{ a.teacher.designation|default:"Teacher" }} &bull; {{ a.teacher.phone_number }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border fw-bold px-2 py-1">Class {{ a.class_name.name }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-secondary border px-2 py-1">Section {{ a.section.name }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle fw-semibold px-2 py-1">
+                                <i class="bi bi-book me-1"></i>{{ a.subject.name }} ({{ a.subject.code }})
+                            </span>
+                        </td>
+                        <td class="small text-muted">{{ a.academic_year.class_year|default:"Current Year" }}</td>
+                        <td class="text-end pe-3">
+                            {% if request.user.is_staff %}
+                            <form action="{% url 'dashboard_management:delete_teacher_assignment' a.id %}" method="POST" class="d-inline" onsubmit="return confirm('Remove this subject assignment?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Remove Assignment">
+                                    <i class="bi bi-trash me-1"></i> Remove
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-diagram-3 fs-2 d-block mb-2 text-secondary"></i>
+                            No subject assignments found matching your filter criteria.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<!-- Modal: Assign Faculty to Subject -->
+{% if request.user.is_staff %}
+<div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <form method="POST" action="{% url 'dashboard_management:assign_teacher_classes' %}">
+                {% csrf_token %}
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="assignModalLabel"><i class="bi bi-plus-circle me-2"></i>Assign Subject to Teacher</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">Select Faculty Member <span class="text-danger">*</span></label>
+                        <select name="teacher" class="form-select" required>
+                            <option value="">Choose Teacher...</option>
+                            {% for t in teachers %}
+                            <option value="{{ t.id }}">{{ t.teachers_name }} ({{ t.designation|default:"Teacher" }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-{% endblock leftside %}
-{% block rightside %}
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Class <span class="text-danger">*</span></label>
+                            <select name="class_name" class="form-select" required>
+                                <option value="">Select Class</option>
+                                {% for c in classes %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Section <span class="text-danger">*</span></label>
+                            <select name="section" class="form-select" required>
+                                <option value="">Select Section</option>
+                                {% for s in sections %}
+                                <option value="{{ s.id }}">{{ s.name }} ({{ s.class_nm.name }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
 
-{% endblock rightside %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">Subject <span class="text-danger">*</span></label>
+                        <select name="subject" class="form-select" required>
+                            <option value="">Select Subject</option>
+                            {% for subj in subjects %}
+                            <option value="{{ subj.id }}">{{ subj.name }} (Class {{ subj.class_nm.name }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">Academic Year</label>
+                        <select name="academic_year" class="form-select">
+                            {% for y in years %}
+                            <option value="{{ y.id }}">{{ y.class_year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Save Assignment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock content %}

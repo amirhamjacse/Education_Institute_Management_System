@@ -5,11 +5,21 @@ app_name = 'dashboard_management'
 
 urlpatterns = [
 
-    # students info
+    # online admission processing & enrollment
     path(
         'onlineadmission/',
         views.OnlineAdmissionProcess.as_view(),
         name='online_admission'
+    ),
+    path(
+        'onlineadmission/enroll/<int:pk>/',
+        views.OnlineAdmissionEnrollView.as_view(),
+        name='online_admission_enroll'
+    ),
+    path(
+        'onlineadmission/hold/<int:pk>/',
+        views.OnlineAdmissionHoldToggleView.as_view(),
+        name='online_admission_hold'
     ),
     path(
         'portelmanager/dashboard',
@@ -20,6 +30,16 @@ urlpatterns = [
         'assigned/class',
         views.AssignClassesToTeacher.as_view(),
         name='assigned_class_teacher'
+    ),
+    path(
+        'assigned/teacher/classes/',
+        views.AssignClassesToTeacher.as_view(),
+        name='assign_teacher_classes'
+    ),
+    path(
+        'assigned/class/delete/<int:pk>/',
+        views.DeleteTeacherAssignmentView.as_view(),
+        name='delete_teacher_assignment'
     ),
     path(
         'portelmanager/id-cards',

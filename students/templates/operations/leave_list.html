@@ -1,0 +1,127 @@
+{% extends 'dashboard/admin_base.html' %}
+{% load static %}
+
+{% block title %}Staff Leave Approvals | {{ webname.name_headline|default:"Institute Management System" }}{% endblock title %}
+{% block breadcrumb_current %}Staff Leave Approvals{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-calendar2-heart-fill text-danger"></i> Faculty &amp; Staff Leave Approvals
+        </h2>
+        <p class="text-muted small mb-0">Review employee leave applications, monitor annual allowance balances, and approve or reject with comments.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'students:leave_apply' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+            <i class="bi bi-calendar-plus"></i> Submit Application
+        </a>
+    </div>
+</div>
+
+<!-- Leave Approval Table Card -->
+<div class="admin-card shadow-sm border-0">
+    <div class="admin-card-header bg-white py-3">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="fw-bold text-dark mb-0">Leave Applications</h5>
+            <span class="badge bg-secondary bg-opacity-10 text-secondary border">{{ leaves.count }} Applications</span>
+        </div>
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="?status=PENDING" class="btn btn-{% if current_status == 'PENDING' %}warning text-dark{% else %}outline-secondary{% endif %}">Pending Review ({{ pending_count }})</a>
+            <a href="?status=APPROVED" class="btn btn-{% if current_status == 'APPROVED' %}success{% else %}outline-secondary{% endif %}">Approved</a>
+            <a href="?status=REJECTED" class="btn btn-{% if current_status == 'REJECTED' %}danger{% else %}outline-secondary{% endif %}">Rejected</a>
+            <a href="?status=ALL" class="btn btn-{% if current_status == 'ALL' %}dark{% else %}outline-secondary{% endif %}">All History</a>
+        </div>
+    </div>
+
+    <div class="admin-card-body p-0">
+        <div class="table-responsive">
+            <table class="table admin-table mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-3">Applicant Employee</th>
+                        <th>Leave Category</th>
+                        <th>Duration &bull; Dates</th>
+                        <th>Reason for Absence</th>
+                        <th>Status</th>
+                        <th class="text-end pe-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in leaves %}
+                    <tr>
+                        <td class="ps-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="sidebar-user-avatar" style="width: 36px; height: 36px; font-size: 0.85rem; background: linear-gradient(135deg, #e11d48, #fb7185);">
+                                    {{ l.applicant.user_id|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ l.applicant.get_full_name|default:l.applicant.user_id }}</div>
+                                    <div class="small text-muted">{{ l.applicant.email|default:l.applicant.phone|default:"Staff Member" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle fw-semibold">{{ l.leave_type.name }}</span>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-dark small">{{ l.start_date }} &rarr; {{ l.end_date }}</div>
+                        </td>
+                        <td>
+                            <div class="small text-muted" style="max-width: 260px;">{{ l.reason }}</div>
+                            {% if l.admin_remarks %}
+                            <div class="small text-primary mt-1" style="font-size:0.75rem;">
+                                <i class="bi bi-chat-left-quote me-1"></i>Remarks: {{ l.admin_remarks }}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if l.status == 'PENDING' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif l.status == 'APPROVED' %}
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle">Approved</span>
+                            {% elif l.status == 'REJECTED' %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle">Rejected</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ l.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-3">
+                            {% if l.status == 'PENDING' %}
+                            <div class="btn-group btn-group-sm">
+                                <form action="{% url 'students:leave_action' l.id %}" method="POST" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="APPROVE">
+                                    <button type="submit" class="btn btn-sm btn-success me-1 d-inline-flex align-items-center gap-1">
+                                        <i class="bi bi-check2"></i> Approve
+                                    </button>
+                                </form>
+                                <form action="{% url 'students:leave_action' l.id %}" method="POST" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="REJECT">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1">
+                                        <i class="bi bi-x"></i> Reject
+                                    </button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span class="text-muted small">
+                                <i class="bi bi-person-check text-muted me-1"></i>by {{ l.approved_by.user_id|default:"Admin" }}
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-check fs-2 text-secondary d-block mb-2"></i>
+                            No leave applications found in this category.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

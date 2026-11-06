@@ -101,7 +101,7 @@ class SignupPrivateTests(TestCase):
         response = self.client.get(SIGNUP_URL)
 
         self.assertEqual(response.status_code, HTTPStatus.FOUND)  # redirected
-        self.assertEqual(response.url, '/')  # redirected to index
+        self.assertEqual(response.url, settings.LOGIN_REDIRECT_URL)
         self.assertFalse(response.wsgi_request.user.is_anonymous)
         self.assertTrue(response.wsgi_request.user.is_authenticated)
 
@@ -110,10 +110,10 @@ class SignupPrivateTests(TestCase):
         """Tests all methods other than get/post"""
         response = self.client.post(SIGNUP_URL)  # 302 redirect
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(response.url, '/')
+        self.assertEqual(response.url, settings.LOGIN_REDIRECT_URL)
         response = self.client.put(SIGNUP_URL)  # 302 mirrors post method
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(response.url, '/')
+        self.assertEqual(response.url, settings.LOGIN_REDIRECT_URL)
         response = self.client.patch(SIGNUP_URL)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
         response = self.client.delete(SIGNUP_URL)  # 405 method not allowed
@@ -188,14 +188,14 @@ class LoginPrivateTests(TestCase):
         """setup"""
         self.user = sample_user()
         self.client = Client()
-        self.client.login(email='user@sample.com', password='samplepwd')
+        self.client.force_login(self.user)
 
     def test_private_view(self):
         """Tests login view for authenticated users"""
         response = self.client.get(LOGIN_URL)
 
         self.assertEqual(response.status_code, HTTPStatus.FOUND)  # redirected
-        self.assertEqual(response.url, '/')  # redirected to index
+        self.assertEqual(response.url, settings.LOGIN_REDIRECT_URL)
         self.assertFalse(response.wsgi_request.user.is_anonymous)
         self.assertTrue(response.wsgi_request.user.is_authenticated)
 
@@ -204,10 +204,10 @@ class LoginPrivateTests(TestCase):
         """Tests all methods other than get/post"""
         response = self.client.post(LOGIN_URL)  # 302 redirect
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(response.url, '/')
+        self.assertEqual(response.url, settings.LOGIN_REDIRECT_URL)
         response = self.client.put(LOGIN_URL)  # 302 mirrors post method
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(response.url, '/')
+        self.assertEqual(response.url, settings.LOGIN_REDIRECT_URL)
         response = self.client.patch(LOGIN_URL)  # 405 method not allowed
         self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
         response = self.client.delete(LOGIN_URL)  # 405 method not allowed

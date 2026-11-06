@@ -1,0 +1,53 @@
+{% extends 'institute/base.html' %}
+{% load static %}
+{% block title %}<title>Payment Successful</title>{% endblock title %}
+
+{% block leftside %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow border-0 rounded-4 text-center overflow-hidden">
+                <div class="card-header bg-success text-white py-4">
+                    <div class="rounded-circle bg-white text-success d-inline-flex align-items-center justify-content-center mb-2 shadow" style="width: 70px; height: 70px;">
+                        <i class="fas fa-check fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-0">Payment Successful!</h4>
+                    <p class="small text-white-50 mb-0">Thank you. Your transaction has been processed successfully.</p>
+                </div>
+                <div class="card-body p-4 text-start">
+                    <h6 class="text-uppercase text-muted fw-bold small mb-3">Transaction Receipt</h6>
+                    <div class="list-group list-group-flush mb-4">
+                        <div class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Transaction ID</span>
+                            <span class="fw-bold text-dark font-monospace">{{ tran_id }}</span>
+                        </div>
+                        {% if val_id %}
+                        <div class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Validation ID</span>
+                            <span class="text-secondary font-monospace">{{ val_id }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Amount Paid</span>
+                            <span class="fw-bold text-success fs-5">{{ amount }} BDT</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Payment Method</span>
+                            <span class="badge bg-light text-dark border">{{ card_type }}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Status</span>
+                            <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>{{ status }}</span>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button onclick="window.print()" class="btn btn-outline-dark btn-sm"><i class="fas fa-print me-1"></i> Print Receipt</button>
+                        <a href="{% url 'homepage' %}" class="btn btn-primary"><i class="fas fa-home me-1"></i> Return to Homepage</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock leftside %}
+{% block rightside %}{% endblock rightside %}

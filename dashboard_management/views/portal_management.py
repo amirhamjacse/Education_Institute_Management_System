@@ -24,30 +24,72 @@ from Core.utils import generate_temp_password, generate_prefixed_user_id
 
 
 class PortalManagerDashboard(
-    LoginRequiredMixin, UserPassesTestMixin,
-    PermissionRequiredMixin, 
+    LoginRequiredMixin, UserPassesTestMixin, 
     TemplateView
 ):
     template_name = 'portal_manager_dashboard.html'
-    permission_required = 'dashboard_management.view_dashboard_management'
 
     def test_func(self):
-        return self.request.user.is_active
+        return self.request.user.is_active and self.request.user.is_staff
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # import models here to avoid circular imports at module load
-        from students.models import StudentsInfo
-        from institute_dashaboard.models import Notice_board, News_headline, Gallery
+        from students.models import (
+            StudentsInfo, ClassName, SectionClas,
+            Book, BookIssue, Vehicle, TransportRoute,
+            Hostel, HostelRoom, BedAllocation,
+            LeaveApplication, ExamAdmitCard
+        )
+        from institute_dashaboard.models import (
+            Notice_board, News_headline, Gallery,
+            Teachers_Information, Other_Employee_Information,
+            OnlineAdmission, Web_Heading
+        )
+        from fees.models import Invoice
+
+        # Class-wise distribution
+        classes_with_counts = []
+        for c in ClassName.objects.all()[:6]:
+            classes_with_counts.append({
+                'class': c,
+                'count': StudentsInfo.objects.filter(class_name=c).count()
+            })
 
         context.update({
+            'webname': Web_Heading.objects.last(),
             'total_students': StudentsInfo.objects.count(),
+            'total_teachers': Teachers_Information.objects.count(),
+            'total_staff': Other_Employee_Information.objects.count(),
+            'total_classes': ClassName.objects.count(),
+            'total_sections': SectionClas.objects.count(),
+            
+            # Admissions & Applications
+            'total_online_pending': OnlineAdmission.objects.filter(is_active=True).count(),
+            'recent_applicants': OnlineAdmission.objects.order_by('-id')[:5],
+
+            # Library & Operations
+            'total_books': Book.objects.count(),
+            'books_issued': BookIssue.objects.filter(status='ISSUED').count(),
+            'total_vehicles': Vehicle.objects.count(),
+            'total_routes': TransportRoute.objects.count(),
+            'total_hostels': Hostel.objects.count(),
+            'total_beds_occupied': BedAllocation.objects.count(),
+
+            # HR & Leaves
+            'pending_leaves_count': LeaveApplication.objects.filter(status='PENDING').count(),
+            'recent_leaves': LeaveApplication.objects.filter(status='PENDING').select_related('applicant', 'leave_type')[:5],
+
+            # Invoices & Fees
+            'total_invoices_count': Invoice.objects.count(),
+            'recent_invoices': Invoice.objects.order_by('-id')[:5],
+
+            # Content & Notif
             'total_notices': Notice_board.objects.count(),
             'total_news': News_headline.objects.count(),
             'total_gallery': Gallery.objects.count(),
             'recent_notices': Notice_board.objects.order_by('-id')[:5],
             'recent_news': News_headline.objects.order_by('-id')[:5],
-            'recent_gallery': Gallery.objects.order_by('-id')[:6],
+            'classes_distribution': classes_with_counts,
         })
         return context
 
@@ -119,8 +161,8 @@ class AddNews(
         form = NewsdForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Notice uploaded successfully!')
-            return redirect('dashboard_management:notice_adding')  # Adjust the URL to your routing
+            messages.success(request, 'News headline published successfully!')
+            return redirect('dashboard_management:news_adding')
         notice = News_headline.objects.all()
         context = {
             'notice': notice,
@@ -137,8 +179,11 @@ class DeleteNews(View):
         return redirect('dashboard_management:news_adding')  # Adjust the URL to your routing
 
 
-class GalleryView(View):
+class GalleryView(LoginRequiredMixin, UserPassesTestMixin, View):
     template_name = 'gallery_management.html'
+
+    def test_func(self):
+        return self.request.user.is_active
 
     def get(self, request, gallery_id=None):
         if gallery_id:
@@ -159,6 +204,9 @@ class GalleryView(View):
         })
 
     def post(self, request, gallery_id=None):
+        if 'delete' in request.path or request.POST.get('action') == 'delete':
+            return self.delete(request, gallery_id)
+
         if gallery_id:
             gallery = get_object_or_404(Gallery, id=gallery_id)
             form = GalleryForm(request.POST, request.FILES, instance=gallery)
@@ -171,7 +219,7 @@ class GalleryView(View):
                 messages.success(request, 'Photo updated successfully!')
             else:
                 messages.success(request, 'Photo added successfully!')
-            return redirect('dashboard_management:gallery_list')  # Adjust the URL as needed
+            return redirect('dashboard_management:gallery_list')
 
         galleries = Gallery.objects.all()
         return render(request, self.template_name, {
@@ -185,7 +233,7 @@ class GalleryView(View):
         gallery = get_object_or_404(Gallery, id=gallery_id)
         gallery.delete()
         messages.success(request, 'Photo deleted successfully!')
-        return redirect('gallery_list')  # Adjust the URL as needed
+        return redirect('dashboard_management:gallery_list')
 
 
 class AddTeacherView(

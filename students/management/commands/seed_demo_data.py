@@ -1,6 +1,6 @@
 import io
 import random
-from datetime import date, timedelta
+from datetime import date, timedelta, time
 
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
@@ -9,6 +9,10 @@ from django.db import transaction
 from students.models import (
     ClassYear, ClassName, SectionClas, Session, Subjects,
     Exam, ExamYear, StudentsInfo,
+    TimeSlot, TeacherAssignment, ClassRoutine, ExamAdmitCard,
+    BookCategory, Book, BookIssue, Vehicle, TransportRoute,
+    StudentTransport, Hostel, HostelRoom, BedAllocation,
+    LeaveType, LeaveApplication
 )
 from institute_dashaboard.models import (
     Web_Heading, Notice_board, News_headline, Gallery, Event,
@@ -107,11 +111,11 @@ class Command(BaseCommand):
             classes = self.seed_classes(class_year)
             sections = self.seed_sections(classes)
             self.seed_subjects(classes)
-            self.seed_exam()
+            exam = self.seed_exam()
             total_students = self.seed_students(
                 classes, sections, options['per_section']
             )
-            self.seed_teachers()
+            teachers = self.seed_teachers()
             self.seed_staff()
             self.seed_notices()
             self.seed_news()
@@ -120,17 +124,42 @@ class Command(BaseCommand):
             self.seed_gallery()
             self.seed_social_media()
 
+            # Academic & Operational modules
+            time_slots = self.seed_time_slots()
+            self.seed_teacher_assignments(classes, sections, class_year, teachers)
+            self.seed_routines(classes, sections, time_slots, teachers)
+            self.seed_admit_cards(exam)
+            self.seed_library()
+            self.seed_transport()
+            self.seed_hostels()
+            self.seed_leave_management()
+
         self.stdout.write(self.style.SUCCESS(
             f'Demo data seeded: {len(classes)} classes, '
             f'{len(classes) * len(SECTION_DEFS)} sections, '
             f'{total_students} students, {len(TEACHERS)} teachers, '
-            f'{len(STAFF)} staff members.'
+            f'{len(STAFF)} staff members, routines, library, transport, hostels, leaves.'
         ))
 
     # ------------------------------------------------------------------
     # cleanup
     # ------------------------------------------------------------------
     def flush_demo_data(self):
+        LeaveApplication.objects.all().delete()
+        LeaveType.objects.all().delete()
+        BedAllocation.objects.all().delete()
+        HostelRoom.objects.all().delete()
+        Hostel.objects.all().delete()
+        StudentTransport.objects.all().delete()
+        TransportRoute.objects.all().delete()
+        Vehicle.objects.all().delete()
+        BookIssue.objects.all().delete()
+        Book.objects.all().delete()
+        BookCategory.objects.all().delete()
+        ExamAdmitCard.objects.all().delete()
+        ClassRoutine.objects.all().delete()
+        TeacherAssignment.objects.all().delete()
+        TimeSlot.objects.all().delete()
         StudentsInfo.objects.all().delete()
         Subjects.objects.all().delete()
         SectionClas.objects.all().delete()
@@ -306,6 +335,7 @@ class Command(BaseCommand):
             if photo:
                 teacher.teachers_photo.save(photo.name, photo, save=False)
             teacher.save()
+        return list(Teachers_Information.objects.all())
 
     def seed_staff(self):
         for name, phone, email, designation in STAFF:
@@ -403,3 +433,321 @@ class Command(BaseCommand):
             SocialMedia.objects.get_or_create(
                 platform=platform, defaults={'url': url, 'icon_class': icon}
             )
+
+    def seed_time_slots(self):
+        slots_data = [
+            ('1st Period', time(9, 0), time(9, 45), False),
+            ('2nd Period', time(9, 45), time(10, 30), False),
+            ('3rd Period', time(10, 30), time(11, 15), False),
+            ('Tiffin Break', time(11, 15), time(11, 45), True),
+            ('4th Period', time(11, 45), time(12, 30), False),
+            ('5th Period', time(12, 30), time(13, 15), False),
+            ('6th Period', time(13, 15), time(14, 0), False),
+        ]
+        created = []
+        for name, start, end, is_break in slots_data:
+            slot, _ = TimeSlot.objects.get_or_create(
+                period_name=name,
+                defaults={'start_time': start, 'end_time': end, 'is_break': is_break}
+            )
+            created.append(slot)
+        return created
+
+    def seed_teacher_assignments(self, classes, sections, class_year, teachers):
+        if not teachers:
+            return
+        for cls in classes:
+            subjects = list(Subjects.objects.filter(class_nm=cls))
+            cls_sections = sections.get(cls.id, [])
+            for sec in cls_sections:
+                for idx, subj in enumerate(subjects):
+                    teacher = teachers[idx % len(teachers)]
+                    TeacherAssignment.objects.get_or_create(
+                        teacher=teacher,
+                        class_name=cls,
+                        section=sec,
+                        subject=subj,
+                        defaults={'academic_year': class_year}
+                    )
+
+    def seed_routines(self, classes, sections, time_slots, teachers):
+        if not classes or not time_slots:
+            return
+        days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday']
+        regular_slots = [s for s in time_slots if not s.is_break]
+
+        for cls in classes[:2]:  # Seed for Class Six and Seven
+            subjects = list(Subjects.objects.filter(class_nm=cls))
+            if not subjects:
+                continue
+            for sec in sections.get(cls.id, [])[:1]:  # Section A
+                room_no = f"Room {100 + cls.id}"
+                for d_idx, day in enumerate(days):
+                    for s_idx, slot in enumerate(regular_slots):
+                        subj = subjects[(d_idx + s_idx) % len(subjects)]
+                        teacher = teachers[(d_idx + s_idx) % len(teachers)] if teachers else None
+                        ClassRoutine.objects.get_or_create(
+                            class_name=cls,
+                            section=sec,
+                            time_slot=slot,
+                            day_of_week=day,
+                            defaults={
+                                'subject': subj,
+                                'teacher': teacher,
+                                'room_number': room_no,
+                            }
+                        )
+
+    def seed_admit_cards(self, exam):
+        students = list(StudentsInfo.objects.all()[:20])
+        exam_year = exam.exam_yea
+        for idx, student in enumerate(students, start=1):
+            ExamAdmitCard.objects.get_or_create(
+                student=student,
+                exam=exam,
+                exam_year=exam_year,
+                defaults={
+                    'roll_number': f"EX-{student.unique_roll}",
+                    'room_number': f"Hall {101 + (idx // 10)}",
+                    'seat_bench': f"Row {(idx % 5) + 1}-Desk {((idx - 1) % 4) + 1}",
+                    'is_approved': True,
+                }
+            )
+
+    def seed_library(self):
+        categories_data = [
+            ('Science & Technology', 'SCI', 'Physics, Chemistry, Biology and Computer Science'),
+            ('Literature & Fiction', 'LIT', 'Bengali & English literary classics, poems, and novels'),
+            ('Mathematics & Logic', 'MATH', 'Algebra, Geometry, Arithmetic and Olympiad preparation'),
+            ('History & Heritage', 'HIST', 'Liberation War, World History, and Civilizations'),
+            ('General Knowledge & Encyclopedia', 'GK', 'Current affairs, world records, encyclopedias'),
+        ]
+        cat_map = {}
+        for name, code, desc in categories_data:
+            cat, _ = BookCategory.objects.get_or_create(
+                name=name,
+                defaults={'code': code, 'description': desc}
+            )
+            cat_map[name] = cat
+
+        books_data = [
+            ('General Science for High School', 'Dr. Ali Asgar', '978-984-40-1011-1', 'National Curriculum', '1st Edition', 15, 'Shelf A1', 'Science & Technology'),
+            ('Fundamentals of Physics', 'Halliday & Resnick', '978-047-046-908-8', 'Wiley Bangladesh', '10th Edition', 10, 'Shelf A2', 'Science & Technology'),
+            ('Shesher Kobita', 'Rabindranath Tagore', '978-984-50-2012-3', 'Bangla Academy', 'Classic Reprint', 12, 'Shelf B1', 'Literature & Fiction'),
+            ('Gitanjali', 'Rabindranath Tagore', '978-984-50-2013-0', 'Bangla Academy', 'Deluxe Edition', 8, 'Shelf B2', 'Literature & Fiction'),
+            ('Higher Mathematics Practice Guide', 'Prof. Harun-ur-Rashid', '978-984-60-3014-5', 'Dhaka Publications', '3rd Edition', 20, 'Shelf C1', 'Mathematics & Logic'),
+            ('Bangladesh & Global Studies', 'Prof. Abul Barkat', '978-984-70-4015-2', 'Muktodhara', '2nd Edition', 18, 'Shelf D1', 'History & Heritage'),
+            ('A Golden Age', 'Tahmima Anam', '978-006-147-890-1', 'John Murray', 'International', 6, 'Shelf B3', 'Literature & Fiction'),
+            ('Computer Programming in Python', 'Tamim Shahriar Subeen', '978-984-88-5016-9', 'Dimik Prokashoni', '2nd Edition', 14, 'Shelf A3', 'Science & Technology'),
+        ]
+        created_books = []
+        for title, author, isbn, pub, ed, qty, shelf, cat_name in books_data:
+            b, _ = Book.objects.get_or_create(
+                title=title,
+                defaults={
+                    'author': author,
+                    'isbn': isbn,
+                    'publisher': pub,
+                    'edition': ed,
+                    'quantity': qty,
+                    'available_copies': qty - 2,
+                    'rack_location': shelf,
+                    'category': cat_map.get(cat_name),
+                }
+            )
+            created_books.append(b)
+
+        students = list(StudentsInfo.objects.all()[:10])
+        today = date.today()
+        if students and created_books:
+            BookIssue.objects.get_or_create(
+                book=created_books[0],
+                student=students[0],
+                defaults={
+                    'issue_date': today - timedelta(days=5),
+                    'due_date': today + timedelta(days=9),
+                    'status': 'ISSUED',
+                }
+            )
+            BookIssue.objects.get_or_create(
+                book=created_books[1],
+                student=students[1],
+                defaults={
+                    'issue_date': today - timedelta(days=20),
+                    'due_date': today - timedelta(days=6),
+                    'status': 'OVERDUE',
+                    'fine_amount': 30.00,
+                    'remarks': '6 days overdue',
+                }
+            )
+            BookIssue.objects.get_or_create(
+                book=created_books[2],
+                student=students[2],
+                defaults={
+                    'issue_date': today - timedelta(days=25),
+                    'due_date': today - timedelta(days=11),
+                    'return_date': today - timedelta(days=12),
+                    'status': 'RETURNED',
+                }
+            )
+
+    def seed_transport(self):
+        v1, _ = Vehicle.objects.get_or_create(
+            vehicle_number='Dhaka Metro-Ga 11-2045',
+            defaults={
+                'vehicle_model': 'Hino 32-Seater Bus',
+                'driver_name': 'Md. Mokbul Hossain',
+                'driver_phone': '01711998877',
+                'capacity': 32,
+            }
+        )
+        v2, _ = Vehicle.objects.get_or_create(
+            vehicle_number='Dhaka Metro-Ga 11-2046',
+            defaults={
+                'vehicle_model': 'Toyota Coaster 28-Seater',
+                'driver_name': 'Md. Rahmatullah',
+                'driver_phone': '01711887766',
+                'capacity': 28,
+            }
+        )
+
+        r1, _ = TransportRoute.objects.get_or_create(
+            route_name='Route 1: Mirpur - Institute Campus',
+            defaults={
+                'vehicle': v1,
+                'start_point': 'Mirpur 10 Circle',
+                'end_point': 'Institute Main Gate',
+                'monthly_fare': 800.00,
+                'stops_description': 'Mirpur 10 (7:30 AM) -> Kazipara (7:40 AM) -> Agargaon (7:55 AM) -> Campus (8:20 AM)',
+            }
+        )
+        r2, _ = TransportRoute.objects.get_or_create(
+            route_name='Route 2: Uttara - Institute Campus',
+            defaults={
+                'vehicle': v2,
+                'start_point': 'Uttara House Building',
+                'end_point': 'Institute Main Gate',
+                'monthly_fare': 1200.00,
+                'stops_description': 'House Building (7:15 AM) -> Airport (7:30 AM) -> Mohakhali (7:50 AM) -> Campus (8:25 AM)',
+            }
+        )
+
+        students = list(StudentsInfo.objects.all()[:6])
+        if len(students) >= 4:
+            StudentTransport.objects.get_or_create(
+                student=students[0],
+                defaults={'route': r1, 'pickup_point': 'Mirpur 10 Circle'}
+            )
+            StudentTransport.objects.get_or_create(
+                student=students[1],
+                defaults={'route': r1, 'pickup_point': 'Kazipara'}
+            )
+            StudentTransport.objects.get_or_create(
+                student=students[2],
+                defaults={'route': r2, 'pickup_point': 'Uttara House Building'}
+            )
+            StudentTransport.objects.get_or_create(
+                student=students[3],
+                defaults={'route': r2, 'pickup_point': 'Airport'}
+            )
+
+    def seed_hostels(self):
+        h1, _ = Hostel.objects.get_or_create(
+            name='Dr. Muhammad Shahidullah Hall',
+            defaults={
+                'hostel_type': 'BOYS',
+                'warden_name': 'Prof. Md. Nazrul Islam',
+                'warden_phone': '01711223344',
+                'address': 'North Campus, Academic Avenue, Dhaka',
+            }
+        )
+        h2, _ = Hostel.objects.get_or_create(
+            name='Begum Rokeya Hall',
+            defaults={
+                'hostel_type': 'GIRLS',
+                'warden_name': 'Dr. Selina Banu',
+                'warden_phone': '01711334455',
+                'address': 'South Campus, Green Road, Dhaka',
+            }
+        )
+
+        r101, _ = HostelRoom.objects.get_or_create(
+            hostel=h1, room_number='101',
+            defaults={'capacity': 4, 'occupied_beds': 2, 'cost_per_bed': 1500.00}
+        )
+        r102, _ = HostelRoom.objects.get_or_create(
+            hostel=h1, room_number='102',
+            defaults={'capacity': 4, 'occupied_beds': 0, 'cost_per_bed': 1500.00}
+        )
+        g201, _ = HostelRoom.objects.get_or_create(
+            hostel=h2, room_number='201',
+            defaults={'capacity': 4, 'occupied_beds': 2, 'cost_per_bed': 1600.00}
+        )
+
+        male_students = list(StudentsInfo.objects.filter(gender='male')[:2])
+        female_students = list(StudentsInfo.objects.filter(gender='female')[:2])
+
+        if len(male_students) >= 2:
+            BedAllocation.objects.get_or_create(
+                student=male_students[0],
+                defaults={'room': r101, 'bed_number': 'Bed 1', 'allocated_date': date.today() - timedelta(days=60)}
+            )
+            BedAllocation.objects.get_or_create(
+                student=male_students[1],
+                defaults={'room': r101, 'bed_number': 'Bed 2', 'allocated_date': date.today() - timedelta(days=45)}
+            )
+        if len(female_students) >= 2:
+            BedAllocation.objects.get_or_create(
+                student=female_students[0],
+                defaults={'room': g201, 'bed_number': 'Bed 1', 'allocated_date': date.today() - timedelta(days=50)}
+            )
+            BedAllocation.objects.get_or_create(
+                student=female_students[1],
+                defaults={'room': g201, 'bed_number': 'Bed 2', 'allocated_date': date.today() - timedelta(days=30)}
+            )
+
+    def seed_leave_management(self):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        types_data = [
+            ('Casual Leave (CL)', 15),
+            ('Sick / Medical Leave (ML)', 14),
+            ('Maternity / Paternity Leave', 90),
+            ('Earned Leave (EL)', 20),
+            ('Special Study Leave', 30),
+        ]
+        created_types = []
+        for name, days in types_data:
+            lt, _ = LeaveType.objects.get_or_create(
+                name=name,
+                defaults={'days_allowed': days}
+            )
+            created_types.append(lt)
+
+        users = list(User.objects.filter(is_staff=True)[:2])
+        today = date.today()
+        if users and created_types:
+            LeaveApplication.objects.get_or_create(
+                applicant=users[0],
+                leave_type=created_types[0],
+                start_date=today + timedelta(days=5),
+                end_date=today + timedelta(days=7),
+                defaults={
+                    'reason': 'Family emergency in hometown.',
+                    'status': 'PENDING',
+                }
+            )
+            if len(users) > 1:
+                LeaveApplication.objects.get_or_create(
+                    applicant=users[1],
+                    leave_type=created_types[1],
+                    start_date=today - timedelta(days=10),
+                    end_date=today - timedelta(days=8),
+                    defaults={
+                        'reason': 'Viral fever and doctor recommended rest.',
+                        'status': 'APPROVED',
+                        'approved_by': users[0],
+                        'admin_remarks': 'Approved with medical certificate verified.',
+                    }
+                )

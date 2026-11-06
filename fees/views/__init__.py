@@ -10,6 +10,7 @@ from .invoice_detail import InvoiceDetailView, InvoiceReceiptPrintView
 from .my_invoices import MyInvoicesView
 from .overdue import OverdueInvoiceListView
 from .report import FeeCollectionReportView
+from .pay_online import PayOnlineInvoiceView
 
 __all__ = [
     FeeHeadListView,
@@ -25,4 +26,5 @@ __all__ = [
     MyInvoicesView,
     OverdueInvoiceListView,
     FeeCollectionReportView,
+    PayOnlineInvoiceView,
 ]

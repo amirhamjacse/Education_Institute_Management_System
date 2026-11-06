@@ -20,6 +20,7 @@ urlpatterns = [
     path('invoices/', views.InvoiceListView.as_view(), name='invoice_list'),
     path('invoices/mine/', views.MyInvoicesView.as_view(), name='my_invoices'),
     path('invoices/<int:pk>/', views.InvoiceDetailView.as_view(), name='invoice_detail'),
+    path('invoices/<int:pk>/pay-online/', views.PayOnlineInvoiceView.as_view(), name='pay_online_invoice'),
     path('invoices/<int:pk>/receipt/', views.InvoiceReceiptPrintView.as_view(), name='invoice_receipt'),
     path('invoices/overdue/', views.OverdueInvoiceListView.as_view(), name='invoice_overdue'),
 
