@@ -86,4 +86,18 @@ urlpatterns = [
          name='teacher_attendance_report'
         ),
 
+    path('api/quick-search/',
+         views.AdminQuickSearchView.as_view(),
+         name='quick_search'
+        ),
+
+    path('export/students/csv/',
+         views.ExportStudentsCSVView.as_view(),
+         name='export_students_csv'
+        ),
+    path('export/invoices/csv/',
+         views.ExportInvoicesCSVView.as_view(),
+         name='export_invoices_csv'
+        ),
+
 ]

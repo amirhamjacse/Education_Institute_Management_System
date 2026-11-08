@@ -16,10 +16,14 @@ class MyInvoicesView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def test_func(self):
         user = self.request.user
-        return user.is_active and hasattr(user, 'student_profile')
+        return user.is_active and (user.is_superuser or hasattr(user, 'student_profile'))
 
     def get(self, request):
-        invoices = Invoice.objects.filter(
-            student=request.user.student_profile, is_deleted=False
-        ).select_related('fee_head').order_by('-created_time')
+        profile = getattr(request.user, 'student_profile', None)
+        if profile:
+            invoices = Invoice.objects.filter(
+                student=profile, is_deleted=False
+            ).select_related('fee_head').order_by('-created_time')
+        else:
+            invoices = []
         return render(request, self.template_name, {'invoices': invoices})

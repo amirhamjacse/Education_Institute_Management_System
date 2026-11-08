@@ -115,6 +115,129 @@
     </div>
 </div>
 
+<!-- Interactive Visual Analytics & Smart Intelligence -->
+<div class="row g-4 mb-4">
+    <!-- Class Enrollment & Capacity Chart -->
+    <div class="col-lg-7">
+        <div class="admin-card h-100">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="admin-card-title"><i class="bi bi-bar-chart-fill text-success"></i> Student Enrollment by Standard</h3>
+                    <small class="text-muted">Live distribution across active classes</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-success-subtle text-success border px-2 py-1 small fw-semibold">
+                        <i class="bi bi-people-fill me-1"></i>{{ total_students }} Students
+                    </span>
+                    <a href="{% url 'dashboard_management:export_students_csv' %}" class="btn btn-sm btn-outline-secondary" title="Export Student Directory to CSV">
+                        <i class="bi bi-file-earmark-spreadsheet me-1"></i>Export CSV
+                    </a>
+                </div>
+            </div>
+            <div class="admin-card-body p-3">
+                <div style="height: 240px; position: relative;">
+                    <canvas id="enrollmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Realization & Collection Chart -->
+    <div class="col-lg-5">
+        <div class="admin-card h-100">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="admin-card-title"><i class="bi bi-pie-chart-fill text-primary"></i> Fee Billing &amp; Realization</h3>
+                    <small class="text-muted">Settlement breakdown of billed invoices</small>
+                </div>
+                <a href="{% url 'fees:invoice_list' %}" class="btn btn-sm btn-outline-primary">
+                    Invoices ({{ total_invoices_count }})
+                </a>
+            </div>
+            <div class="admin-card-body p-3">
+                <div class="row align-items-center">
+                    <div class="col-sm-6 text-center">
+                        <div style="height: 180px; position: relative;" class="mx-auto">
+                            <canvas id="financeChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 ps-sm-3 mt-3 mt-sm-0">
+                        <div class="mb-2">
+                            <span class="small text-muted d-block" style="font-size:0.75rem;">PAID SETTLED</span>
+                            <span class="fw-bold text-success fs-5">৳{{ paid_amount|default:"0" }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="small text-muted d-block" style="font-size:0.75rem;">PARTIAL DUE</span>
+                            <span class="fw-bold text-warning fs-5">৳{{ partial_amount|default:"0" }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="small text-muted d-block" style="font-size:0.75rem;">UNPAID OUTSTANDING</span>
+                            <span class="fw-bold text-danger fs-5">৳{{ unpaid_amount|default:"0" }}</span>
+                        </div>
+                        <a href="{% url 'dashboard_management:export_invoices_csv' %}" class="btn btn-sm btn-light border text-muted w-100 mt-2 small">
+                            <i class="bi bi-download me-1"></i>Export Billing CSV
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Smart Operational Insights Bar -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="p-3 rounded-3 bg-white border d-flex align-items-center justify-content-between shadow-xs">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-2.5 rounded-circle {% if overdue_books_count %}bg-danger-subtle text-danger{% else %}bg-success-subtle text-success{% endif %} fs-4">
+                    <i class="bi bi-journal-x"></i>
+                </div>
+                <div>
+                    <div class="fw-bold text-dark small">Library Overdue Loans</div>
+                    <div class="text-muted" style="font-size:0.75rem;">
+                        {% if overdue_books_count %}<span class="text-danger fw-semibold">{{ overdue_books_count }} book{{ overdue_books_count|pluralize }} past return date</span>{% else %}<span class="text-success">All loans on schedule</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'students:library_issues' %}" class="btn btn-sm btn-light border">Circulation</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="p-3 rounded-3 bg-white border d-flex align-items-center justify-content-between shadow-xs">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-2.5 rounded-circle {% if total_online_pending %}bg-warning-subtle text-warning{% else %}bg-success-subtle text-success{% endif %} fs-4">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+                <div>
+                    <div class="fw-bold text-dark small">Pending Online Applicants</div>
+                    <div class="text-muted" style="font-size:0.75rem;">
+                        {% if total_online_pending %}<span class="text-warning fw-semibold">{{ total_online_pending }} candidate{{ total_online_pending|pluralize }} awaiting enrollment</span>{% else %}<span class="text-success">Admissions inbox clear</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'dashboard_management:online_admission' %}" class="btn btn-sm btn-light border">Admissions</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="p-3 rounded-3 bg-white border d-flex align-items-center justify-content-between shadow-xs">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-2.5 rounded-circle {% if pending_leaves_count %}bg-danger-subtle text-danger{% else %}bg-success-subtle text-success{% endif %} fs-4">
+                    <i class="bi bi-calendar-heart-fill"></i>
+                </div>
+                <div>
+                    <div class="fw-bold text-dark small">Staff Leave Applications</div>
+                    <div class="text-muted" style="font-size:0.75rem;">
+                        {% if pending_leaves_count %}<span class="text-danger fw-semibold">{{ pending_leaves_count }} request{{ pending_leaves_count|pluralize }} awaiting approval</span>{% else %}<span class="text-success">All requests addressed</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'students:leave_manage' %}" class="btn btn-sm btn-light border">Leave Desk</a>
+        </div>
+    </div>
+</div>
+
 <!-- Command Center Quick Actions Grid -->
 <div class="admin-card mb-4">
     <div class="admin-card-header">
@@ -122,10 +245,36 @@
             <h2 class="admin-card-title"><i class="bi bi-grid-3x3-gap-fill text-success"></i> Management Modules &amp; Services</h2>
             <small class="text-muted">Direct operational shortcuts to key administrative tools</small>
         </div>
-        <span class="badge bg-light text-dark border px-3 py-2 fw-semibold">12 Core Systems Active</span>
+        <span class="badge bg-light text-dark border px-3 py-2 fw-semibold">14 Core Systems Active</span>
     </div>
     <div class="admin-card-body p-3">
         <div class="row g-3">
+
+            <!-- Student Directory -->
+            <div class="col-xl-3 col-md-4 col-sm-6">
+                <a href="{% url 'students:students_list' %}" class="p-3 border rounded-3 bg-white text-decoration-none d-flex align-items-center gap-3 transition-hover h-100 shadow-xs" style="transition: all 0.18s ease;">
+                    <div class="p-3 rounded-3 text-white" style="background: linear-gradient(135deg, #0284c7, #38bdf8);">
+                        <i class="bi bi-people-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Student Directory</h6>
+                        <p class="text-muted small mb-0">Roster &amp; 360° profiles</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Student Attendance -->
+            <div class="col-xl-3 col-md-4 col-sm-6">
+                <a href="{% url 'students:attendance_query' %}" class="p-3 border rounded-3 bg-white text-decoration-none d-flex align-items-center gap-3 transition-hover h-100 shadow-xs" style="transition: all 0.18s ease;">
+                    <div class="p-3 rounded-3 text-white" style="background: linear-gradient(135deg, #10b981, #34d399);">
+                        <i class="bi bi-check2-square fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Student Attendance</h6>
+                        <p class="text-muted small mb-0">Daily roll call &amp; analytics</p>
+                    </div>
+                </a>
+            </div>
             
             <!-- Routine / Timetable -->
             <div class="col-xl-3 col-md-4 col-sm-6">
@@ -485,3 +634,95 @@
 
 </div>
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Enrollment Bar Chart
+    const enrollmentCtx = document.getElementById('enrollmentChart');
+    if (enrollmentCtx) {
+        const labels = {{ chart_class_labels_json|safe|default:"[]" }};
+        const data = {{ chart_class_data_json|safe|default:"[]" }};
+
+        new Chart(enrollmentCtx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Enrolled Students',
+                    data: data,
+                    backgroundColor: 'rgba(5, 150, 105, 0.82)',
+                    hoverBackgroundColor: '#047857',
+                    borderRadius: 6,
+                    maxBarThickness: 38
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        padding: 10,
+                        cornerRadius: 8,
+                        titleFont: { size: 13, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 5, color: '#64748b' },
+                        grid: { color: '#f1f5f9' }
+                    },
+                    x: {
+                        ticks: { color: '#475569', font: { weight: '600' } },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Financial Realization Doughnut Chart
+    const financeCtx = document.getElementById('financeChart');
+    if (financeCtx) {
+        const financeData = {{ chart_finance_json|safe|default:"[0, 0, 0]" }};
+        // If all 0, show a placeholder neutral segment
+        const hasData = financeData.some(v => v > 0);
+
+        new Chart(financeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Paid', 'Partial Due', 'Unpaid'],
+                datasets: [{
+                    data: hasData ? financeData : [1],
+                    backgroundColor: hasData 
+                        ? ['#10b981', '#f59e0b', '#ef4444'] 
+                        : ['#e2e8f0'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '72%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: hasData,
+                        callbacks: {
+                            label: function (ctx) {
+                                return ' ৳' + Number(ctx.raw).toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock extra_js %}

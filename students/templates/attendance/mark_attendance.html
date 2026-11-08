@@ -1,179 +1,143 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
-{% load widget_tweaks %}
-{% block title %}
-<title>Mark Attendance</title>
-{% endblock title %}
 
-{% block leftside %}
-<style>
-    .portal-dashboard { padding: 8px 0 12px; }
-    .dashboard-shell { overflow: hidden; background: #f7faf8; border: 1px solid #dbe7e0; border-radius: 12px; box-shadow: 0 22px 54px rgba(18, 52, 38, 0.12); }
-    .dashboard-hero { position: relative; padding: clamp(18px, 3vw, 30px); color: #fff; background: linear-gradient(135deg, rgba(4, 91, 53, 0.96), rgba(8, 114, 67, 0.84)), url("{% static 'institute/img/4444.jpg' %}") center/cover; }
-    .dashboard-hero::after { content: ""; position: absolute; inset: auto 0 0 0; height: 1px; background: rgba(255, 255, 255, 0.24); }
-    .dashboard-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid rgba(255, 255, 255, 0.42); border-radius: 999px; background: rgba(255, 255, 255, 0.16); font-weight: 800; }
-    .dashboard-hero h1 { max-width: 820px; margin: 12px 0 6px; color: #fff; font-size: clamp(1.7rem, 3vw, 2.8rem); font-weight: 900; line-height: 1.08; overflow-wrap: anywhere; }
-    .dashboard-hero p { max-width: 720px; margin: 0; color: rgba(255, 255, 255, 0.9); font-size: 1rem; line-height: 1.55; }
-    .dashboard-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-    .dashboard-meta span { display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.16); color: #fff; font-weight: 800; backdrop-filter: blur(8px); }
-    .dashboard-content { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 14px; padding: clamp(12px, 2vw, 18px); }
-    .dashboard-panel { background: #fff; border: 1px solid #dfe8e3; border-radius: 10px; box-shadow: 0 14px 34px rgba(18, 52, 38, 0.08); }
-    .dashboard-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #e7eee9; }
-    .dashboard-panel-header h2, .dashboard-panel-header h3 { margin: 0; color: #1b2838; font-weight: 900; }
-    .dashboard-panel-header small { color: #667085; font-weight: 700; }
-    .table-section { padding: 16px; }
-    .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #e7eee9; }
-    .table { margin: 0; min-width: max-content; }
-    .table thead th { background: #f5f8f6; color: #1b2838; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 2px solid #dbe7e0; padding: 12px 14px; white-space: nowrap; }
-    .table tbody td { padding: 10px 14px; vertical-align: middle; color: #34443c; border-color: #edf3ef; }
-    .table tbody tr:hover { background: #f6faf8; }
-    .status-select { min-width: 130px; min-height: 42px; border-radius: 8px; border: 2px solid #d6e2db; padding: 6px 10px; font-weight: 700; }
-    .status-select:focus { border-color: #087243; outline: none; box-shadow: 0 0 0 0.2rem rgba(8, 114, 67, 0.12); }
-    .student-avatar { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; border: 2px solid #e3ece6; background: #f0f5f2; }
-    .student-avatar-placeholder { width: 38px; height: 38px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #e3ece6, #d6e2db); color: #667085; font-size: 1rem; font-weight: 900; }
-    .badge-roll { display: inline-block; padding: 3px 10px; border-radius: 999px; background: #eaf4ef; color: #087243; font-weight: 800; font-size: 0.8rem; }
-    .submit-bar { padding: 16px 0 0; display: flex; justify-content: center; }
-    .submit-bar .btn { min-width: 240px; min-height: 48px; border-radius: 999px; font-weight: 800; box-shadow: 0 14px 24px rgba(8, 114, 67, 0.22); }
-    .messages-container { padding: 0 0 16px; }
-    .messages-container .alert { border-radius: 10px; font-weight: 600; border: none; margin: 0; }
-    .dashboard-side { display: grid; gap: 14px; align-content: start; }
-    .profile-panel { padding: 16px; }
-    .profile-avatar { width: 62px; height: 62px; display: inline-flex; align-items: center; justify-content: center; color: #fff; background: linear-gradient(135deg, #087243, #0f8b63); border-radius: 14px; font-size: 2rem; box-shadow: 0 14px 28px rgba(8, 114, 67, 0.22); }
-    .profile-panel h3 { margin: 12px 0 4px; color: #1b2838; font-weight: 900; }
-    .profile-panel p { margin: 0; color: #667085; overflow-wrap: anywhere; }
-    .status-list { display: grid; gap: 10px; margin-top: 14px; }
-    .status-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; background: #f5f8f6; border: 1px solid #e4ece7; border-radius: 8px; }
-    .status-item strong { color: #34443c; }
-    .status-item span { color: #087243; font-weight: 900; }
-    .tips-panel { padding: 16px; }
-    .tips-panel h3 { margin: 0 0 12px; color: #1b2838; font-weight: 900; }
-    .tips-panel ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-    .tips-panel li { display: flex; gap: 10px; color: #4b5b53; line-height: 1.55; }
-    @media (max-width: 1199.98px) { .dashboard-content { grid-template-columns: 1fr; } .dashboard-side { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 767.98px) { .portal-dashboard { padding-top: 10px; } .dashboard-side { grid-template-columns: 1fr; } .dashboard-panel-header { align-items: flex-start; flex-direction: column; } }
-</style>
+{% block title %}Mark Attendance: {{ class }} - {{ section }} ({{ date|date:"d M Y" }}) | Admin Console{% endblock title %}
+{% block breadcrumb_current %}Mark Attendance{% endblock %}
 
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-calendar2-check-fill"></i> Attendance Entry</span>
-            <h1>{{ class }} - {{ section }}</h1>
-            <p>Mark attendance status for each student on {{ date }}.</p>
-            <div class="dashboard-meta">
-                <span><i class="bi bi-people-fill"></i> {{ object_list|length }} students</span>
-                <span><i class="bi bi-calendar-event"></i> {{ date }}</span>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-calendar2-check-fill text-primary"></i> Classroom Attendance Sheet
+        </h2>
+        <p class="text-muted small mb-0">
+            Class: <strong class="text-dark">{{ class }}</strong> &bull; Section: <strong class="text-dark">{{ section }}</strong> &bull; Date: <strong class="text-primary">{{ date|date:"l, d M Y" }}</strong>
+        </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <button type="button" class="btn btn-outline-success btn-sm shadow-sm" onclick="setAllAttendance('present')">
+            <i class="bi bi-check-all me-1"></i> Mark All Present
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-sm shadow-sm" onclick="setAllAttendance('absent')">
+            <i class="bi bi-x-lg me-1"></i> Mark All Absent
+        </button>
+        <a href="{% url 'students:attendance_query' %}" class="btn btn-outline-secondary btn-sm shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> Change Class/Date
+        </a>
+    </div>
+</div>
+
+<form method="post" id="attendanceForm">
+    {% csrf_token %}
+    <div class="admin-card shadow-sm border-0 mb-4">
+        <div class="admin-card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="fw-bold text-dark mb-0">Student Roll Call ({{ object_list|length }} Students)</h5>
+            <div class="d-flex gap-2 text-muted small">
+                <span>Present: <strong class="text-success" id="presentCount">0</strong></span> &bull;
+                <span>Absent: <strong class="text-danger" id="absentCount">0</strong></span> &bull;
+                <span>Late: <strong class="text-warning" id="lateCount">0</strong></span> &bull;
+                <span>Leave: <strong class="text-info" id="leaveCount">0</strong></span>
             </div>
         </div>
 
-        <div class="dashboard-content">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>Student Attendance</h2>
-                        <small>Choose a status for each student, then submit.</small>
-                    </div>
-                    <small>{{ webname.name_headline|default:"Education Institute" }}</small>
-                </div>
-
-                <div class="table-section">
-                    {% if messages %}
-                    <div class="messages-container">
-                        {% for message in messages %}
-                        <div class="alert {{ message.tags }} d-flex align-items-center gap-2" role="alert">
-                            <i class="bi {% if message.tags == 'alert-success' %}bi-check-circle-fill{% elif message.tags == 'alert-danger' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %}"></i>
-                            {{ message }}
-                        </div>
+        <div class="admin-card-body p-0">
+            <div class="table-responsive">
+                <table class="table admin-table mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>Student</th>
+                            <th>Roll / ID</th>
+                            <th style="width: 280px;">Attendance Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in object_list %}
+                        <tr>
+                            <td class="text-muted small fw-semibold">{{ forloop.counter }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    {% if row.student.students_image %}
+                                    <img src="{{ row.student.students_image.url }}" alt="{{ row.student.name }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #e2e8f0;">
+                                    {% else %}
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 40px; height: 40px; background: linear-gradient(135deg, #059669, #10b981); font-size: 1rem;">
+                                        {{ row.student.name|slice:":1"|upper }}
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ row.student.name }}</div>
+                                        <small class="text-muted">{{ row.student.gender|default:"Student" }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-dark border font-monospace px-2 py-1">
+                                    {{ row.student.unique_roll }}
+                                </span>
+                            </td>
+                            <td>
+                                <input type="hidden" name="sid" value="{{ row.student.id }}">
+                                <select name="status_{{ row.student.id }}" class="form-select form-select-sm attendance-status-select" onchange="updateSummaryCounts()">
+                                    {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if row.status == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="bi bi-people display-6 d-block mb-2 text-secondary"></i>
+                                <p class="mb-0 fw-semibold">No students enrolled in this class and section.</p>
+                            </td>
+                        </tr>
                         {% endfor %}
-                    </div>
-                    {% endif %}
-                    <form action="" method="post">
-                        {% csrf_token %}
-                        <div class="table-wrapper">
-                            <table class="table table-hover table-bordered mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Image</th>
-                                        <th>Name</th>
-                                        <th>Roll</th>
-                                        <th style="min-width:150px;">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {% for row in object_list %}
-                                <tr>
-                                    <td class="text-center fw-bold text-muted" style="width:40px;">
-                                        {{ forloop.counter }}
-                                    </td>
-                                    <td>
-                                        {% if row.student.students_image %}
-                                        <img src="{{ row.student.students_image.url }}" class="student-avatar" alt="{{ row.student.name }}">
-                                        {% else %}
-                                        <span class="student-avatar-placeholder"><i class="bi bi-person-fill"></i></span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="fw-semibold">{{ row.student.name|default:'-' }}</td>
-                                    <td><span class="badge-roll">{{ row.student.unique_roll|default:'-' }}</span></td>
-                                    <td>
-                                        <input type="hidden" name="sid" value="{{ row.student.id }}">
-                                        <select name="status_{{ row.student.id }}" class="status-select">
-                                            {% for value, label in status_choices %}
-                                            <option value="{{ value }}" {% if row.status == value %}selected{% endif %}>{{ label }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="text-center py-4 text-muted">
-                                        <i class="bi bi-people fs-3 d-block mb-2"></i>
-                                        No students found for the selected class and section.
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="submit-bar">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="bi bi-check2-circle"></i> Save Attendance
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            <aside class="dashboard-side">
-                <div class="dashboard-panel profile-panel">
-                    <span class="profile-avatar"><i class="bi bi-person-fill"></i></span>
-                    <h3>{{ request.user.get_full_name|default:"Teacher" }}</h3>
-                    <p>{{ request.user.email|default:request.user }}</p>
-                    <div class="status-list">
-                        <div class="status-item">
-                            <strong>Students</strong>
-                            <span>{{ object_list|length }}</span>
-                        </div>
-                        <div class="status-item">
-                            <strong>Date</strong>
-                            <span>{{ date }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dashboard-panel tips-panel">
-                    <h3>Instructions</h3>
-                    <ul>
-                        <li><i class="bi bi-check-circle-fill text-success"></i><span>Every student defaults to "Present".</span></li>
-                        <li><i class="bi bi-check-circle-fill text-success"></i><span>Change the status for absent, late, or on-leave students.</span></li>
-                        <li><i class="bi bi-check-circle-fill text-success"></i><span>Click "Save Attendance" to record all statuses at once.</span></li>
-                        <li><i class="bi bi-check-circle-fill text-success"></i><span>Reopening this page for the same date lets you correct entries.</span></li>
-                    </ul>
-                </div>
-            </aside>
+        <div class="admin-card-footer bg-white py-3 border-top d-flex justify-content-between align-items-center">
+            <a href="{% url 'students:attendance_query' %}" class="btn btn-outline-secondary">
+                Back
+            </a>
+            <button type="submit" class="btn btn-admin-primary px-5 py-2 shadow-sm d-inline-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill"></i> Save Attendance Records
+            </button>
         </div>
     </div>
-</section>
-{% endblock leftside %}
+</form>
+{% endblock content %}
 
-{% block rightside %}
-{% endblock rightside %}
+{% block extra_js %}
+<script>
+    function updateSummaryCounts() {
+        let p = 0, a = 0, lt = 0, lv = 0;
+        document.querySelectorAll('.attendance-status-select').forEach(sel => {
+            if (sel.value === 'present') p++;
+            else if (sel.value === 'absent') a++;
+            else if (sel.value === 'late') lt++;
+            else if (sel.value === 'leave') lv++;
+        });
+        const pEl = document.getElementById('presentCount');
+        const aEl = document.getElementById('absentCount');
+        const ltEl = document.getElementById('lateCount');
+        const lvEl = document.getElementById('leaveCount');
+        if (pEl) pEl.textContent = p;
+        if (aEl) aEl.textContent = a;
+        if (ltEl) ltEl.textContent = lt;
+        if (lvEl) lvEl.textContent = lv;
+    }
+
+    function setAllAttendance(statusValue) {
+        document.querySelectorAll('.attendance-status-select').forEach(sel => {
+            sel.value = statusValue;
+        });
+        updateSummaryCounts();
+    }
+
+    document.addEventListener('DOMContentLoaded', updateSummaryCounts);
+</script>
+{% endblock extra_js %}

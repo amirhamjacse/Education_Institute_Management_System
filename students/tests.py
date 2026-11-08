@@ -342,3 +342,24 @@ class OnlineAdmissionEnrollTests(AcademicAndOperationsBaseTestCase):
         self.assertEqual(student.name, 'Applicant John')
         self.assertIsNotNone(student.user)
         self.assertTrue(student.user.groups.filter(name='Student').exists())
+
+
+class StudentDirectoryAndDetailTests(AcademicAndOperationsBaseTestCase):
+    def test_student_list_view(self):
+        res = self.client.get(reverse('students:students_list'))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Student Directory')
+        self.assertContains(res, self.student.name)
+
+    def test_student_admin_detail_view(self):
+        res = self.client.get(reverse('students:student_admin_detail', args=[self.student.id]))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, self.student.name)
+        self.assertContains(res, self.student.unique_roll)
+        self.assertContains(res, 'Personal & Guardian Details')
+
+    def test_student_create_form_get(self):
+        res = self.client.get(reverse('students:students_create'))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Register New Student')
+

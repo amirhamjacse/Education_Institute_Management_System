@@ -1,85 +1,136 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
-{% block title %}
-<title>Fee Collection Report</title>
-{% endblock title %}
 
-{% block leftside %}
-<style>
-{% include 'fees/_styles.html' %}
-</style>
+{% block title %}Fee Collection Analytics &amp; Report | {{ webname.name_headline|default:"Admin Console" }}{% endblock title %}
+{% block breadcrumb_current %}Fee Collection Report{% endblock %}
 
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-bar-chart-line-fill"></i> Fee Management</span>
-            <h1>Fee Collection Report</h1>
-            <p>Total invoiced, collected, and outstanding amounts, filterable by class, session, and date range.</p>
-        </div>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-bar-chart-line-fill text-primary"></i> Fee Collection Analytics &amp; Reports
+        </h2>
+        <p class="text-muted small mb-0">Total invoiced, realized payments, and outstanding balances aggregated by class, session, and date range.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'dashboard_management:export_invoices_csv' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-file-earmark-spreadsheet text-success"></i> Export CSV
+        </a>
+        <a href="{% url 'fees:invoice_list' %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-receipt"></i> All Invoices
+        </a>
+    </div>
+</div>
 
-        <div class="dashboard-content">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div><h2>Filters</h2></div>
-                </div>
-                <form method="get" class="filter-bar">
-                    <div>
-                        <label>Class</label>
-                        <select name="class_name">
-                            <option value="">All classes</option>
-                            {% for c in classes %}
-                            <option value="{{ c.id }}" {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label>Session</label>
-                        <input type="text" name="session" value="{{ selected_session|default:'' }}" placeholder="e.g. 2025-2026">
-                    </div>
-                    <div>
-                        <label>From date</label>
-                        <input type="date" name="start_date" value="{{ start_date }}">
-                    </div>
-                    <div>
-                        <label>To date</label>
-                        <input type="date" name="end_date" value="{{ end_date }}">
-                    </div>
-                    <div style="align-self:end;">
-                        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel-fill"></i> Filter</button>
-                    </div>
-                </form>
+<!-- Filters Card -->
+<div class="admin-card mb-4">
+    <div class="admin-card-body py-3">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted mb-1">Class / Department</label>
+                <select name="class_name" class="form-select">
+                    <option value="">All Classes</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}" {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted mb-1">Academic Session</label>
+                <input type="text" name="session" value="{{ selected_session|default:'' }}" class="form-control" placeholder="e.g. 2025-2026">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted mb-1">From Date</label>
+                <input type="date" name="start_date" value="{{ start_date }}" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted mb-1">To Date</label>
+                <input type="date" name="end_date" value="{{ end_date }}" class="form-control">
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-primary flex-fill" type="submit">
+                    <i class="bi bi-funnel-fill me-1"></i> Filter
+                </button>
+                <a href="{% url 'fees:fee_report' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 
-                <div class="summary-cards">
-                    <div class="summary-card"><strong>{{ total_invoiced }}</strong><span>Total Invoiced</span></div>
-                    <div class="summary-card collected"><strong>{{ total_collected }}</strong><span>Total Collected</span></div>
-                    <div class="summary-card due"><strong>{{ total_due }}</strong><span>Total Due</span></div>
-                </div>
-
-                <div class="dashboard-panel-header">
-                    <div><h2>By Class</h2></div>
-                </div>
-                <div class="table-section">
-                    <div class="table-wrapper">
-                        <table class="table table-hover table-bordered mb-0">
-                            <thead><tr><th>Class</th><th>Invoiced</th></tr></thead>
-                            <tbody>
-                            {% for row in by_class %}
-                            <tr>
-                                <td class="fw-semibold">{{ row.class_name__name|default:'-' }}</td>
-                                <td>{{ row.invoiced }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr><td colspan="2" class="text-center py-4 text-muted">No invoices match the selected filters.</td></tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+<!-- 3 KPI Metric Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-blue">
+                <i class="bi bi-receipt"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-primary">৳{{ total_invoiced }}</h3>
+                <p class="kpi-label">Total Invoiced</p>
             </div>
         </div>
     </div>
-</section>
-{% endblock leftside %}
+    <div class="col-md-4">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-emerald">
+                <i class="bi bi-cash-coin"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-success">৳{{ total_collected }}</h3>
+                <p class="kpi-label">Total Realized &amp; Collected</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon {% if total_due > 0 %}kpi-icon-rose{% else %}kpi-icon-emerald{% endif %}">
+                <i class="bi bi-wallet2"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value {% if total_due > 0 %}text-danger{% else %}text-success{% endif %}">৳{{ total_due }}</h3>
+                <p class="kpi-label">Outstanding Arrears</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-{% block rightside %}
-{% endblock rightside %}
+<!-- By Class Distribution Table -->
+<div class="admin-card shadow-sm border-0">
+    <div class="admin-card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+            <i class="bi bi-mortarboard text-primary"></i> Class-wise Invoice Incurred
+        </h5>
+    </div>
+    <div class="admin-card-body p-0">
+        <div class="table-responsive">
+            <table class="table admin-table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>Class / Department</th>
+                        <th>Total Invoiced</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in by_class %}
+                    <tr>
+                        <td class="fw-bold text-dark">
+                            <span class="badge bg-primary-subtle text-primary fs-6">{{ row.class_name__name|default:'General' }}</span>
+                        </td>
+                        <td class="fw-bold text-dark fs-6">৳{{ row.invoiced }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="text-center py-5 text-muted">
+                            <i class="bi bi-graph-up display-6 d-block mb-2 text-secondary"></i>
+                            <p class="mb-0 fw-semibold">No invoices match the selected date range or class.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

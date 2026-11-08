@@ -1,4 +1,5 @@
 from .create_students import StudentsCreateView, StudentsListView, StudentsUpdateView, StudentsDeleteView
+from .student_detail import StudentAdminDetailView
 from .dashboard import (
     SDashboard, StudentsInfoDashboard, ResultsDashboard, StudentsDashboard
 )
@@ -17,7 +18,8 @@ from .attendance import (
 
 
 __all__ = [
-    StudentsCreateView, StudentsListView, StudentsUpdateView, StudentsDeleteView, SDashboard,
+    StudentsCreateView, StudentsListView, StudentsUpdateView, StudentsDeleteView,
+    StudentAdminDetailView, SDashboard,
     ResultsCreateView, StudentsInfoDashboard, ListOfResultsAddView,
     ListOfResultscCeateResultView, ResultsDashboard, ShowResultView,
     SemesterResultView, SemesterResultViews, StudentsDashboard,

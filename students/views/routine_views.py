@@ -23,8 +23,8 @@ class RoutineView(LoginRequiredMixin, View):
         teachers = Teachers_Information.objects.all()
         subjects = Subjects.objects.filter(is_active=True)
 
-        selected_class_id = request.GET.get('class_name')
-        selected_section_id = request.GET.get('section')
+        selected_class_id = request.GET.get('class_name') or request.GET.get('class_id')
+        selected_section_id = request.GET.get('section') or request.GET.get('section_id')
 
         # Auto-detect class/section for logged-in student
         if not selected_class_id and hasattr(request.user, 'student_profile'):
@@ -60,6 +60,33 @@ class RoutineView(LoginRequiredMixin, View):
                 if r.day_of_week in routine_matrix:
                     routine_matrix[r.day_of_week][r.time_slot_id] = r
 
+        # Build structured routine_grid with smart conflict detection
+        routine_grid = []
+        for day in days:
+            slots_data = []
+            for slot in time_slots:
+                entry = routine_matrix[day].get(slot.id)
+                conflict_warning = None
+                if entry and entry.teacher:
+                    clash = ClassRoutine.objects.filter(
+                        day_of_week=day,
+                        time_slot=slot,
+                        teacher=entry.teacher,
+                        is_active=True
+                    ).exclude(class_name=selected_class, section=selected_section).select_related('class_name', 'section').first()
+                    if clash:
+                        conflict_warning = f"Faculty double-booked: Also scheduled in Class {clash.class_name.name} ({clash.section.name})"
+
+                slots_data.append({
+                    'slot': slot,
+                    'entry': entry,
+                    'conflict': conflict_warning
+                })
+            routine_grid.append({
+                'day': day,
+                'slots': slots_data
+            })
+
         webheading = Web_Heading.objects.last()
 
         context = {
@@ -72,6 +99,7 @@ class RoutineView(LoginRequiredMixin, View):
             'selected_section': selected_section,
             'days': days,
             'routine_matrix': routine_matrix,
+            'routine_grid': routine_grid,
             'webname': webheading,
         }
         return render(request, self.template_name, context)

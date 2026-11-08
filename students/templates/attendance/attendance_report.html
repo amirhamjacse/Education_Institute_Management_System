@@ -1,146 +1,185 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
-{% block title %}
-<title>Attendance Report</title>
-{% endblock title %}
 
-{% block leftside %}
-<style>
-    .portal-dashboard { padding: 8px 0 12px; }
-    .dashboard-shell { overflow: hidden; background: #f7faf8; border: 1px solid #dbe7e0; border-radius: 12px; box-shadow: 0 22px 54px rgba(18, 52, 38, 0.12); }
-    .dashboard-hero { position: relative; padding: clamp(18px, 3vw, 30px); color: #fff; background: linear-gradient(135deg, rgba(4, 91, 53, 0.96), rgba(8, 114, 67, 0.84)), url("{% static 'institute/img/4444.jpg' %}") center/cover; }
-    .dashboard-hero::after { content: ""; position: absolute; inset: auto 0 0 0; height: 1px; background: rgba(255, 255, 255, 0.24); }
-    .dashboard-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid rgba(255, 255, 255, 0.42); border-radius: 999px; background: rgba(255, 255, 255, 0.16); font-weight: 800; }
-    .dashboard-hero h1 { max-width: 820px; margin: 12px 0 6px; color: #fff; font-size: clamp(1.7rem, 3vw, 2.8rem); font-weight: 900; line-height: 1.08; overflow-wrap: anywhere; }
-    .dashboard-hero p { max-width: 720px; margin: 0; color: rgba(255, 255, 255, 0.9); font-size: 1rem; line-height: 1.55; }
-    .dashboard-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-    .dashboard-meta span { display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.16); color: #fff; font-weight: 800; backdrop-filter: blur(8px); }
-    .dashboard-content { padding: clamp(12px, 2vw, 18px); display: grid; gap: 14px; }
-    .dashboard-panel { background: #fff; border: 1px solid #dfe8e3; border-radius: 10px; box-shadow: 0 14px 34px rgba(18, 52, 38, 0.08); }
-    .dashboard-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #e7eee9; }
-    .dashboard-panel-header h2 { margin: 0; color: #1b2838; font-weight: 900; }
-    .dashboard-panel-header small { color: #667085; font-weight: 700; }
-    .filter-bar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; padding: 16px; }
-    .filter-bar label { display: block; margin-bottom: 6px; font-weight: 800; color: #1b2838; font-size: 0.85rem; }
-    .filter-bar select, .filter-bar input { width: 100%; min-height: 44px; border-radius: 8px; border: 2px solid #d6e2db; padding: 6px 10px; }
-    .filter-bar .btn { min-height: 44px; border-radius: 8px; font-weight: 800; width: 100%; }
-    .summary-cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; padding: 0 16px 16px; }
-    .summary-card { padding: 14px; border-radius: 10px; border: 1px solid #e7eee9; background: #f7faf8; text-align: center; }
-    .summary-card strong { display: block; font-size: 1.5rem; font-weight: 900; color: #1b2838; }
-    .summary-card span { color: #667085; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; }
-    .summary-card.present strong { color: #087243; }
-    .summary-card.absent strong { color: #c92f5d; }
-    .summary-card.late strong { color: #c27803; }
-    .summary-card.leave strong { color: #2879f3; }
-    .table-section { padding: 0 16px 16px; }
-    .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #e7eee9; }
-    .table { margin: 0; min-width: max-content; }
-    .table thead th { background: #f5f8f6; color: #1b2838; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 2px solid #dbe7e0; padding: 12px 14px; white-space: nowrap; }
-    .table tbody td { padding: 10px 14px; vertical-align: middle; color: #34443c; border-color: #edf3ef; }
-    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-weight: 800; font-size: 0.8rem; }
-    .status-badge.present { background: #eaf4ef; color: #087243; }
-    .status-badge.absent { background: #fdeaef; color: #c92f5d; }
-    .status-badge.late { background: #fdf3e3; color: #c27803; }
-    .status-badge.leave { background: #eaf1fd; color: #2879f3; }
-    @media (max-width: 991.98px) { .filter-bar, .summary-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-</style>
+{% block title %}Student Attendance Analytics &amp; Report | {{ webname.name_headline|default:"Admin Console" }}{% endblock title %}
+{% block breadcrumb_current %}Attendance Report{% endblock %}
 
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-bar-chart-line-fill"></i> Attendance Report</span>
-            <h1>Attendance Records</h1>
-            <p>Filter by class, section, and date range to review attendance history.</p>
-        </div>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-bar-chart-line-fill text-primary"></i> Student Attendance Analytics &amp; Reports
+        </h2>
+        <p class="text-muted small mb-0">Historical attendance audit log filterable by date range, classroom, and section.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'students:attendance_query' %}" class="btn btn-admin-primary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-calendar-check"></i> Mark Daily Attendance
+        </a>
+    </div>
+</div>
 
-        <div class="dashboard-content">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>Filters</h2>
-                        <small>Narrow down the records you want to see.</small>
-                    </div>
-                </div>
-                <form method="get" class="filter-bar">
-                    <div>
-                        <label>Class</label>
-                        <select name="class_name">
-                            <option value="">All classes</option>
-                            {% for c in classes %}
-                            <option value="{{ c.id }}" {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label>Section</label>
-                        <select name="section">
-                            <option value="">All sections</option>
-                            {% for s in sections %}
-                            <option value="{{ s.id }}" {% if selected_section == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label>From date</label>
-                        <input type="date" name="start_date" value="{{ start_date|default:'' }}">
-                    </div>
-                    <div>
-                        <label>To date</label>
-                        <input type="date" name="end_date" value="{{ end_date|default:'' }}">
-                    </div>
-                    <div style="align-self:end;">
-                        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel-fill"></i> Filter</button>
-                    </div>
-                </form>
+<!-- Filters Card -->
+<div class="admin-card mb-4">
+    <div class="admin-card-body py-3">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted mb-1">Class / Grade</label>
+                <select name="class_name" class="form-select">
+                    <option value="">All Classes</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}" {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted mb-1">Section</label>
+                <select name="section" class="form-select">
+                    <option value="">All Sections</option>
+                    {% for s in sections %}
+                    <option value="{{ s.id }}" {% if selected_section == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted mb-1">From Date</label>
+                <input type="date" name="start_date" value="{{ start_date|default:'' }}" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted mb-1">To Date</label>
+                <input type="date" name="end_date" value="{{ end_date|default:'' }}" class="form-control">
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-primary flex-fill" type="submit">
+                    <i class="bi bi-funnel-fill me-1"></i> Filter
+                </button>
+                <a href="{% url 'students:attendance_report' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 
-                <div class="summary-cards">
-                    <div class="summary-card"><strong>{{ summary.total }}</strong><span>Total</span></div>
-                    <div class="summary-card present"><strong>{{ summary.present }}</strong><span>Present</span></div>
-                    <div class="summary-card absent"><strong>{{ summary.absent }}</strong><span>Absent</span></div>
-                    <div class="summary-card late"><strong>{{ summary.late }}</strong><span>Late</span></div>
-                    <div class="summary-card leave"><strong>{{ summary.leave }}</strong><span>Leave</span></div>
-                </div>
-
-                <div class="table-section">
-                    <div class="table-wrapper">
-                        <table class="table table-hover table-bordered mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Student</th>
-                                    <th>Roll</th>
-                                    <th>Class</th>
-                                    <th>Section</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for record in records %}
-                            <tr>
-                                <td>{{ record.date }}</td>
-                                <td class="fw-semibold">{{ record.student.name|default:'-' }}</td>
-                                <td>{{ record.student.unique_roll|default:'-' }}</td>
-                                <td>{{ record.class_name|default:'-' }}</td>
-                                <td>{{ record.section|default:'-' }}</td>
-                                <td><span class="status-badge {{ record.status }}">{{ record.get_status_display }}</span></td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">
-                                    <i class="bi bi-calendar-x fs-3 d-block mb-2"></i>
-                                    No attendance records match the selected filters.
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+<!-- 5 KPI Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-auto flex-fill">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-blue">
+                <i class="bi bi-clipboard2-check"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-primary">{{ summary.total }}</h3>
+                <p class="kpi-label">Total Marked</p>
             </div>
         </div>
     </div>
-</section>
-{% endblock leftside %}
+    <div class="col-6 col-lg-auto flex-fill">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-emerald">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-success">{{ summary.present }}</h3>
+                <p class="kpi-label">Present</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-auto flex-fill">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-rose">
+                <i class="bi bi-x-circle"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-danger">{{ summary.absent }}</h3>
+                <p class="kpi-label">Absent</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-auto flex-fill">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-amber">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-warning">{{ summary.late }}</h3>
+                <p class="kpi-label">Late Arrival</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-auto flex-fill">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-purple">
+                <i class="bi bi-pause-circle"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-info">{{ summary.leave }}</h3>
+                <p class="kpi-label">Approved Leave</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-{% block rightside %}
-{% endblock rightside %}
+<!-- Attendance Records Table -->
+<div class="admin-card shadow-sm border-0">
+    <div class="admin-card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold text-dark mb-0">Daily Audit Log</h5>
+        <span class="badge bg-secondary-subtle text-dark border px-2 py-1">{{ records|length }} Records</span>
+    </div>
+    <div class="admin-card-body p-0">
+        <div class="table-responsive">
+            <table class="table admin-table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Student</th>
+                        <th>Roll / ID</th>
+                        <th>Class &amp; Section</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td class="fw-semibold text-dark">{{ record.date|date:"D, d M Y" }}</td>
+                        <td>
+                            <a href="{% url 'students:student_admin_detail' record.student.id %}" class="fw-bold text-dark text-decoration-none">
+                                {{ record.student.name }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-secondary border font-monospace">{{ record.student.unique_roll }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary-subtle text-primary">{{ record.class_name|default:"General" }}</span>
+                            {% if record.section %}<span class="badge bg-light text-muted border">Sec {{ record.section }}</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if record.status == 'present' %}
+                            <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill"><i class="bi bi-check-circle me-1"></i>Present</span>
+                            {% elif record.status == 'absent' %}
+                            <span class="badge bg-danger-subtle text-danger px-2 py-1 rounded-pill"><i class="bi bi-x-circle me-1"></i>Absent</span>
+                            {% elif record.status == 'late' %}
+                            <span class="badge bg-warning-subtle text-warning px-2 py-1 rounded-pill"><i class="bi bi-clock me-1"></i>Late</span>
+                            {% else %}
+                            <span class="badge bg-info-subtle text-info px-2 py-1 rounded-pill"><i class="bi bi-pause-circle me-1"></i>Leave</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-x display-6 d-block mb-2 text-secondary"></i>
+                            <p class="mb-0 fw-semibold">No attendance records match your filter criteria.</p>
+                            <a href="{% url 'students:attendance_query' %}" class="btn btn-admin-primary btn-sm mt-2">
+                                <i class="bi bi-calendar-check me-1"></i> Mark Attendance
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

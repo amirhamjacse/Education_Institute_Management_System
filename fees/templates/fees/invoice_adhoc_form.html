@@ -1,84 +1,102 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
 {% load widget_tweaks %}
-{% block title %}
-<title>Ad-hoc Invoice</title>
-{% endblock title %}
 
-{% block leftside %}
-<style>
-{% include 'fees/_styles.html' %}
-</style>
+{% block title %}Issue Ad-Hoc Fee Invoice | {{ webname.name_headline|default:"Admin Console" }}{% endblock title %}
+{% block breadcrumb_current %}Ad-Hoc Fee Invoice{% endblock %}
 
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-person-plus-fill"></i> Fee Management</span>
-            <h1>Ad-hoc Invoice</h1>
-            <p>Create a one-off invoice for a single student, not tied to any fee structure — e.g. a fine or a special charge.</p>
-        </div>
-
-        <div class="dashboard-content">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>Invoice Details</h2>
-                    </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'fees:invoice_generate_query' %}"><i class="bi bi-receipt"></i> Bulk Generate Instead</a>
-                </div>
-                {% include 'fees/_messages.html' %}
-                <div class="form-section">
-                    <div class="form-card">
-                        <form method="post" class="form-section">
-                            {% csrf_token %}
-                            <div class="form-grid">
-                                <div class="form-group-card full">
-                                    <label>Student <span class="text-danger">*</span></label>
-                                    {% render_field form.student|add_class:'form-control' %}
-                                    {{ form.student.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Fee Head <span class="text-danger">*</span></label>
-                                    {% render_field form.fee_head|add_class:'form-control' %}
-                                    {{ form.fee_head.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Amount <span class="text-danger">*</span></label>
-                                    {% render_field form.amount|add_class:'form-control' %}
-                                    {{ form.amount.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Discount</label>
-                                    {% render_field form.discount|add_class:'form-control' %}
-                                    {{ form.discount.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Due Date <span class="text-danger">*</span></label>
-                                    {% render_field form.due_date|add_class:'form-control' %}
-                                    {{ form.due_date.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Period Label</label>
-                                    {% render_field form.period_label|add_class:'form-control' %}
-                                    {{ form.period_label.errors }}
-                                </div>
-                                <div class="form-group-card full">
-                                    <label>Remarks</label>
-                                    {% render_field form.remarks|add_class:'form-control' %}
-                                    {{ form.remarks.errors }}
-                                </div>
-                                <div class="form-actions">
-                                    <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle"></i> Create Invoice</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-10">
+        
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                    <i class="bi bi-receipt text-primary"></i> Issue Ad-Hoc Single Invoice
+                </h2>
+                <p class="text-muted small mb-0">Create an individualized charge for a specific student (e.g. lab fine, special assessment, uniform, or extracurricular fee).</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'fees:invoice_generate_query' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-receipt-cutoff me-1"></i> Bulk Invoicing
+                </a>
+                <a href="{% url 'fees:invoice_list' %}" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> All Invoices
+                </a>
             </div>
         </div>
-    </div>
-</section>
-{% endblock leftside %}
 
-{% block rightside %}
-{% endblock rightside %}
+        <div class="admin-card shadow-sm border-0">
+            <div class="admin-card-header bg-white py-3 border-bottom">
+                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-pencil-square text-success"></i> Invoice Particulars
+                </h5>
+            </div>
+            <div class="admin-card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-dark">Select Student <span class="text-danger">*</span></label>
+                            {% render_field form.student class="form-select" %}
+                            {% if form.student.errors %}<div class="text-danger small mt-1">{{ form.student.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Fee Head / Charge Type <span class="text-danger">*</span></label>
+                            {% render_field form.fee_head class="form-select" %}
+                            {% if form.fee_head.errors %}<div class="text-danger small mt-1">{{ form.fee_head.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Invoice Amount (৳) <span class="text-danger">*</span></label>
+                            {% render_field form.amount class="form-control" placeholder="0.00" %}
+                            {% if form.amount.errors %}<div class="text-danger small mt-1">{{ form.amount.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Special Concession / Discount (৳)</label>
+                            {% render_field form.discount class="form-control" placeholder="0.00" %}
+                            {% if form.discount.errors %}<div class="text-danger small mt-1">{{ form.discount.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Payment Due Date <span class="text-danger">*</span></label>
+                            {% render_field form.due_date class="form-control" type="date" %}
+                            {% if form.due_date.errors %}<div class="text-danger small mt-1">{{ form.due_date.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Session Label</label>
+                            {% render_field form.session class="form-control" placeholder="e.g. 2025-2026" %}
+                            {% if form.session.errors %}<div class="text-danger small mt-1">{{ form.session.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Period Label</label>
+                            {% render_field form.period_label class="form-control" placeholder="e.g. Midterm, Ad-hoc, Fine" %}
+                            {% if form.period_label.errors %}<div class="text-danger small mt-1">{{ form.period_label.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-dark">Reason / Remarks</label>
+                            {% render_field form.remarks class="form-control" rows="2" placeholder="Note down specifics regarding this ad-hoc charge" %}
+                            {% if form.remarks.errors %}<div class="text-danger small mt-1">{{ form.remarks.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-12 pt-3 border-top d-flex justify-content-end gap-2">
+                            <a href="{% url 'fees:invoice_list' %}" class="btn btn-outline-secondary px-4 py-2">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-admin-primary px-5 py-2 shadow-sm d-inline-flex align-items-center gap-2">
+                                <i class="bi bi-check-circle-fill"></i> Issue Invoice
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

@@ -1,166 +1,221 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admit Card - {{ webname.name_headline|default:"Education Institute" }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" rel="stylesheet">
+    <title>Official Admit Cards &bull; {{ webname.name_headline|default:"Education Institute" }}</title>
+    
+    <link rel="stylesheet" href="{% static 'institute/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'institute/icons/bootstrap-icons.css' %}">
+    
     <style>
         body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #212529;
+            background-color: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
         }
-        .admit-card-container {
-            max-width: 800px;
-            margin: 20px auto;
+
+        .admit-card-page {
+            max-width: 820px;
+            margin: 24px auto;
             background: #ffffff;
-            border: 2px solid #0d6efd;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 2px solid #0f172a;
+            border-radius: 12px;
+            padding: 28px 34px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
             page-break-after: always;
+            break-after: page;
+            position: relative;
         }
+
         .admit-header {
-            border-bottom: 2px solid #0d6efd;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 16px;
+            margin-bottom: 18px;
         }
-        .roll-badge {
-            font-size: 1.25rem;
+
+        .roll-badge-box {
+            background: #f8fafc;
+            border: 2px solid #059669;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .roll-number-text {
+            font-size: 1.4rem;
             letter-spacing: 2px;
-            font-weight: 700;
+            font-weight: 800;
+            color: #059669;
         }
+
+        .fake-barcode {
+            height: 32px;
+            background: repeating-linear-gradient(
+                90deg,
+                #0f172a,
+                #0f172a 2px,
+                transparent 2px,
+                transparent 4px,
+                #0f172a 4px,
+                #0f172a 7px,
+                transparent 7px,
+                transparent 9px
+            );
+            width: 180px;
+            margin: 4px auto 0;
+        }
+
         @media print {
             body {
-                background: none;
-                margin: 0;
-                padding: 0;
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             .no-print {
                 display: none !important;
             }
-            .admit-card-container {
-                box-shadow: none;
-                margin: 0;
-                border: 2px solid #000;
-                page-break-after: always;
+            .admit-card-page {
+                box-shadow: none !important;
+                margin: 0 auto !important;
+                border: 2px solid #0f172a !important;
+                page-break-after: always !important;
+                break-after: page !important;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="no-print text-center py-3 bg-dark text-white shadow-sm sticky-top">
-    <button onclick="window.print()" class="btn btn-success btn-sm px-4 fw-bold me-2">
-        <i class="fas fa-print me-1"></i> Print All Admit Cards
-    </button>
-    <button onclick="window.close()" class="btn btn-outline-light btn-sm">Close</button>
+<div class="no-print py-2 px-3 bg-dark text-white shadow-sm sticky-top d-flex justify-content-between align-items-center">
+    <div class="small fw-semibold">
+        <i class="bi bi-printer me-1 text-success"></i> Print Preview Mode &bull; {{ admit_cards|length }} Admit Card{{ admit_cards|length|pluralize }}
+    </div>
+    <div class="d-flex gap-2">
+        <button onclick="window.print()" class="btn btn-success btn-sm px-4 fw-bold">
+            <i class="bi bi-printer-fill me-1"></i> Print All Passes
+        </button>
+        <button onclick="window.close()" class="btn btn-outline-light btn-sm">Close</button>
+    </div>
 </div>
 
 {% for card in admit_cards %}
-<div class="admit-card-container">
+<div class="admit-card-page">
     <!-- Header -->
-    <div class="admit-header text-center">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <div>
+    <div class="admit-header">
+        <div class="d-flex justify-content-between align-items-center gap-3">
+            <div style="width: 80px;">
                 {% if webname.institute_logo %}
-                <img src="{{ webname.institute_logo.url }}" alt="Logo" height="60">
+                <img src="{{ webname.institute_logo.url }}" alt="Logo" style="max-height: 64px; max-width: 80px; object-fit: contain;">
                 {% else %}
-                <div class="rounded-circle bg-primary text-white p-2 d-inline-flex" style="width: 50px; height: 50px; justify-content: center; align-items: center; font-weight: bold;">EI</div>
+                <div class="rounded-3 bg-success text-white p-2 d-flex align-items-center justify-content-center fw-bold" style="width: 56px; height: 56px; font-size: 1.1rem;">EI</div>
                 {% endif %}
             </div>
-            <div class="text-center flex-grow-1 px-3">
-                <h3 class="fw-bold text-primary mb-0 text-uppercase">{{ webname.name_headline|default:"Ideal Education Institute" }}</h3>
-                <p class="text-muted small mb-0">{{ webname.location|default:"Dhaka, Bangladesh" }}</p>
-                <div class="badge bg-danger text-uppercase px-3 py-2 mt-2" style="font-size: 0.9rem; letter-spacing: 1px;">
-                    EXAMINATION ADMIT CARD
+
+            <div class="text-center flex-grow-1">
+                <h3 class="fw-bold text-dark mb-0 text-uppercase" style="letter-spacing: -0.02em;">
+                    {{ webname.name_headline|default:"Ideal Education Institute" }}
+                </h3>
+                <div class="text-muted small mb-1">{{ webname.location|default:"Main Campus &bull; Dhaka, Bangladesh" }}</div>
+                <div class="badge bg-dark text-white text-uppercase px-3 py-1.5" style="letter-spacing: 0.08em; font-size: 0.82rem;">
+                    EXAMINATION ADMIT CARD &bull; PASS
+                </div>
+                <div class="fw-bold text-success mt-1 small">
+                    {{ card.exam.name }} &bull; Academic Session {{ card.exam_year.exam_year|default:"2025–2026" }}
                 </div>
             </div>
-            <div>
+
+            <div style="width: 80px;" class="text-end">
                 {% if card.student.students_image %}
-                <img src="{{ card.student.students_image.url }}" alt="Student" class="border" width="75" height="85" style="object-fit: cover;">
+                <img src="{{ card.student.students_image.url }}" alt="Student" class="border rounded" width="75" height="90" style="object-fit: cover;">
                 {% else %}
-                <div class="border d-flex align-items-center justify-content-center bg-light text-muted" style="width: 75px; height: 85px; font-size: 0.75rem;">
-                    PHOTO
+                <div class="border rounded d-flex align-items-center justify-content-center bg-light text-muted small fw-semibold" style="width: 75px; height: 90px; font-size: 0.72rem;">
+                    PASTE PHOTO
                 </div>
                 {% endif %}
             </div>
         </div>
-        <h5 class="fw-bold text-dark mt-2 mb-0">{{ card.exam.name }} — {{ card.exam_year.exam_year }}</h5>
     </div>
 
     <!-- Student Details Grid -->
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-3">
         <div class="col-8">
-            <table class="table table-sm table-borderless mb-0">
+            <table class="table table-sm table-borderless mb-0" style="font-size: 0.88rem;">
                 <tbody>
                     <tr>
-                        <th class="text-secondary" style="width: 140px;">Student Name:</th>
+                        <th class="text-muted fw-semibold" style="width: 140px;">Candidate Name:</th>
                         <td class="fw-bold text-dark fs-6">{{ card.student.name }}</td>
                     </tr>
                     <tr>
-                        <th class="text-secondary">Father's Name:</th>
-                        <td>{{ card.student.father_name|default:"-" }}</td>
+                        <th class="text-muted fw-semibold">Father's Name:</th>
+                        <td class="fw-semibold text-dark">{{ card.student.father_name|default:"-" }}</td>
                     </tr>
                     <tr>
-                        <th class="text-secondary">Class & Section:</th>
-                        <td><strong class="text-primary">{{ card.student.class_name.name }}</strong> (Section {{ card.student.section_class.name }})</td>
+                        <th class="text-muted fw-semibold">Class &amp; Section:</th>
+                        <td><strong class="text-success">Class {{ card.student.class_name.name }}</strong> (Section {{ card.student.section_class.name }})</td>
                     </tr>
                     <tr>
-                        <th class="text-secondary">Session:</th>
-                        <td>{{ card.student.session.name|default:"Annual" }}</td>
+                        <th class="text-muted fw-semibold">Academic Session:</th>
+                        <td>{{ card.student.session|default:"2025-2026" }}</td>
                     </tr>
                     <tr>
-                        <th class="text-secondary">Regular Roll:</th>
-                        <td>{{ card.student.unique_roll }}</td>
+                        <th class="text-muted fw-semibold">Student ID / Roll:</th>
+                        <td class="font-monospace fw-bold text-dark">{{ card.student.unique_roll|default:"-" }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
         <div class="col-4">
-            <div class="card border-primary h-100 text-center p-3 bg-light">
-                <span class="text-muted small text-uppercase fw-semibold">Exam Roll Number</span>
-                <div class="text-primary roll-badge my-1">{{ card.roll_number }}</div>
-                <div class="border-top pt-2 mt-2">
-                    <div class="small"><strong>Hall:</strong> {{ card.room_number|default:"Hall A" }}</div>
-                    <div class="small"><strong>Seat:</strong> {{ card.seat_bench|default:"Assigned" }}</div>
+            <div class="roll-badge-box h-100 d-flex flex-column justify-content-center">
+                <span class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Official Exam Roll</span>
+                <div class="roll-number-text my-1">{{ card.roll_number }}</div>
+                <div class="border-top pt-2 mt-1 small">
+                    <div><strong>Exam Hall:</strong> {{ card.room_number|default:"Main Examination Hall" }}</div>
+                    <div><strong>Desk/Seat:</strong> {{ card.seat_bench|default:"Row A &bull; Desk 12" }}</div>
                 </div>
+                <div class="fake-barcode"></div>
             </div>
         </div>
     </div>
 
-    <!-- Instructions -->
-    <div class="border rounded p-3 bg-light mb-5">
-        <h6 class="fw-bold text-dark mb-1 small text-uppercase"><i class="fas fa-exclamation-triangle text-warning me-1"></i> Examination Hall Rules:</h6>
-        <div class="small text-muted" style="font-size: 0.78rem; line-height: 1.4;">
-            {{ card.instructions|linebreaks }}
+    <!-- Instructions Box -->
+    <div class="border rounded-3 p-3 bg-light mb-4" style="font-size: 0.78rem; border-color: #cbd5e1 !important;">
+        <h6 class="fw-bold text-dark mb-1 small text-uppercase d-flex align-items-center gap-1">
+            <i class="bi bi-shield-exclamation text-warning"></i> Examination Rules &amp; Candidate Guidelines:
+        </h6>
+        <div class="text-muted" style="line-height: 1.45;">
+            {{ card.instructions|default:"Candidates must arrive 15 minutes before exam commencement with this original admit card. Electronic devices, smartwatches, and unauthorized paper materials are strictly prohibited in the examination hall."|linebreaks }}
         </div>
     </div>
 
     <!-- Signatures -->
-    <div class="row pt-4 text-center">
+    <div class="row pt-4 text-center mt-3">
         <div class="col-4">
-            <div class="border-top border-dark pt-1 small fw-semibold">
+            <div class="border-top border-dark pt-1 small fw-semibold text-dark">
                 Candidate's Signature
             </div>
         </div>
         <div class="col-4">
-            <div class="border-top border-dark pt-1 small fw-semibold">
-                Controller of Exams
+            <div class="border-top border-dark pt-1 small fw-semibold text-dark">
+                Controller of Examinations
             </div>
         </div>
         <div class="col-4">
-            <div class="border-top border-dark pt-1 small fw-semibold">
-                Headmaster / Principal Seal
+            <div class="border-top border-dark pt-1 small fw-semibold text-dark">
+                Principal / Headmaster Seal
             </div>
         </div>
     </div>
 </div>
 {% empty %}
 <div class="container py-5 text-center text-muted">
-    <h4>No admit cards found to display.</h4>
+    <i class="bi bi-card-heading fs-1 d-block mb-2 text-secondary"></i>
+    <h4 class="fw-bold text-dark">No Admit Cards Found</h4>
+    <p class="small text-muted">Generate admit cards from the admin console first.</p>
 </div>
 {% endfor %}
 

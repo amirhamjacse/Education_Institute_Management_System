@@ -54,10 +54,17 @@
                     <span><strong>{{ r.start_point }}</strong> &rarr; <strong>{{ r.end_point }}</strong></span>
                 </div>
                 {% if r.vehicle %}
-                <div class="p-2 bg-light rounded-3 mb-3 small">
-                    <div class="fw-semibold text-dark"><i class="bi bi-truck-flatbed me-1"></i>{{ r.vehicle.vehicle_model }} ({{ r.vehicle.vehicle_number }})</div>
-                    <div class="text-muted"><i class="bi bi-person me-1"></i>Driver: {{ r.vehicle.driver_name }} &bull; {{ r.vehicle.driver_phone }}</div>
-                    <div class="text-muted"><i class="bi bi-people me-1"></i>Capacity: {{ r.vehicle.capacity }} Seats</div>
+                <div class="p-2.5 bg-light rounded-3 mb-3 small border">
+                    <div class="fw-bold text-dark d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-truck-flatbed me-1 text-primary"></i>{{ r.vehicle.vehicle_model }} ({{ r.vehicle.vehicle_number }})</span>
+                        {% if r.vehicle.driver_phone %}
+                        <a href="tel:{{ r.vehicle.driver_phone }}" class="badge bg-success text-white text-decoration-none px-2 py-1">
+                            <i class="bi bi-telephone-fill me-1"></i>Call Driver
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="text-muted mt-1"><i class="bi bi-person me-1"></i>Driver: {{ r.vehicle.driver_name }} &bull; {{ r.vehicle.driver_phone }}</div>
+                    <div class="text-muted"><i class="bi bi-people me-1"></i>Vehicle Capacity: {{ r.vehicle.capacity }} Seats</div>
                 </div>
                 {% endif %}
                 {% if r.stops_description %}
@@ -80,15 +87,21 @@
 
 <!-- Student Route Allocations Table -->
 <div class="admin-card shadow-sm border-0">
-    <div class="admin-card-header bg-white py-3">
+    <div class="admin-card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="d-flex align-items-center gap-2">
             <h5 class="fw-bold text-dark mb-0">Registered Student Riders</h5>
             <span class="badge bg-indigo bg-opacity-10 text-indigo border" style="color: #4f46e5;">{{ allocations.count }} Students</span>
         </div>
+        <div style="max-width: 260px;">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="passengerSearchInput" class="form-control border-start-0" placeholder="Filter passenger / roll...">
+            </div>
+        </div>
     </div>
     <div class="admin-card-body p-0">
         <div class="table-responsive">
-            <table class="table admin-table mb-0">
+            <table class="table admin-table mb-0" id="passengerTable">
                 <thead>
                     <tr>
                         <th class="ps-3">Student Name</th>
@@ -100,7 +113,7 @@
                 </thead>
                 <tbody>
                     {% for a in allocations %}
-                    <tr>
+                    <tr class="passenger-row" data-search="{{ a.student.name|lower }} {{ a.student.unique_roll|lower }} {{ a.route.route_name|lower }} {{ a.pickup_point|lower }}">
                         <td class="ps-3">
                             <div class="fw-bold text-dark">{{ a.student.name }}</div>
                             <div class="small text-muted">Roll: {{ a.student.unique_roll }}</div>
@@ -177,3 +190,26 @@
 </div>
 {% endif %}
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('passengerSearchInput');
+    const rows = document.querySelectorAll('#passengerTable tbody .passenger-row');
+
+    if (input && rows.length) {
+        input.addEventListener('input', function () {
+            const query = this.value.trim().toLowerCase();
+            rows.forEach(row => {
+                const text = row.getAttribute('data-search') || '';
+                if (!query || text.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock extra_js %}

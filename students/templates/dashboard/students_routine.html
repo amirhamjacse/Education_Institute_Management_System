@@ -5,155 +5,273 @@
 {% block breadcrumb_current %}Class Routine{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+<style>
+    .routine-slot-card {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        border-left: 4px solid #10b981 !important;
+    }
+    .routine-slot-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+    }
+    .routine-break-pill {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px dashed #f59e0b;
+        font-weight: 700;
+        font-size: 0.78rem;
+    }
+    .day-pill-btn.active {
+        background-color: #059669 !important;
+        color: #ffffff !important;
+        border-color: #059669 !important;
+    }
+
+    @media print {
+        .admin-sidebar, .admin-topbar, .d-print-none, .btn, footer {
+            display: none !important;
+        }
+        .admin-main {
+            margin-left: 0 !important;
+            padding: 0 !important;
+        }
+        .admin-content {
+            padding: 10px !important;
+        }
+        .print-header {
+            display: block !important;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 12px;
+        }
+        .print-signatures {
+            display: flex !important;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding: 0 40px;
+        }
+        .print-sign-line {
+            border-top: 1px solid #334155;
+            width: 160px;
+            text-align: center;
+            padding-top: 4px;
+            font-size: 0.8rem;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        table {
+            font-size: 0.78rem !important;
+        }
+        th, td {
+            padding: 4px 6px !important;
+        }
+    }
+    .print-header, .print-signatures {
+        display: none;
+    }
+</style>
+
+<!-- Printable Header -->
+<div class="print-header">
+    <h3 class="fw-bold text-dark mb-1">{{ webname.name_headline|default:"Education Institute" }}</h3>
+    <div class="text-muted small mb-2">{{ webname.location|default:"Main Academic Campus" }}</div>
+    <h5 class="fw-bold text-success mb-1">
+        Official Class Timetable &bull; Class {{ selected_class.name }} (Section {{ selected_section.name }})
+    </h5>
+    <div class="small text-muted">Academic Session 2025–2026 &bull; Published for Classroom Notice Board</div>
+</div>
+
+<!-- Page Top Actions -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 d-print-none">
     <div>
-        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+        <h1 class="h3 fw-bold text-dark mb-1 d-flex align-items-center gap-2">
             <i class="bi bi-calendar-week-fill text-success"></i> Class Routine &amp; Timetable
-        </h2>
-        <p class="text-muted small mb-0">Manage weekly period schedules, classroom allocations, and faculty assignments.</p>
+        </h1>
+        <p class="text-muted small mb-0">Master weekly period schedules, classroom allocations, and faculty assignments with collision alerts.</p>
     </div>
-    <div class="d-flex flex-wrap gap-2 d-print-none">
+    <div class="d-flex flex-wrap gap-2">
         <button onclick="window.print()" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
-            <i class="bi bi-printer"></i> Print Routine
+            <i class="bi bi-printer-fill"></i> Print Schedule
         </button>
         {% if request.user.is_staff %}
-        <button type="button" class="btn btn-admin-primary btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addSlotModal">
-            <i class="bi bi-plus-circle"></i> Add Routine Slot
+        <button type="button" class="btn btn-success btn-sm d-inline-flex align-items-center gap-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#addSlotModal">
+            <i class="bi bi-plus-circle-fill"></i> Add Period Slot
         </button>
         {% endif %}
     </div>
 </div>
 
 <!-- Class & Section Selector Card -->
-<div class="admin-card d-print-none mb-4">
-    <div class="admin-card-body py-3">
-        <form method="GET" class="row g-3 align-items-end">
+<div class="card border-0 shadow-sm d-print-none mb-4" style="border-radius: 12px;">
+    <div class="card-body p-3">
+        <form method="GET" class="row g-3 align-items-end" id="routineFilterForm">
             <div class="col-md-5">
-                <label class="form-label small fw-semibold text-secondary mb-1">Select Class</label>
-                <select name="class_name" class="form-select" onchange="this.form.submit()">
-                    {% for cls in classes %}
-                    <option value="{{ cls.id }}" {% if selected_class.id == cls.id %}selected{% endif %}>{{ cls.name }}</option>
-                    {% endfor %}
-                </select>
+                <label class="form-label small fw-bold text-dark mb-1">Select Class / Standard</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-mortarboard"></i></span>
+                    <select name="class_name" class="form-select border-start-0" onchange="document.getElementById('routineFilterForm').submit()">
+                        {% for cls in classes %}
+                        <option value="{{ cls.id }}" {% if selected_class.id == cls.id %}selected{% endif %}>Class {{ cls.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
             <div class="col-md-5">
-                <label class="form-label small fw-semibold text-secondary mb-1">Select Section</label>
-                <select name="section" class="form-select" onchange="this.form.submit()">
-                    {% for sec in sections %}
-                    {% if not selected_class or sec.class_nm_id == selected_class.id %}
-                    <option value="{{ sec.id }}" {% if selected_section.id == sec.id %}selected{% endif %}>Section {{ sec.name }}</option>
-                    {% endif %}
-                    {% endfor %}
-                </select>
+                <label class="form-label small fw-bold text-dark mb-1">Select Section</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-diagram-3"></i></span>
+                    <select name="section" class="form-select border-start-0" onchange="document.getElementById('routineFilterForm').submit()">
+                        {% for sec in sections %}
+                        {% if not selected_class or sec.class_nm_id == selected_class.id %}
+                        <option value="{{ sec.id }}" {% if selected_section.id == sec.id %}selected{% endif %}>Section {{ sec.name }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-dark w-100 py-2 d-inline-flex align-items-center justify-content-center gap-1">
-                    <i class="bi bi-search"></i> View
+                <button type="submit" class="btn btn-secondary w-100 fw-semibold">
+                    <i class="bi bi-filter me-1"></i> Filter
                 </button>
             </div>
         </form>
     </div>
 </div>
 
+<!-- Day Quick Filter Tabs (D-print-none) -->
+<div class="d-flex align-items-center gap-2 mb-3 overflow-auto pb-1 d-print-none">
+    <span class="small fw-bold text-muted me-2"><i class="bi bi-funnel"></i> Day Filter:</span>
+    <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 day-pill-btn active" onclick="filterDay('all', this)">
+        Full Week Matrix
+    </button>
+    {% for day in days %}
+    <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 day-pill-btn" onclick="filterDay('{{ day }}', this)">
+        {{ day }}
+    </button>
+    {% endfor %}
+</div>
+
 <!-- Timetable Matrix Grid Card -->
-<div class="admin-card shadow-sm border-0">
-    <div class="admin-card-header bg-white py-3">
+<div class="card border-0 shadow-sm" style="border-radius: 14px; overflow: hidden;">
+    <div class="card-header bg-white py-3 px-4 border-bottom d-flex align-items-center justify-content-between">
         <div>
             <h5 class="fw-bold text-dark mb-0 d-inline-flex align-items-center gap-2">
                 <i class="bi bi-calendar3 text-success"></i>
-                <span>Weekly Timetable: <span class="text-success">{{ selected_class.name|default:"Class" }}</span> &bull; Section {{ selected_section.name|default:"A" }}</span>
+                <span>Weekly Schedule: <span class="text-success">Class {{ selected_class.name|default:"Class" }}</span> &bull; Section {{ selected_section.name|default:"A" }}</span>
             </h5>
         </div>
-        <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle px-3 py-2">Active Academic Routine</span>
+        <span class="badge bg-success-subtle text-success border px-3 py-2 small fw-semibold">
+            <i class="bi bi-clock-history me-1"></i> Active Semester Timetable
+        </span>
     </div>
 
-    <div class="admin-card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle mb-0 text-center">
-                <thead style="background-color: #0f172a; color: #ffffff;" class="text-uppercase small">
-                    <tr>
-                        <th style="width: 130px; background-color: #0b1120; color: #94a3b8;" class="py-3">Day / Period</th>
-                        {% for slot in time_slots %}
-                        <th class="py-3 {% if slot.is_break %}bg-warning text-dark{% endif %}" style="min-width: 140px;">
-                            <div class="fw-bold">{{ slot.period_name }}</div>
-                            <div class="fw-normal small text-white-50" style="font-size: 0.72rem;">
-                                {{ slot.start_time|time:"h:i A" }} - {{ slot.end_time|time:"h:i A" }}
-                            </div>
-                        </th>
-                        {% empty %}
-                        <th class="py-3">No Time Slots Defined</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in routine_grid %}
-                    <tr>
-                        <td class="fw-bold bg-light text-dark py-3">{{ row.day }}</td>
-                        {% for item in row.slots %}
-                        <td class="p-2 {% if item.slot.is_break %}bg-warning bg-opacity-10{% endif %}">
-                            {% if item.slot.is_break %}
-                                <span class="badge bg-warning text-dark py-2 px-3 fw-semibold">
-                                    <i class="bi bi-cup-hot-fill me-1"></i> Tiffin Break
-                                </span>
-                            {% elif item.entry %}
-                                <div class="p-2 rounded-3 border bg-white shadow-xs position-relative text-start">
-                                    <div class="fw-bold text-success" style="font-size: 0.88rem;">{{ item.entry.subject.name }}</div>
-                                    <div class="small text-secondary mb-1">
-                                        <i class="bi bi-person me-1"></i>{{ item.entry.teacher.teachers_name|default:"Faculty" }}
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center pt-1 border-top" style="font-size: 0.75rem;">
-                                        <span class="badge bg-light text-muted border">{{ item.entry.room_number|default:"Room 101" }}</span>
-                                        {% if request.user.is_staff %}
-                                        <form action="{% url 'students:delete_routine_slot' item.entry.id %}" method="POST" class="d-inline d-print-none" onsubmit="return confirm('Remove this routine slot?');">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-link text-danger p-0 border-0" title="Delete Slot">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% else %}
-                                <span class="text-muted small">&mdash;</span>
-                            {% endif %}
-                        </td>
-                        {% endfor %}
-                    </tr>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle mb-0 text-center" id="routineTable">
+            <thead style="background-color: #0f172a; color: #ffffff;" class="text-uppercase small">
+                <tr>
+                    <th style="width: 140px; background-color: #0b1120; color: #94a3b8;" class="py-3">Day / Period</th>
+                    {% for slot in time_slots %}
+                    <th class="py-3 {% if slot.is_break %}bg-warning text-dark{% endif %}" style="min-width: 150px;">
+                        <div class="fw-bold">{{ slot.period_name }}</div>
+                        <div class="fw-normal small text-white-50" style="font-size: 0.72rem;">
+                            {{ slot.start_time|time:"h:i A" }} &ndash; {{ slot.end_time|time:"h:i A" }}
+                        </div>
+                    </th>
                     {% empty %}
-                    <tr>
-                        <td colspan="8" class="text-center py-5 text-muted">
-                            <i class="bi bi-calendar-x fs-2 d-block mb-2 text-secondary"></i>
-                            No routine entries configured for this class and section yet.
-                        </td>
-                    </tr>
+                    <th class="py-3">No Time Slots Defined</th>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in routine_grid %}
+                <tr class="day-row" data-day="{{ row.day }}">
+                    <td class="fw-bold bg-light text-dark py-3">
+                        <div>{{ row.day }}</div>
+                        <span class="badge bg-white text-muted border small mt-1">Class {{ selected_class.name }}</span>
+                    </td>
+                    {% for item in row.slots %}
+                    <td class="p-2 {% if item.slot.is_break %}bg-warning bg-opacity-10{% endif %}">
+                        {% if item.slot.is_break %}
+                            <div class="routine-break-pill py-2 px-2 rounded-2">
+                                <i class="bi bi-cup-hot-fill me-1"></i> Break
+                            </div>
+                        {% elif item.entry %}
+                            <div class="p-2.5 rounded-3 border bg-white shadow-xs position-relative text-start routine-slot-card">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="fw-bold text-dark" style="font-size: 0.88rem;">{{ item.entry.subject.name }}</span>
+                                    <span class="badge bg-light text-muted border" style="font-size: 0.68rem;">{{ item.entry.room_number|default:"Room 101" }}</span>
+                                </div>
+                                <div class="small text-secondary mb-1">
+                                    <i class="bi bi-person-fill text-success me-1"></i>{{ item.entry.teacher.teachers_name|default:"Faculty" }}
+                                </div>
+
+                                {% if item.conflict %}
+                                <div class="badge bg-danger-subtle text-danger border border-danger-subtle text-wrap text-start w-100 p-1 mb-1" style="font-size: 0.68rem;">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>{{ item.conflict }}
+                                </div>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-between align-items-center pt-1 border-top" style="font-size: 0.75rem;">
+                                    <span class="text-muted small">Code: {{ item.entry.subject.code|default:"-" }}</span>
+                                    {% if request.user.is_staff %}
+                                    <form action="{% url 'students:delete_routine_slot' item.entry.id %}" method="POST" class="d-inline d-print-none" onsubmit="return confirm('Remove this routine slot?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-link text-danger p-0 border-0" title="Delete Slot">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <span class="text-muted small opacity-50">&mdash;</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-5 text-muted">
+                        <i class="bi bi-calendar-x fs-2 d-block mb-2 text-secondary"></i>
+                        No routine entries configured for this class and section yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
+
+<!-- Print Signatures Section -->
+<div class="print-signatures">
+    <div class="print-sign-line">Class Teacher</div>
+    <div class="print-sign-line">Academic In-Charge</div>
+    <div class="print-sign-line">Principal / Headmaster</div>
 </div>
 
 <!-- Add Routine Slot Modal (Staff Only) -->
 {% if request.user.is_staff %}
 <div class="modal fade" id="addSlotModal" tabindex="-1" aria-labelledby="addSlotModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden;">
             <form method="POST" action="{% url 'students:students_routine' %}">
                 {% csrf_token %}
                 <input type="hidden" name="class_name" value="{{ selected_class.id }}">
                 <input type="hidden" name="section" value="{{ selected_section.id }}">
                 
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="addSlotModalLabel"><i class="bi bi-plus-circle me-2"></i>Add Schedule Slot</h5>
+                <div class="modal-header bg-success text-white py-3 px-4">
+                    <h5 class="modal-title fw-bold" id="addSlotModalLabel"><i class="bi bi-calendar-plus me-2"></i>Schedule Period Slot</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div class="alert alert-light border small text-muted mb-3">
-                        Configuring for: <strong>Class {{ selected_class.name }} &bull; Section {{ selected_section.name }}</strong>
+                    <div class="alert alert-light border small text-muted mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-info-circle text-primary fs-5"></i>
+                        <div>Configuring for: <strong>Class {{ selected_class.name }} &bull; Section {{ selected_section.name }}</strong></div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-secondary">Day of the Week <span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold small text-dark">Day of the Week <span class="text-danger">*</span></label>
                         <select name="day_of_week" class="form-select" required>
                             <option value="Saturday">Saturday</option>
                             <option value="Sunday">Sunday</option>
@@ -165,18 +283,18 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-secondary">Period / Time Slot <span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold small text-dark">Period / Time Slot <span class="text-danger">*</span></label>
                         <select name="time_slot" class="form-select" required>
                             {% for slot in time_slots %}
                             {% if not slot.is_break %}
-                            <option value="{{ slot.id }}">{{ slot.period_name }} ({{ slot.start_time|time:"h:i A" }} - {{ slot.end_time|time:"h:i A" }})</option>
+                            <option value="{{ slot.id }}">{{ slot.period_name }} ({{ slot.start_time|time:"h:i A" }} &ndash; {{ slot.end_time|time:"h:i A" }})</option>
                             {% endif %}
                             {% endfor %}
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-secondary">Subject <span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold small text-dark">Subject <span class="text-danger">*</span></label>
                         <select name="subject" class="form-select" required>
                             {% for subj in subjects %}
                             <option value="{{ subj.id }}">{{ subj.name }} (Code: {{ subj.code }})</option>
@@ -185,23 +303,23 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-secondary">Assigned Teacher</label>
+                        <label class="form-label fw-bold small text-dark">Assigned Teacher</label>
                         <select name="teacher" class="form-select">
                             <option value="">Select Faculty Member...</option>
                             {% for t in teachers %}
-                            <option value="{{ t.id }}">{{ t.teachers_name }} ({{ t.designation|default:"Teacher" }})</option>
+                            <option value="{{ t.id }}">{{ t.teachers_name }} ({{ t.designation|default:"Faculty" }})</option>
                             {% endfor %}
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-secondary">Room / Hall Number</label>
-                        <input type="text" name="room_number" class="form-control" placeholder="e.g. Room 204" value="Room 101">
+                        <label class="form-label fw-bold small text-dark">Room / Hall Number</label>
+                        <input type="text" name="room_number" class="form-control" placeholder="e.g. Room 204, Science Lab 1" value="Room 101">
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-admin-primary btn-sm px-4">Save Routine Slot</button>
+                <div class="modal-footer bg-light px-4 py-3">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success px-4 fw-bold shadow-sm">Save Routine Slot</button>
                 </div>
             </form>
         </div>
@@ -209,3 +327,21 @@
 </div>
 {% endif %}
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+function filterDay(dayName, btn) {
+    document.querySelectorAll('.day-pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const rows = document.querySelectorAll('#routineTable tbody .day-row');
+    rows.forEach(row => {
+        if (dayName === 'all' || row.getAttribute('data-day') === dayName) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock extra_js %}

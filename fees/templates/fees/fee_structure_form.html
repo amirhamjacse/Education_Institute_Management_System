@@ -1,75 +1,85 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
 {% load widget_tweaks %}
+
 {% block title %}
-<title>{% if is_edit %}Edit{% else %}Add{% endif %} Fee Structure</title>
+{% if is_edit %}Edit Fee Structure{% else %}Add Fee Structure{% endif %} | {{ webname.name_headline|default:"Admin Console" }}
 {% endblock title %}
 
-{% block leftside %}
-<style>
-{% include 'fees/_styles.html' %}
-</style>
+{% block breadcrumb_current %}
+{% if is_edit %}Edit Fee Structure{% else %}Add Fee Structure{% endif %}
+{% endblock %}
 
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-diagram-3-fill"></i> Fee Management</span>
-            <h1>{% if is_edit %}Edit Fee Structure{% else %}Add Fee Structure{% endif %}</h1>
-            <p>Set the fee amount for a class, session, and billing frequency.</p>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-10">
+        
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                    <i class="bi bi-diagram-3-fill text-primary"></i>
+                    {% if is_edit %}Edit Fee Structure Schedule{% else %}Add Fee Structure Schedule{% endif %}
+                </h2>
+                <p class="text-muted small mb-0">Set billing rates, frequency, and class-wise tuition schedules.</p>
+            </div>
+            <a href="{% url 'fees:fee_structure_list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Fee Structures
+            </a>
         </div>
 
-        <div class="dashboard-content">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>Fee Structure Details</h2>
-                        <small>All fields are required.</small>
+        <div class="admin-card shadow-sm border-0">
+            <div class="admin-card-header bg-white py-3 border-bottom">
+                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-sliders text-success"></i> Schedule Details
+                </h5>
+            </div>
+            <div class="admin-card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Fee Head <span class="text-danger">*</span></label>
+                            {% render_field form.fee_head class="form-select" %}
+                            {% if form.fee_head.errors %}<div class="text-danger small mt-1">{{ form.fee_head.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Class / Grade <span class="text-danger">*</span></label>
+                            {% render_field form.class_name class="form-select" %}
+                            {% if form.class_name.errors %}<div class="text-danger small mt-1">{{ form.class_name.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Academic Session <span class="text-danger">*</span></label>
+                            {% render_field form.session class="form-control" placeholder="e.g. 2025-2026" %}
+                            {% if form.session.errors %}<div class="text-danger small mt-1">{{ form.session.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Billing Frequency <span class="text-danger">*</span></label>
+                            {% render_field form.frequency class="form-select" %}
+                            {% if form.frequency.errors %}<div class="text-danger small mt-1">{{ form.frequency.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Standard Amount (৳) <span class="text-danger">*</span></label>
+                            {% render_field form.amount class="form-control" placeholder="0.00" %}
+                            {% if form.amount.errors %}<div class="text-danger small mt-1">{{ form.amount.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-12 pt-3 border-top d-flex justify-content-end gap-2">
+                            <a href="{% url 'fees:fee_structure_list' %}" class="btn btn-outline-secondary px-4 py-2">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-admin-primary px-5 py-2 shadow-sm d-inline-flex align-items-center gap-2">
+                                <i class="bi bi-check-circle-fill"></i> Save Fee Structure
+                            </button>
+                        </div>
                     </div>
-                </div>
-                {% include 'fees/_messages.html' %}
-                <div class="form-section">
-                    <div class="form-card">
-                        <form method="post" class="form-section">
-                            {% csrf_token %}
-                            <div class="form-grid">
-                                <div class="form-group-card">
-                                    <label>Fee Head <span class="text-danger">*</span></label>
-                                    {% render_field form.fee_head|add_class:'form-control' %}
-                                    {{ form.fee_head.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Class <span class="text-danger">*</span></label>
-                                    {% render_field form.class_name|add_class:'form-control' %}
-                                    {{ form.class_name.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Session <span class="text-danger">*</span></label>
-                                    {% render_field form.session|add_class:'form-control'|attr:'placeholder:e.g. 2025-2026' %}
-                                    {{ form.session.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Frequency <span class="text-danger">*</span></label>
-                                    {% render_field form.frequency|add_class:'form-control' %}
-                                    {{ form.frequency.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Amount <span class="text-danger">*</span></label>
-                                    {% render_field form.amount|add_class:'form-control' %}
-                                    {{ form.amount.errors }}
-                                </div>
-                                <div class="form-actions">
-                                    <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle"></i> Save</button>
-                                    <a class="btn btn-outline-secondary ms-2" href="{% url 'fees:fee_structure_list' %}">Cancel</a>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
-    </div>
-</section>
-{% endblock leftside %}
 
-{% block rightside %}
-{% endblock rightside %}
+    </div>
+</div>
+{% endblock content %}

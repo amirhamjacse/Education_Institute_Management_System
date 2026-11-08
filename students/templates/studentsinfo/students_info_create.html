@@ -1,506 +1,229 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
 {% load widget_tweaks %}
 
 {% block title %}
-<title>Students Info add</title>
+{% if is_update %}Edit Student: {{ form.instance.name }}{% else %}Register New Student{% endif %} | Admin Console
 {% endblock title %}
 
-{% block leftside %}
-<style>
-    .portal-dashboard {
-        padding: 8px 0 12px;
-    }
+{% block breadcrumb_current %}
+{% if is_update %}Edit Student{% else %}Register Student{% endif %}
+{% endblock %}
 
-    .dashboard-shell {
-        overflow: hidden;
-        background: #f7faf8;
-        border: 1px solid #dbe7e0;
-        border-radius: 12px;
-        box-shadow: 0 22px 54px rgba(18, 52, 38, 0.12);
-    }
-
-    .dashboard-hero {
-        position: relative;
-        padding: clamp(18px, 3vw, 30px);
-        color: #fff;
-        background:
-            linear-gradient(135deg, rgba(4, 91, 53, 0.96), rgba(8, 114, 67, 0.84)),
-            url("{% static 'institute/img/4444.jpg' %}") center/cover;
-    }
-
-    .dashboard-hero::after {
-        content: "";
-        position: absolute;
-        inset: auto 0 0 0;
-        height: 1px;
-        background: rgba(255, 255, 255, 0.24);
-    }
-
-    .dashboard-eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 7px 12px;
-        border: 1px solid rgba(255, 255, 255, 0.42);
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.16);
-        font-weight: 800;
-    }
-
-    .dashboard-hero h1 {
-        max-width: 820px;
-        margin: 12px 0 6px;
-        color: #fff;
-        font-size: clamp(1.7rem, 3vw, 2.8rem);
-        font-weight: 900;
-        line-height: 1.08;
-        overflow-wrap: anywhere;
-    }
-
-    .dashboard-hero p {
-        max-width: 720px;
-        margin: 0;
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 1rem;
-        line-height: 1.55;
-    }
-
-    .dashboard-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 16px;
-    }
-
-    .dashboard-meta span {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 9px 12px;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.16);
-        color: #fff;
-        font-weight: 800;
-        backdrop-filter: blur(8px);
-    }
-
-    .dashboard-content {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 330px;
-        gap: 14px;
-        padding: clamp(12px, 2vw, 18px);
-    }
-
-    .dashboard-panel {
-        background: #fff;
-        border: 1px solid #dfe8e3;
-        border-radius: 10px;
-        box-shadow: 0 14px 34px rgba(18, 52, 38, 0.08);
-    }
-
-    .dashboard-panel-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 14px 16px;
-        border-bottom: 1px solid #e7eee9;
-    }
-
-    .dashboard-panel-header h2,
-    .dashboard-panel-header h3 {
-        margin: 0;
-        color: #1b2838;
-        font-weight: 900;
-    }
-
-    .dashboard-panel-header small {
-        color: #667085;
-        font-weight: 700;
-    }
-
-    .form-section {
-        padding: 16px;
-    }
-
-    .form-card {
-        background: #ffffff;
-        border: 1px solid #e3ece6;
-        border-radius: 14px;
-        box-shadow: 0 14px 34px rgba(18, 52, 38, 0.08);
-        overflow: hidden;
-    }
-
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
-    }
-
-    .form-group-card {
-        padding: 14px;
-        border: 1px solid #e7eee9;
-        border-radius: 12px;
-        background: linear-gradient(180deg, #ffffff, #fbfdfc);
-    }
-
-    .form-group-card label {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
-        color: #1b2838;
-        font-weight: 800;
-        line-height: 1.35;
-    }
-
-    .form-group-card .text-danger {
-        font-weight: 800;
-    }
-
-    .form-group-card .form-control {
-        min-height: 48px;
-        border-color: #d6e2db;
-        border-radius: 10px;
-        box-shadow: none;
-    }
-
-    .form-group-card .form-control:focus {
-        border-color: #087243;
-        box-shadow: 0 0 0 0.2rem rgba(8, 114, 67, 0.12);
-    }
-
-    .form-group-card textarea.form-control {
-        min-height: 92px;
-    }
-
-    .form-actions {
-        display: flex;
-        justify-content: center;
-        padding: 18px 16px 22px;
-    }
-
-    .form-actions .btn {
-        min-width: 220px;
-        min-height: 48px;
-        border-radius: 999px;
-        font-weight: 800;
-        box-shadow: 0 14px 24px rgba(8, 114, 67, 0.22);
-    }
-
-    .dashboard-side {
-        display: grid;
-        gap: 14px;
-        align-content: start;
-    }
-
-    .profile-panel {
-        padding: 16px;
-    }
-
-    .profile-avatar {
-        width: 62px;
-        height: 62px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        background: linear-gradient(135deg, #087243, #0f8b63);
-        border-radius: 14px;
-        font-size: 2rem;
-        box-shadow: 0 14px 28px rgba(8, 114, 67, 0.22);
-    }
-
-    .profile-panel h3 {
-        margin: 12px 0 4px;
-        color: #1b2838;
-        font-weight: 900;
-    }
-
-    .profile-panel p {
-        margin: 0;
-        color: #667085;
-        overflow-wrap: anywhere;
-    }
-
-    .status-list {
-        display: grid;
-        gap: 10px;
-        margin-top: 14px;
-    }
-
-    .status-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 12px;
-        background: #f5f8f6;
-        border: 1px solid #e4ece7;
-        border-radius: 8px;
-    }
-
-    .status-item strong {
-        color: #34443c;
-    }
-
-    .status-item span {
-        color: #087243;
-        font-weight: 900;
-    }
-
-    .tips-panel {
-        padding: 16px;
-    }
-
-    .tips-panel h3 {
-        margin: 0 0 12px;
-        color: #1b2838;
-        font-weight: 900;
-    }
-
-    .tips-panel ul {
-        display: grid;
-        gap: 8px;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-    }
-
-    .tips-panel li {
-        display: flex;
-        gap: 10px;
-        color: #4b5b53;
-        line-height: 1.55;
-    }
-
-    @media (max-width: 1199.98px) {
-        .dashboard-content {
-            grid-template-columns: 1fr;
-        }
-
-        .dashboard-side {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-    }
-
-    @media (max-width: 767.98px) {
-        .portal-dashboard {
-            padding-top: 10px;
-        }
-
-        .form-grid,
-        .dashboard-side {
-            grid-template-columns: 1fr;
-        }
-
-        .dashboard-panel-header {
-            align-items: flex-start;
-            flex-direction: column;
-        }
-
-        .form-actions .btn {
-            width: 100%;
-        }
-    }
-</style>
-
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-person-plus-fill"></i> Student Admission</span>
-            <h1>{% if is_update %}Edit Student Information{% else %}Add Student Information{% endif %}</h1>
-            <p>{% if is_update %}Update the student's profile details below.{% else %}Complete the admission profile with student, family, contact, class, and enrollment details in one structured form.{% endif %}</p>
-            <div class="dashboard-meta">
-                <span><i class="bi bi-file-earmark-person"></i> Profile details</span>
-                <span><i class="bi bi-telephone-fill"></i> Contact data</span>
-                <span><i class="bi bi-mortarboard-fill"></i> Academic record</span>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                    <i class="bi bi-person-{% if is_update %}gear{% else %}plus-fill{% endif %} text-primary"></i>
+                    {% if is_update %}Edit Student Profile: {{ form.instance.name }}{% else %}Register New Student{% endif %}
+                </h2>
+                <p class="text-muted small mb-0">
+                    {% if is_update %}Update enrollment information, academic details, and guardian contacts.{% else %}Create student record and automatically generate portal login credentials.{% endif %}
+                </p>
             </div>
+            <a href="{% url 'students:students_list' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+                <i class="bi bi-arrow-left"></i> Back to Student Directory
+            </a>
         </div>
 
-        <div class="dashboard-content">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>{% if is_update %}Edit Student Information{% else %}Student Information Form{% endif %}</h2>
-                        <small>{% if is_update %}Update the fields below and save changes.{% else %}Fill in each field carefully before submitting.{% endif %}</small>
-                    </div>
-                    <small>{{ webname.name_headline|default:"Education Institute" }}</small>
+        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger shadow-sm border-0 d-flex align-items-center gap-2 mb-4">
+                <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+                <div>{{ form.non_field_errors }}</div>
+            </div>
+            {% endif %}
+
+            <!-- SECTION 1: PERSONAL IDENTITY -->
+            <div class="admin-card mb-4 shadow-sm border-0">
+                <div class="admin-card-header bg-white py-3 border-bottom">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-person-badge text-primary"></i> Student Personal Profile
+                    </h5>
                 </div>
-
-                <div class="form-section">
-                    <div class="form-card">
-                        <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
-                            {% csrf_token %}
-                            <div class="form-section">
-                                <div class="form-grid">
-                                    <div class="form-group-card">
-                                        <label>
-                                            Students Full Name
-                                            {% if form.name.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.name|add_class:"form-control" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            Unique Roll/Id <span class="required text-danger">(Put blank if you want auto genarate this id)</span>
-                                            {% if form.unique_roll.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.unique_roll|add_class:"form-control" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            {{ form.father_name.field.label }}
-                                            {% if form.father_name.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.father_name|add_class:"form-control" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            {{ form.mother_name.field.label }}
-                                            {% if form.mother_name.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.mother_name|add_class:"form-control" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            {{ form.students_image.field.label }}
-                                            {% if form.students_image.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.students_image|add_class:"form-control" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            {{ form.date_of_birth.field.label }}
-                                            {% if form.date_of_birth.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.date_of_birth|add_class:"form-control" type="date" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            {{ form.present_address.field.label }}
-                                            {% if form.present_address.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.present_address|add_class:"form-control" rows="3" cols="5" title="" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            {{ form.permanent_address.field.label }}
-                                            {% if form.permanent_address.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.permanent_address|add_class:"form-control" rows="3" cols="5" title="" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            {{ form.personal_mobile_number.field.label }}
-                                            {% if form.personal_mobile_number.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.personal_mobile_number|add_class:"form-control" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            {{ form.gender.field.label }}
-                                            {% if form.gender.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.gender|add_class:"form-control" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            {{ form.gurdian_mobile_number.field.label }}
-                                            {% if form.gurdian_mobile_number.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.gurdian_mobile_number|add_class:"form-control" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            Class/Department
-                                            {% if form.class_name.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.class_name|add_class:"form-control" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            Section/Group
-                                            {% if form.section_class.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.section_class|add_class:"form-control" %}
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label for="group-select">ID For:</label>
-                                        <select id="group-select" name="group_id" class="form-control">
-                                            {% for obj in group %}
-                                                <option value="{{ obj.id }}">{{ obj.name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group-card">
-                                        <label>
-                                            Admission Date
-                                            {% if form.admission_date.field.required %}<span class="required text-danger">*</span>{% endif %}
-                                        </label>
-                                        {% render_field form.admission_date|add_class:"form-control" type="date" %}
-                                    </div>
-                                </div>
-
-                                <div class="form-actions">
-                                    <button class="btn btn-primary" type="submit">{% if is_update %}Update{% else %}Add{% endif %}</button>
-                                </div>
+                <div class="admin-card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">Full Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
+                                {% render_field form.name class="form-control" placeholder="Enter student full name" required="required" %}
                             </div>
-                        </form>
+                            {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">Student Roll / ID Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="bi bi-hash"></i></span>
+                                {% render_field form.unique_roll class="form-control" placeholder="Leave empty for auto-generated roll" %}
+                            </div>
+                            <small class="text-muted">If left blank, system generates an automated ID based on class/year.</small>
+                            {% if form.unique_roll.errors %}<div class="text-danger small mt-1">{{ form.unique_roll.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-dark small">Gender</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="bi bi-gender-ambiguous"></i></span>
+                                {% render_field form.gender class="form-select" %}
+                            </div>
+                            {% if form.gender.errors %}<div class="text-danger small mt-1">{{ form.gender.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-dark small">Date of Birth</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="bi bi-calendar-event"></i></span>
+                                {% render_field form.date_of_birth class="form-control" type="date" %}
+                            </div>
+                            {% if form.date_of_birth.errors %}<div class="text-danger small mt-1">{{ form.date_of_birth.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-dark small">Blood Group</label>
+                            {% render_field form.blood_group class="form-control" placeholder="e.g. A+, B+, O+" %}
+                            {% if form.blood_group.errors %}<div class="text-danger small mt-1">{{ form.blood_group.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">Religion</label>
+                            {% render_field form.relegion class="form-control" placeholder="e.g. Islam, Hinduism, Christianity, etc." %}
+                            {% if form.relegion.errors %}<div class="text-danger small mt-1">{{ form.relegion.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">Student Photograph</label>
+                            {% render_field form.students_image class="form-control" accept="image/*" %}
+                            <small class="text-muted">Passport size portrait photograph (JPG, PNG).</small>
+                            {% if form.students_image.errors %}<div class="text-danger small mt-1">{{ form.students_image.errors.0 }}</div>{% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <aside class="dashboard-side">
-                <div class="dashboard-panel profile-panel">
-                    <span class="profile-avatar"><i class="bi bi-person-fill"></i></span>
-                    <h3>{{ request.user.get_full_name|default:"Admission Desk" }}</h3>
-                    <p>{{ request.user.email|default:request.user }}</p>
-                    <div class="status-list">
-                        <div class="status-item">
-                            <strong>Status</strong>
-                            <span>Ready</span>
+            <!-- SECTION 2: ACADEMIC PLACEMENT -->
+            <div class="admin-card mb-4 shadow-sm border-0">
+                <div class="admin-card-header bg-white py-3 border-bottom">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-mortarboard-fill text-success"></i> Academic Placement &amp; Enrollment
+                    </h5>
+                </div>
+                <div class="admin-card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-dark small">Class / Department <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="bi bi-building"></i></span>
+                                {% render_field form.class_name class="form-select" %}
+                            </div>
+                            {% if form.class_name.errors %}<div class="text-danger small mt-1">{{ form.class_name.errors.0 }}</div>{% endif %}
                         </div>
-                        <div class="status-item">
-                            <strong>Flow</strong>
-                            <span>Manual entry</span>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-dark small">Section / Group</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="bi bi-diagram-2"></i></span>
+                                {% render_field form.section_class class="form-select" %}
+                            </div>
+                            {% if form.section_class.errors %}<div class="text-danger small mt-1">{{ form.section_class.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-dark small">Admission Date</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="bi bi-calendar-check"></i></span>
+                                {% render_field form.admission_date class="form-control" type="date" %}
+                            </div>
+                            {% if form.admission_date.errors %}<div class="text-danger small mt-1">{{ form.admission_date.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        {% if group %}
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small" for="group-select">Portal Access Group</label>
+                            <select id="group-select" name="group_id" class="form-select">
+                                {% for obj in group %}
+                                    <option value="{{ obj.id }}" {% if obj.name == 'Student' %}selected{% endif %}>{{ obj.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: GUARDIAN & CONTACT INFORMATION -->
+            <div class="admin-card mb-4 shadow-sm border-0">
+                <div class="admin-card-header bg-white py-3 border-bottom">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-telephone-inbound text-warning"></i> Guardian &amp; Emergency Contacts
+                    </h5>
+                </div>
+                <div class="admin-card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">Father's Full Name</label>
+                            {% render_field form.father_name class="form-control" placeholder="Fathers full name" %}
+                            {% if form.father_name.errors %}<div class="text-danger small mt-1">{{ form.father_name.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">Mother's Full Name</label>
+                            {% render_field form.mother_name class="form-control" placeholder="Mothers full name" %}
+                            {% if form.mother_name.errors %}<div class="text-danger small mt-1">{{ form.mother_name.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">Personal Mobile Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="bi bi-phone"></i></span>
+                                {% render_field form.personal_mobile_number class="form-control" placeholder="01XXXXXXXXX" %}
+                            </div>
+                            {% if form.personal_mobile_number.errors %}<div class="text-danger small mt-1">{{ form.personal_mobile_number.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">Guardian Contact Phone</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="bi bi-telephone"></i></span>
+                                {% render_field form.gurdian_mobile_number class="form-control" placeholder="01XXXXXXXXX" %}
+                            </div>
+                            {% if form.gurdian_mobile_number.errors %}<div class="text-danger small mt-1">{{ form.gurdian_mobile_number.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">Present Address</label>
+                            {% render_field form.present_address class="form-control" rows="2" placeholder="House/Road, Village/City, Upazila, District" %}
+                            {% if form.present_address.errors %}<div class="text-danger small mt-1">{{ form.present_address.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small">Permanent Address</label>
+                            {% render_field form.permanent_address class="form-control" rows="2" placeholder="Permanent residence address" %}
+                            {% if form.permanent_address.errors %}<div class="text-danger small mt-1">{{ form.permanent_address.errors.0 }}</div>{% endif %}
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="dashboard-panel tips-panel">
-                    <h3>Quick Tips</h3>
-                    <ul>
-                        <li><i class="bi bi-check-circle-fill"></i><span>Leave Unique Roll blank to generate it automatically.</span></li>
-                        <li><i class="bi bi-check-circle-fill"></i><span>Use a clear student image for future identification.</span></li>
-                        <li><i class="bi bi-check-circle-fill"></i><span>Double-check class, section, and admission date before saving.</span></li>
-                    </ul>
-                </div>
-            </aside>
-        </div>
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-end gap-2 mb-5">
+                <a href="{% url 'students:students_list' %}" class="btn btn-outline-secondary px-4 py-2">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-admin-primary px-5 py-2 shadow-sm d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill"></i>
+                    {% if is_update %}Save Changes{% else %}Enroll &amp; Create Student{% endif %}
+                </button>
+            </div>
+
+        </form>
     </div>
-</section>
-{% endblock leftside %}
-
-{% block rightside %}
-{% endblock rightside %}
-
-
-
-
-
+</div>
+{% endblock content %}

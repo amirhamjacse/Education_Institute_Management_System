@@ -1,0 +1,515 @@
+{% extends 'dashboard/admin_base.html' %}
+{% load static %}
+
+{% block title %}{{ student.name }} ({{ student.unique_roll }}) | Student 360° Profile{% endblock title %}
+{% block breadcrumb_current %}Student 360° Profile{% endblock %}
+
+{% block content %}
+<style>
+    .student-header-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 16px;
+        color: #ffffff;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25);
+    }
+    .student-header-card::after {
+        content: "";
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .student-avatar-lg {
+        width: 96px;
+        height: 96px;
+        border-radius: 20px;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.25);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+    }
+    .student-avatar-placeholder-lg {
+        width: 96px;
+        height: 96px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #059669, #10b981);
+        color: #ffffff;
+        font-size: 2.2rem;
+        font-weight: 800;
+        border: 3px solid rgba(255, 255, 255, 0.25);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+    }
+    .stat-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.12);
+        color: #e2e8f0;
+    }
+    .profile-nav-tabs .nav-link {
+        font-weight: 600;
+        color: #64748b;
+        border: none;
+        padding: 12px 18px;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s ease;
+    }
+    .profile-nav-tabs .nav-link.active {
+        color: #0f172a;
+        background: transparent;
+        border-bottom-color: #10b981;
+    }
+    .profile-nav-tabs .nav-link:hover:not(.active) {
+        color: #0f172a;
+        border-bottom-color: #cbd5e1;
+    }
+    .info-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+    .info-val {
+        font-size: 0.95rem;
+        color: #0f172a;
+        font-weight: 600;
+    }
+</style>
+
+<!-- Student Header Card -->
+<div class="student-header-card">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+            {% if student.students_image %}
+            <img src="{{ student.students_image.url }}" alt="{{ student.name }}" class="student-avatar-lg">
+            {% else %}
+            <div class="student-avatar-placeholder-lg">{{ student.name|slice:":1"|upper }}</div>
+            {% endif %}
+            <div>
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                    <h2 class="h3 fw-bold mb-0 text-white">{{ student.name }}</h2>
+                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill small">
+                        <i class="bi bi-check-circle-fill me-1"></i>Enrolled Student
+                    </span>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+                    <span class="stat-pill"><i class="bi bi-hash"></i> Roll: <strong class="text-white">{{ student.unique_roll }}</strong></span>
+                    <span class="stat-pill"><i class="bi bi-mortarboard"></i> Class: <strong class="text-white">{{ student.class_name|default:"Unassigned" }}</strong></span>
+                    {% if student.section_class %}
+                    <span class="stat-pill"><i class="bi bi-diagram-2"></i> Section: <strong class="text-white">{{ student.section_class }}</strong></span>
+                    {% endif %}
+                    {% if student.session %}
+                    <span class="stat-pill"><i class="bi bi-calendar3"></i> Session: <strong class="text-white">{{ student.session }}</strong></span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'students:students_edit' student.id %}" class="btn btn-light btn-sm fw-semibold shadow-sm">
+                <i class="bi bi-pencil-square me-1 text-primary"></i> Edit Profile
+            </a>
+            <a href="{% url 'dashboard_management:student_id_cards' %}" class="btn btn-outline-light btn-sm fw-semibold">
+                <i class="bi bi-person-vcard me-1"></i> ID Card
+            </a>
+            <a href="{% url 'fees:invoice_adhoc' %}" class="btn btn-outline-light btn-sm fw-semibold">
+                <i class="bi bi-receipt me-1"></i> Add Invoice
+            </a>
+            <a href="{% url 'students:students_list' %}" class="btn btn-outline-secondary btn-sm text-white-50 border-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Student List
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 4 Key KPI Metrics -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-emerald">
+                <i class="bi bi-calendar-check"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-success">{{ attendance_percentage }}%</h3>
+                <p class="kpi-label">Attendance Rate ({{ present_days }}/{{ total_attendance_days }} days)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-blue">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-primary">৳{{ total_invoiced }}</h3>
+                <p class="kpi-label">Total Invoiced</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon {% if total_due > 0 %}kpi-icon-rose{% else %}kpi-icon-emerald{% endif %}">
+                <i class="bi bi-exclamation-circle"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value {% if total_due > 0 %}text-danger{% else %}text-success{% endif %}">৳{{ total_due }}</h3>
+                <p class="kpi-label">Outstanding Due</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-amber">
+                <i class="bi bi-book"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-warning">{{ book_issues.count }}</h3>
+                <p class="kpi-label">Books Borrowed</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Tabs & Content -->
+<div class="card border-0 shadow-sm" style="border-radius: 14px; overflow: hidden;">
+    <div class="card-header bg-white border-bottom p-0">
+        <ul class="nav profile-nav-tabs px-3" id="studentProfileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                    <i class="bi bi-person-lines-fill me-1"></i> Personal & Guardian Details
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab">
+                    <i class="bi bi-calendar-check me-1"></i> Attendance Logs ({{ total_attendance_days }})
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="fees-tab" data-bs-toggle="tab" data-bs-target="#fees" type="button" role="tab">
+                    <i class="bi bi-receipt me-1"></i> Fee Invoices ({{ invoices.count }})
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="results-tab" data-bs-toggle="tab" data-bs-target="#results" type="button" role="tab">
+                    <i class="bi bi-award me-1"></i> Academic Results ({{ results.count }})
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="campus-tab" data-bs-toggle="tab" data-bs-target="#campus" type="button" role="tab">
+                    <i class="bi bi-buildings me-1"></i> Campus Services
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-body p-4">
+        <div class="tab-content" id="studentProfileTabContent">
+
+            <!-- TAB 1: OVERVIEW & GUARDIAN -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="p-3 bg-light rounded-3 h-100 border border-light-subtle">
+                            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-person-badge text-primary"></i> Personal Information
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="info-label">Full Legal Name</div>
+                                    <div class="info-val">{{ student.name }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="info-label">Admission Roll</div>
+                                    <div class="info-val"><span class="badge bg-secondary-subtle text-dark">{{ student.unique_roll }}</span></div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="info-label">Gender</div>
+                                    <div class="info-val">{{ student.gender|default:"Not specified" }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="info-label">Date of Birth</div>
+                                    <div class="info-val">{{ student.date_of_birth|date:"d M, Y"|default:"-" }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="info-label">Blood Group</div>
+                                    <div class="info-val">{{ student.blood_group|default:"-" }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="info-label">Religion</div>
+                                    <div class="info-val">{{ student.relegion|default:"-" }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="info-label">Personal Mobile</div>
+                                    <div class="info-val">
+                                        {% if student.personal_mobile_number %}
+                                        <a href="tel:{{ student.personal_mobile_number }}" class="text-decoration-none">
+                                            <i class="bi bi-telephone text-success me-1"></i>{{ student.personal_mobile_number }}
+                                        </a>
+                                        {% else %}-{% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="info-label">Admission Date</div>
+                                    <div class="info-val">{{ student.admission_date|date:"d M, Y"|default:"-" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="p-3 bg-light rounded-3 h-100 border border-light-subtle">
+                            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-people text-success"></i> Guardian & Contact Details
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="info-label">Father's Name</div>
+                                    <div class="info-val">{{ student.father_name|default:"-" }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="info-label">Mother's Name</div>
+                                    <div class="info-val">{{ student.mother_name|default:"-" }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="info-label">Guardian Contact Number</div>
+                                    <div class="info-val">
+                                        {% if student.guardian_mobile_number %}
+                                        <a href="tel:{{ student.guardian_mobile_number }}" class="text-decoration-none">
+                                            <i class="bi bi-telephone text-primary me-1"></i>{{ student.guardian_mobile_number }}
+                                        </a>
+                                        {% else %}-{% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="info-label">System User Account</div>
+                                    <div class="info-val">
+                                        {% if student.user %}
+                                        <span class="badge bg-success-subtle text-success"><i class="bi bi-person-check me-1"></i>{{ student.user.user_id }}</span>
+                                        {% else %}
+                                        <span class="badge bg-warning-subtle text-warning">No Login Account</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="info-label">Present Address</div>
+                                    <div class="info-val">{{ student.present_address|default:"Not recorded" }}</div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="info-label">Permanent Address</div>
+                                    <div class="info-val">{{ student.permanent_address|default:"Not recorded" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ATTENDANCE -->
+            <div class="tab-pane fade" id="attendance" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">Recent Attendance History (Last 30 Days)</h5>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-success px-2 py-1">Present: {{ present_days }}</span>
+                        <span class="badge bg-danger px-2 py-1">Absent: {{ absent_days }}</span>
+                        <span class="badge bg-warning text-dark px-2 py-1">Late: {{ late_days }}</span>
+                        <span class="badge bg-info text-dark px-2 py-1">Leave: {{ leave_days }}</span>
+                    </div>
+                </div>
+                <div class="table-responsive border rounded-3">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Class &amp; Section</th>
+                                <th>Status</th>
+                                <th>Marked By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for att in attendance_records %}
+                            <tr>
+                                <td class="fw-semibold">{{ att.date|date:"D, d M Y" }}</td>
+                                <td>{{ att.class_name }} - {{ att.section }}</td>
+                                <td>
+                                    {% if att.status == 'present' %}
+                                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill"><i class="bi bi-check-circle me-1"></i>Present</span>
+                                    {% elif att.status == 'absent' %}
+                                    <span class="badge bg-danger-subtle text-danger px-2 py-1 rounded-pill"><i class="bi bi-x-circle me-1"></i>Absent</span>
+                                    {% elif att.status == 'late' %}
+                                    <span class="badge bg-warning-subtle text-warning px-2 py-1 rounded-pill"><i class="bi bi-clock me-1"></i>Late</span>
+                                    {% else %}
+                                    <span class="badge bg-info-subtle text-info px-2 py-1 rounded-pill"><i class="bi bi-pause-circle me-1"></i>Leave</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-muted">{{ att.marked_by|default:"Faculty Staff" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-4">No attendance records found for this student.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: FEES & INVOICES -->
+            <div class="tab-pane fade" id="fees" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">Billing &amp; Invoices</h5>
+                    <a href="{% url 'fees:invoice_adhoc' %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i> Issue Ad-Hoc Fee
+                    </a>
+                </div>
+                <div class="table-responsive border rounded-3">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Fee Head</th>
+                                <th>Due Date</th>
+                                <th>Amount</th>
+                                <th>Paid</th>
+                                <th>Due</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inv in invoices %}
+                            <tr>
+                                <td class="fw-bold"><a href="{% url 'fees:invoice_detail' inv.id %}" class="text-decoration-none">{{ inv.invoice_no }}</a></td>
+                                <td>{{ inv.fee_head.name|default:inv.fee_head }}</td>
+                                <td class="small">{{ inv.due_date|date:"d M Y" }}</td>
+                                <td class="fw-semibold">৳{{ inv.amount }}</td>
+                                <td class="text-success fw-semibold">৳{{ inv.paid_amount }}</td>
+                                <td class="{% if inv.due_amount > 0 %}text-danger fw-bold{% else %}text-muted{% endif %}">৳{{ inv.due_amount }}</td>
+                                <td>
+                                    {% if inv.status == 'PAID' %}
+                                    <span class="badge bg-success-subtle text-success">PAID</span>
+                                    {% elif inv.status == 'PARTIAL' %}
+                                    <span class="badge bg-warning-subtle text-warning">PARTIAL</span>
+                                    {% else %}
+                                    <span class="badge bg-danger-subtle text-danger">UNPAID</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'fees:invoice_detail' inv.id %}" class="btn btn-outline-primary btn-sm py-0 px-2" title="View details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'fees:invoice_receipt' inv.id %}" target="_blank" class="btn btn-outline-secondary btn-sm py-0 px-2" title="Print Receipt">
+                                        <i class="bi bi-printer"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="8" class="text-center text-muted py-4">No invoices issued to this student yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 4: ACADEMIC RESULTS -->
+            <div class="tab-pane fade" id="results" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">Examination Grades &amp; Transcripts</h5>
+                    <a href="{% url 'students:result_dashobard' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-journal-check me-1"></i> Results Hub
+                    </a>
+                </div>
+                <div class="table-responsive border rounded-3">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Exam</th>
+                                <th>Year</th>
+                                <th>Subject</th>
+                                <th>Marks Scored</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for res in results %}
+                            <tr>
+                                <td class="fw-semibold">{{ res.exam_type|default:"Semester Exam" }}</td>
+                                <td>{{ res.exam_year|default:"-" }}</td>
+                                <td>{{ res.subject|default:"General" }}</td>
+                                <td><span class="badge bg-primary-subtle text-primary fw-bold fs-6">{{ res.marks }}</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-4">No exam results recorded for this student yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 5: CAMPUS SERVICES (LIBRARY, HOSTEL, TRANSPORT) -->
+            <div class="tab-pane fade" id="campus" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border h-100">
+                            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-book text-warning me-2"></i>Library Borrowing Log</h5>
+                            <ul class="list-group list-group-flush bg-transparent">
+                                {% for issue in book_issues %}
+                                <li class="list-group-item bg-transparent px-0 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-semibold">{{ issue.book.title }}</div>
+                                        <small class="text-muted">Issued: {{ issue.issue_date|date:"d M Y" }} &bull; Due: {{ issue.due_date|date:"d M Y" }}</small>
+                                    </div>
+                                    <span class="badge {% if issue.status == 'RETURNED' %}bg-success-subtle text-success{% else %}bg-warning-subtle text-warning{% endif %}">
+                                        {{ issue.status }}
+                                    </span>
+                                </li>
+                                {% empty %}
+                                <li class="list-group-item bg-transparent text-muted px-0">No library books borrowed.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border h-100">
+                            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-buildings text-primary me-2"></i>Hostel &amp; Transport</h5>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <div class="info-label">Hostel &amp; Room Assignment</div>
+                                {% if hostel_bed %}
+                                <div class="info-val text-success">
+                                    <i class="bi bi-building me-1"></i>{{ hostel_bed.room.hostel.name }} &bull; Room {{ hostel_bed.room.room_number }} (Bed #{{ hostel_bed.bed_number }})
+                                </div>
+                                {% else %}
+                                <div class="info-val text-muted">Day Scholar (No hostel allocated)</div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="info-label">Transport Route &amp; Bus Pass</div>
+                                {% if transport_pass %}
+                                <div class="info-val text-primary">
+                                    <i class="bi bi-bus-front me-1"></i>{{ transport_pass.route.route_name }} &bull; Stop: {{ transport_pass.pickup_point|default:"Campus Gate" }}
+                                </div>
+                                {% else %}
+                                <div class="info-val text-muted">No transport bus pass subscribed.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock content %}

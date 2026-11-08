@@ -1,116 +1,143 @@
-{% extends 'institute/base.html' %} 
-{% load static %} 
-{% load widget_tweaks %}
-{% block title %}
-<title>Students List</title>
-{% endblock title %} 
+{% extends 'dashboard/admin_base.html' %}
+{% load static %}
 
-<!-- left side main things start from here -->
-{% block leftside %} 
+{% block title %}Academic Results Directory | {{ webname.name_headline|default:"Admin Console" }}{% endblock title %}
+{% block breadcrumb_current %}Results Directory{% endblock %}
 
-      <!-- student short info start -->
-<div class="row">
-    <div class="container-fluid">
-    <div class="container-fluid">
-      <div class="bg-success pt-3 ps-2 pb-1 ">
-        <h5 class="text-white bangla">All Students List</h5>
-      </div>
-      <div class="bg-light border mt-1 py-2 bangla">
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-graph-up-arrow text-primary"></i> Academic Transcripts &amp; Grade Reports
+        </h2>
+        <p class="text-muted small mb-0">Browse student assessment records, print semester grade cards, and view cumulative academic transcripts.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'students:students_list_for_result' %}" class="btn btn-admin-primary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-plus-circle"></i> Input Results
+        </a>
+        <a href="{% url 'students:result_dashobard' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-arrow-left"></i> Results Hub
+        </a>
+    </div>
+</div>
 
-        <div class="table_scroll">
-            <table class="table table-hove table-bordered my-0">
+<!-- Search Bar -->
+<div class="admin-card mb-4">
+    <div class="admin-card-body py-3">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" id="resultStudentSearch" class="form-control border-start-0" placeholder="Filter by student name, roll number, or class...">
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-6 text-md-end text-muted small">
+                <span class="badge bg-secondary-subtle text-dark border px-3 py-2 rounded-pill">
+                    {{ object_list.count }} Students Listed
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transcripts Table -->
+<div class="admin-card shadow-sm border-0">
+    <div class="admin-card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold text-dark mb-0">Student Transcript Records</h5>
+    </div>
+    <div class="admin-card-body p-0">
+        <div class="table-responsive">
+            <table class="table admin-table mb-0 align-middle" id="resultStudentsTable">
                 <thead>
                     <tr>
-                        <th>SL.No.</th>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Roll</th>
-                        <th>Class</th>
-                        <th>Year</th>
-                        {% comment %} <th>Result{{object_lis}}</th> {% endcomment %}
-                        <th >Semester</th>
+                        <th style="width: 50px;">#</th>
+                        <th>Student</th>
+                        <th>Roll / ID</th>
+                        <th>Class &amp; Section</th>
+                        <th>Semester Grade Cards</th>
+                        <th class="text-end" style="width: 120px;">Profile</th>
                     </tr>
                 </thead>
-            <tbody>
-              <form action="" method="post">
-                {% csrf_token %}
-            {% for object in object_list %}
-            <tr>
-                <td class="text-center">
-                    {% if page_obj %}
-                    {{ forloop.counter0|add:page_obj.start_index }}
-                    {% else %}
-                    {{ forloop.counter }}
-                    {% endif %}
-                    
-                    {% comment %} <td> <img src="{% url 'object.students_image' %}" width="50px" alt="img"></td> {% endcomment %}
-                    <td> image comming soon </td>
-                    <td> {{object.name}} </td>
-                    <td> {{object.unique_roll}} </td>
-                    <td> {{object.class_name}} </td>
-                    <td> {{object.admission_date}} </td>
-                                      {% comment %} <td> {{form.marks}}</td> {% endcomment %}
-                    {% comment %} <td> <input name="mark" type="text"> </td>
-                    <td> <input name="sid" value="{{object.id}}" type="text"> </td> {% endcomment %}
-
-                    
-                
-                {% comment %} {% comment %} <td>{{object.lines.item}}</td>
-                <td>{{object.lines.amount}}</td>
-                <td>{% if object.date %}{{ object.date }}{% endif %}</td>
-                <td>{% if object.description %}{{ object.description|truncatewords:4 }}{% endif %}</td>
-                 {% endcomment %}
-        <td><a class="btn btn-primary btn-sm" href="{% url 'students:show_result_detail' object.id 1 %}"></i> 1st Semester</a> 
-                    <td> <a class="btn btn-primary btn-sm" href="#"></i> 2nd Semester</a>  </td>
-                    <td>  <a class="btn btn-primary btn-sm" href="#"></i> 3rd Semester</a> </td> 
-                    {% comment %} <a class="btn btn-primary btn-sm" href="#"></i> 2nd Semester Result</a>  
-                    <a class="btn btn-primary btn-sm" href="#"></i> 3rd Semester Result</a>   {% endcomment %}
-                 </td>
-                    {% comment %} <a class="btn btn-danger btn-sm" href=""><i class="bi bi-trash"></i> Delete</a> {% endcomment %}
-                    {% comment %} <a class="btn btn-primary btn-sm" href="{% url 'students:result_create' object.id 1 %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Add Result</a></td>   {% endcomment %}
-
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-      </div>
-      {% comment %} <div> {% endcomment %}
-        {% comment %} {% include 'snippets/pagination.html' %} {% endcomment %}
-      
-      </form>
-   
-
-    
-            
-
-            <!-- students info table by search end here -->
-                <!-- student short info end -->
-               
-
-          
-     
-
- 
-          <!-- Notice Table non-search end here -->
-          
-         <!-- Pagination starting start here -->
-         
-          <!-- Pagination end here -->
-          
-          <!-- Page Number show starting here -->
-          
-        <!-- Page Number show end here -->
-        
-        
-      </div>
+                <tbody>
+                    {% for object in object_list %}
+                    <tr class="result-student-row"
+                        data-name="{{ object.name|lower }}"
+                        data-roll="{{ object.unique_roll|lower }}"
+                        data-class="{{ object.class_name|default:''|lower }}">
+                        <td class="text-muted small fw-semibold">{{ forloop.counter }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                {% if object.students_image %}
+                                <img src="{{ object.students_image.url }}" alt="{{ object.name }}" class="rounded-circle" style="width: 38px; height: 38px; object-fit: cover; border: 2px solid #e2e8f0;">
+                                {% else %}
+                                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 38px; height: 38px; background: linear-gradient(135deg, #059669, #10b981); font-size: 0.95rem;">
+                                    {{ object.name|slice:":1"|upper }}
+                                </div>
+                                {% endif %}
+                                <div class="fw-bold text-dark">{{ object.name }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-secondary border font-monospace">{{ object.unique_roll }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary-subtle text-primary">{{ object.class_name|default:"General" }}</span>
+                            {% if object.section_class %}<span class="badge bg-light text-muted border">Sec {{ object.section_class }}</span>{% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a class="btn btn-outline-primary" href="{% url 'students:show_result_detail' object.id 1 %}">
+                                    <i class="bi bi-file-earmark-text me-1"></i> 1st Sem
+                                </a>
+                                <a class="btn btn-outline-secondary" href="{% url 'students:show_result_detail' object.id 2 %}">
+                                    2nd Sem
+                                </a>
+                                <a class="btn btn-outline-secondary" href="{% url 'students:show_result_detail' object.id 3 %}">
+                                    3rd Sem
+                                </a>
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'students:student_admin_detail' object.id %}" class="btn btn-outline-dark btn-sm py-1 px-2" title="360° Profile Details">
+                                <i class="bi bi-person-lines-fill"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-people display-6 d-block mb-2 text-secondary"></i>
+                            <p class="mb-0 fw-semibold">No students found in directory.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
-  {% endblock leftside %}
-  {% block rightside %}
+</div>
+{% endblock content %}
 
-  {% endblock rightside %}
+{% block extra_js %}
+<script>
+    const searchInput = document.getElementById('resultStudentSearch');
+    const rows = document.querySelectorAll('.result-student-row');
 
-
-
-
-
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const q = this.value.toLowerCase().trim();
+            rows.forEach(r => {
+                const name = r.getAttribute('data-name') || '';
+                const roll = r.getAttribute('data-roll') || '';
+                const cls = r.getAttribute('data-class') || '';
+                if (!q || name.includes(q) || roll.includes(q) || cls.includes(q)) {
+                    r.style.display = '';
+                } else {
+                    r.style.display = 'none';
+                }
+            });
+        });
+    }
+</script>
+{% endblock extra_js %}

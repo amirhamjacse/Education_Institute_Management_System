@@ -455,13 +455,13 @@
                     </a>
                     {% endif %}
 
-                    {% if request.user|has_group:"Portal_Manager" or request.user.is_superuser %}
+                    {% if request.user|has_group:"Portal_Manager" or request.user.is_superuser or request.user.is_staff %}
                     <a class="portal-card portal-card-rose" href="{% url 'dashboard_management:portal_manager_board' %}">
                         <div class="portal-card-inner">
-                            <span class="portal-icon"><i class="bi bi-sliders"></i></span>
-                            <span class="portal-code">PMIT</span>
-                            <h3>Portal Manager Dashboard</h3>
-                            <p>Control portal content, settings, notices, galleries, and operational data.</p>
+                            <span class="portal-icon"><i class="bi bi-speedometer2"></i></span>
+                            <span class="portal-code">ADMIN</span>
+                            <h3>Admin &amp; Portal Manager Dashboard</h3>
+                            <p>Control portal content, settings, notices, students, attendance, fees, and analytics.</p>
                             <span class="portal-card-footer">Open dashboard <i class="bi bi-arrow-right"></i></span>
                         </div>
                     </a>

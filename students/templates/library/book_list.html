@@ -35,7 +35,7 @@
                 <label class="form-label small text-secondary fw-semibold mb-1">Search Keywords</label>
                 <div class="input-group">
                     <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" name="q" class="form-control" placeholder="Search by book title, author, ISBN, or publisher..." value="{{ search_query }}">
+                    <input type="text" id="bookSearchInput" name="q" class="form-control" placeholder="Search by book title, author, ISBN, or publisher..." value="{{ search_query }}">
                 </div>
             </div>
             <div class="col-md-3">
@@ -55,9 +55,9 @@
 </div>
 
 <!-- Books Grid -->
-<div class="row g-3">
+<div class="row g-3" id="booksGrid">
     {% for b in books %}
-    <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="col-xl-3 col-lg-4 col-md-6 book-card-col" data-title="{{ b.title|lower }}" data-author="{{ b.author|lower }}" data-isbn="{{ b.isbn|default:''|lower }}">
         <div class="admin-card h-100 d-flex flex-column shadow-xs">
             <div class="p-3 d-flex gap-3 align-items-start">
                 {% if b.book_image %}
@@ -153,3 +153,29 @@
 </div>
 {% endif %}
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('bookSearchInput');
+    const cards = document.querySelectorAll('.book-card-col');
+
+    if (input && cards.length) {
+        input.addEventListener('input', function () {
+            const term = this.value.trim().toLowerCase();
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title') || '';
+                const author = card.getAttribute('data-author') || '';
+                const isbn = card.getAttribute('data-isbn') || '';
+
+                if (!term || title.includes(term) || author.includes(term) || isbn.includes(term)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock extra_js %}

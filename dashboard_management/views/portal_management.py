@@ -43,17 +43,51 @@ class PortalManagerDashboard(
         from institute_dashaboard.models import (
             Notice_board, News_headline, Gallery,
             Teachers_Information, Other_Employee_Information,
-            OnlineAdmission, Web_Heading
+            OnlineAdmission, Web_Heading, TeacherAttendance
         )
         from fees.models import Invoice
+        from django.db.models import Sum
+        from django.utils import timezone
+        import datetime
+        import json
+
+        today = timezone.localdate()
 
         # Class-wise distribution
         classes_with_counts = []
-        for c in ClassName.objects.all()[:6]:
+        class_chart_labels = []
+        class_chart_data = []
+        for c in ClassName.objects.all():
+            cnt = StudentsInfo.objects.filter(class_name=c).count()
             classes_with_counts.append({
                 'class': c,
-                'count': StudentsInfo.objects.filter(class_name=c).count()
+                'count': cnt
             })
+            class_chart_labels.append(f"Class {c.name}")
+            class_chart_data.append(cnt)
+
+        # 7-day Attendance Trend
+        attendance_days = []
+        attendance_present = []
+        attendance_absent = []
+        for i in range(6, -1, -1):
+            d = today - datetime.timedelta(days=i)
+            attendance_days.append(d.strftime('%a %d'))
+            p_cnt = TeacherAttendance.objects.filter(date=d, status='P').count()
+            a_cnt = TeacherAttendance.objects.filter(date=d, status__in=['A', 'L']).count()
+            attendance_present.append(p_cnt)
+            attendance_absent.append(a_cnt)
+
+        # Financial statistics
+        total_invoiced_amt = Invoice.objects.aggregate(t=Sum('amount'))['t'] or 0
+        paid_amt = Invoice.objects.filter(status='PAID').aggregate(t=Sum('amount'))['t'] or 0
+        unpaid_amt = Invoice.objects.filter(status='UNPAID').aggregate(t=Sum('amount'))['t'] or 0
+        partial_amt = Invoice.objects.filter(status='PARTIAL').aggregate(t=Sum('amount'))['t'] or 0
+
+        # Library inventory & overdue
+        avail_books = Book.objects.aggregate(t=Sum('available_copies'))['t'] or 0
+        issued_books = BookIssue.objects.filter(status='ISSUED').count()
+        overdue_books = BookIssue.objects.filter(status='ISSUED', return_date__lt=today).count()
 
         context.update({
             'webname': Web_Heading.objects.last(),
@@ -69,7 +103,9 @@ class PortalManagerDashboard(
 
             # Library & Operations
             'total_books': Book.objects.count(),
-            'books_issued': BookIssue.objects.filter(status='ISSUED').count(),
+            'books_issued': issued_books,
+            'books_available': avail_books,
+            'overdue_books_count': overdue_books,
             'total_vehicles': Vehicle.objects.count(),
             'total_routes': TransportRoute.objects.count(),
             'total_hostels': Hostel.objects.count(),
@@ -81,6 +117,10 @@ class PortalManagerDashboard(
 
             # Invoices & Fees
             'total_invoices_count': Invoice.objects.count(),
+            'total_invoiced_amount': total_invoiced_amt,
+            'paid_amount': paid_amt,
+            'unpaid_amount': unpaid_amt,
+            'partial_amount': partial_amt,
             'recent_invoices': Invoice.objects.order_by('-id')[:5],
 
             # Content & Notif
@@ -90,6 +130,15 @@ class PortalManagerDashboard(
             'recent_notices': Notice_board.objects.order_by('-id')[:5],
             'recent_news': News_headline.objects.order_by('-id')[:5],
             'classes_distribution': classes_with_counts,
+
+            # JSON Data for Charts
+            'chart_class_labels_json': json.dumps(class_chart_labels),
+            'chart_class_data_json': json.dumps(class_chart_data),
+            'chart_att_days_json': json.dumps(attendance_days),
+            'chart_att_present_json': json.dumps(attendance_present),
+            'chart_att_absent_json': json.dumps(attendance_absent),
+            'chart_finance_json': json.dumps([float(paid_amt), float(partial_amt), float(unpaid_amt)]),
+            'chart_library_json': json.dumps([issued_books, avail_books]),
         })
         return context
 

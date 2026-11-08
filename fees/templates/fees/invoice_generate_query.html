@@ -1,78 +1,89 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
 {% load widget_tweaks %}
-{% block title %}
-<title>Generate Invoices</title>
-{% endblock title %}
 
-{% block leftside %}
-<style>
-{% include 'fees/_styles.html' %}
-</style>
+{% block title %}Bulk Invoice Generator | {{ webname.name_headline|default:"Admin Console" }}{% endblock title %}
+{% block breadcrumb_current %}Bulk Invoice Generator{% endblock %}
 
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-receipt-cutoff"></i> Fee Management</span>
-            <h1>Generate Invoices</h1>
-            <p>Pick a class, an existing fee structure, and a billing period to bulk-generate invoices.</p>
-            <div class="dashboard-meta">
-                <span><i class="bi bi-diagram-3"></i> <a href="{% url 'fees:fee_structure_list' %}" class="text-white">Manage fee structures</a></span>
-                <span><i class="bi bi-person-plus"></i> <a href="{% url 'fees:invoice_adhoc' %}" class="text-white">Ad-hoc single invoice</a></span>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-10">
+        
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                    <i class="bi bi-receipt-cutoff text-primary"></i> Bulk Invoice Generator
+                </h2>
+                <p class="text-muted small mb-0">Select class, fee schedule, and billing period to generate batch fee invoices for students.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'fees:invoice_adhoc' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-person-plus me-1"></i> Ad-Hoc Single Invoice
+                </a>
+                <a href="{% url 'fees:invoice_list' %}" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Invoices
+                </a>
             </div>
         </div>
 
-        <div class="dashboard-content">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>Select Criteria</h2>
-                        <small>Students already invoiced for this fee structure and period will be skipped automatically.</small>
-                    </div>
+        <div class="admin-card shadow-sm border-0">
+            <div class="admin-card-header bg-white py-3 border-bottom">
+                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-sliders text-success"></i> Batch Invoicing Criteria
+                </h5>
+            </div>
+            <div class="admin-card-body p-4">
+                <div class="alert alert-info border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
+                    <i class="bi bi-info-circle-fill fs-5 text-info"></i>
+                    <div class="small">Students who have already been invoiced for this specific fee structure and billing period will be safely skipped to avoid duplicate billing.</div>
                 </div>
-                {% include 'fees/_messages.html' %}
-                <div class="form-section">
-                    <div class="form-card">
-                        <form method="post" class="form-section">
-                            {% csrf_token %}
-                            <div class="form-grid">
-                                <div class="form-group-card">
-                                    <label>Class <span class="text-danger">*</span></label>
-                                    {% render_field form.class_name|add_class:'form-control' %}
-                                    {{ form.class_name.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Section</label>
-                                    {% render_field form.section|add_class:'form-control' %}
-                                    {{ form.section.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Fee Structure <span class="text-danger">*</span></label>
-                                    {% render_field form.fee_structure|add_class:'form-control' %}
-                                    {{ form.fee_structure.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Period</label>
-                                    {% render_field form.period_label|add_class:'form-control' %}
-                                    {{ form.period_label.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Due Date <span class="text-danger">*</span></label>
-                                    {% render_field form.due_date|add_class:'form-control' %}
-                                    {{ form.due_date.errors }}
-                                </div>
-                                <div class="form-actions">
-                                    <button class="btn btn-primary" type="submit"><i class="bi bi-arrow-right-circle"></i> Preview Roster</button>
-                                </div>
-                            </div>
-                        </form>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Class / Grade <span class="text-danger">*</span></label>
+                            {% render_field form.class_name class="form-select" %}
+                            {% if form.class_name.errors %}<div class="text-danger small mt-1">{{ form.class_name.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Section / Group</label>
+                            {% render_field form.section class="form-select" %}
+                            {% if form.section.errors %}<div class="text-danger small mt-1">{{ form.section.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Fee Structure <span class="text-danger">*</span></label>
+                            {% render_field form.fee_structure class="form-select" %}
+                            {% if form.fee_structure.errors %}<div class="text-danger small mt-1">{{ form.fee_structure.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Billing Period Label</label>
+                            {% render_field form.period_label class="form-control" placeholder="e.g. January 2026, Term 1, Annual" %}
+                            {% if form.period_label.errors %}<div class="text-danger small mt-1">{{ form.period_label.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Payment Due Date <span class="text-danger">*</span></label>
+                            {% render_field form.due_date class="form-control" type="date" %}
+                            {% if form.due_date.errors %}<div class="text-danger small mt-1">{{ form.due_date.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-12 pt-3 border-top d-flex justify-content-end gap-2">
+                            <a href="{% url 'fees:invoice_list' %}" class="btn btn-outline-secondary px-4 py-2">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-admin-primary px-5 py-2 shadow-sm d-inline-flex align-items-center gap-2">
+                                <i class="bi bi-arrow-right-circle-fill"></i> Proceed to Student Review
+                            </button>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
+
     </div>
-</section>
-{% endblock leftside %}
-
-{% block rightside %}
-{% endblock rightside %}
+</div>
+{% endblock content %}

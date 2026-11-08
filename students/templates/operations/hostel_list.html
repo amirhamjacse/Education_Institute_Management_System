@@ -90,15 +90,21 @@
 
 <!-- Bed Allocations Table Card -->
 <div class="admin-card shadow-sm border-0">
-    <div class="admin-card-header bg-white py-3">
+    <div class="admin-card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="d-flex align-items-center gap-2">
             <h5 class="fw-bold text-dark mb-0">Active Resident Students</h5>
             <span class="badge bg-purple bg-opacity-10 text-purple border" style="color: #7c3aed;">{{ allocations.count }} Residents</span>
         </div>
+        <div style="max-width: 260px;">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="residentSearchInput" class="form-control border-start-0" placeholder="Filter resident / room...">
+            </div>
+        </div>
     </div>
     <div class="admin-card-body p-0">
         <div class="table-responsive">
-            <table class="table admin-table mb-0">
+            <table class="table admin-table mb-0" id="residentTable">
                 <thead>
                     <tr>
                         <th class="ps-3">Student Name</th>
@@ -111,7 +117,7 @@
                 </thead>
                 <tbody>
                     {% for a in allocations %}
-                    <tr>
+                    <tr class="resident-row" data-search="{{ a.student.name|lower }} {{ a.student.unique_roll|lower }} {{ a.room.hostel.name|lower }} {{ a.room.room_number|lower }} {{ a.bed_number|lower }}">
                         <td class="ps-3">
                             <div class="fw-bold text-dark">{{ a.student.name }}</div>
                             <div class="small text-muted">Phone: {{ a.student.personal_mobile_number }}</div>
@@ -191,3 +197,26 @@
 </div>
 {% endif %}
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('residentSearchInput');
+    const rows = document.querySelectorAll('#residentTable tbody .resident-row');
+
+    if (input && rows.length) {
+        input.addEventListener('input', function () {
+            const query = this.value.trim().toLowerCase();
+            rows.forEach(row => {
+                const text = row.getAttribute('data-search') || '';
+                if (!query || text.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock extra_js %}

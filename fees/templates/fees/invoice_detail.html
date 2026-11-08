@@ -1,149 +1,255 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
 {% load widget_tweaks %}
-{% block title %}
-<title>Invoice {{ invoice.invoice_no }}</title>
-{% endblock title %}
 
-{% block leftside %}
-<style>
-{% include 'fees/_styles.html' %}
-</style>
+{% block title %}Invoice {{ invoice.invoice_no }} | Admin Console{% endblock title %}
+{% block breadcrumb_current %}Invoice {{ invoice.invoice_no }}{% endblock %}
 
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-receipt"></i> Invoice</span>
-            <h1>{{ invoice.invoice_no }}</h1>
-            <p>{{ invoice.student.name }} &middot; {{ invoice.class_name }}{% if invoice.section %} - {{ invoice.section }}{% endif %} &middot; {{ invoice.fee_head }}</p>
-            <div class="dashboard-meta">
-                <span><i class="bi bi-calendar-event"></i> Due {{ invoice.due_date }}</span>
-                <span><i class="bi bi-flag-fill"></i> <span class="status-badge {{ invoice.status }}">{{ invoice.get_status_display }}</span></span>
-                <span><i class="bi bi-printer"></i> <a class="text-white" href="{% url 'fees:invoice_receipt' invoice.pk %}" target="_blank">Print Receipt</a></span>
+{% block content %}
+<!-- Top Action Bar -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <h2 class="fw-bold text-dark mb-0 font-monospace">{{ invoice.invoice_no }}</h2>
+            {% if invoice.status == 'paid' %}
+            <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
+            {% elif invoice.status == 'partial' %}
+            <span class="badge bg-primary-subtle text-primary px-2 py-1 rounded-pill"><i class="bi bi-hourglass-split me-1"></i>Partial</span>
+            {% elif invoice.status == 'overdue' %}
+            <span class="badge bg-danger-subtle text-danger px-2 py-1 rounded-pill"><i class="bi bi-exclamation-triangle-fill me-1"></i>Overdue</span>
+            {% elif invoice.status == 'cancelled' %}
+            <span class="badge bg-secondary-subtle text-muted px-2 py-1 rounded-pill">Cancelled</span>
+            {% else %}
+            <span class="badge bg-warning-subtle text-warning px-2 py-1 rounded-pill"><i class="bi bi-clock me-1"></i>Unpaid</span>
+            {% endif %}
+        </div>
+        <p class="text-muted small mb-0">
+            Issued to <strong class="text-dark">{{ invoice.student.name }}</strong> (Roll: {{ invoice.student.unique_roll }}) &bull; Due by <strong>{{ invoice.due_date|date:"d M Y" }}</strong>
+        </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'fees:invoice_receipt' invoice.pk %}" target="_blank" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-printer"></i> Print Receipt
+        </a>
+        {% if invoice.status != 'paid' and invoice.status != 'cancelled' %}
+        <a href="{% url 'fees:pay_online_invoice' invoice.pk %}" class="btn btn-outline-success btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-credit-card"></i> Pay Online (SSLCommerz)
+        </a>
+        {% endif %}
+        <a href="{% url 'fees:invoice_list' %}" class="btn btn-outline-dark btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-arrow-left"></i> All Invoices
+        </a>
+    </div>
+</div>
+
+<!-- 3 KPI Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-blue">
+                <i class="bi bi-receipt"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-primary">৳{{ invoice.net_amount }}</h3>
+                <p class="kpi-label">Net Invoiced Amount</p>
+                {% if invoice.discount > 0 %}<small class="text-muted">(৳{{ invoice.discount }} discount applied)</small>{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon kpi-icon-emerald">
+                <i class="bi bi-cash-coin"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value text-success">৳{{ invoice.paid_amount }}</h3>
+                <p class="kpi-label">Total Realized &amp; Paid</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="kpi-card h-100">
+            <div class="kpi-icon {% if invoice.due_amount > 0 %}kpi-icon-rose{% else %}kpi-icon-emerald{% endif %}">
+                <i class="bi bi-wallet2"></i>
+            </div>
+            <div>
+                <h3 class="kpi-value {% if invoice.due_amount > 0 %}text-danger{% else %}text-success{% endif %}">৳{{ invoice.due_amount }}</h3>
+                <p class="kpi-label">Outstanding Balance Due</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Student Details & Billing Summary -->
+    <div class="col-lg-5">
+        <div class="admin-card mb-4 shadow-sm border-0">
+            <div class="admin-card-header bg-white py-3 border-bottom">
+                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-person-badge text-primary"></i> Student &amp; Invoice Breakdown
+                </h5>
+            </div>
+            <div class="admin-card-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 50px; height: 50px; background: linear-gradient(135deg, #059669, #10b981); font-size: 1.3rem;">
+                        {{ invoice.student.name|slice:":1"|upper }}
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-0">
+                            <a href="{% url 'students:student_admin_detail' invoice.student.id %}" class="text-decoration-none">
+                                {{ invoice.student.name }}
+                            </a>
+                        </h6>
+                        <small class="text-muted">Roll: {{ invoice.student.unique_roll }}</small>
+                    </div>
+                </div>
+
+                <div class="row g-3 small">
+                    <div class="col-6">
+                        <span class="text-muted d-block">Class &amp; Section</span>
+                        <strong class="text-dark">{{ invoice.class_name }}{% if invoice.section %} ({{ invoice.section }}){% endif %}</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block">Fee Head</span>
+                        <strong class="text-dark">{{ invoice.fee_head.name }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block">Session</span>
+                        <strong class="text-dark">{{ invoice.session }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block">Billing Period</span>
+                        <strong class="text-dark">{{ invoice.period_label|default:"Annual" }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block">Created On</span>
+                        <span class="text-secondary">{{ invoice.created_time|date:"d M Y, h:i A" }}</span>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block">Generated By</span>
+                        <span class="text-secondary">{{ invoice.generated_by|default:"System" }}</span>
+                    </div>
+                    {% if invoice.remarks %}
+                    <div class="col-12 mt-2 pt-2 border-top">
+                        <span class="text-muted d-block">Remarks</span>
+                        <span class="text-secondary fst-italic">{{ invoice.remarks }}</span>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
-        <div class="dashboard-content with-side">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>Summary</h2>
+        <!-- Record Payment Form Card -->
+        {% if can_record_payment %}
+        <div class="admin-card shadow-sm border-0">
+            <div class="admin-card-header bg-white py-3 border-bottom">
+                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-cash-coin text-success"></i> Record Manual Payment
+                </h5>
+            </div>
+            <div class="admin-card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Amount Received (৳) <span class="text-danger">*</span></label>
+                            {% render_field payment_form.amount class="form-control" placeholder=invoice.due_amount %}
+                            {% if payment_form.amount.errors %}<div class="text-danger small">{{ payment_form.amount.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Payment Method <span class="text-danger">*</span></label>
+                            {% render_field payment_form.method class="form-select" %}
+                            {% if payment_form.method.errors %}<div class="text-danger small">{{ payment_form.method.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Payment Date <span class="text-danger">*</span></label>
+                            {% render_field payment_form.paid_on class="form-control" type="date" %}
+                            {% if payment_form.paid_on.errors %}<div class="text-danger small">{{ payment_form.paid_on.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Ref / Transaction #</label>
+                            {% render_field payment_form.reference_no class="form-control" placeholder="Trx ID / Bank receipt" %}
+                            {% if payment_form.reference_no.errors %}<div class="text-danger small">{{ payment_form.reference_no.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-dark">Notes / Remarks</label>
+                            {% render_field payment_form.remarks class="form-control" rows="2" placeholder="Optional payment remarks" %}
+                        </div>
+                        <div class="col-12 pt-2">
+                            <button type="submit" class="btn btn-success w-100 py-2 fw-semibold shadow-sm">
+                                <i class="bi bi-check2-circle me-1"></i> Confirm &amp; Save Payment
+                            </button>
+                        </div>
                     </div>
-                </div>
-                {% include 'fees/_messages.html' %}
-                <div class="summary-cards">
-                    <div class="summary-card"><strong>{{ invoice.net_amount }}</strong><span>Net Amount</span></div>
-                    <div class="summary-card collected"><strong>{{ invoice.paid_amount }}</strong><span>Paid</span></div>
-                    <div class="summary-card due"><strong>{{ invoice.due_amount }}</strong><span>Due</span></div>
-                </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>Payment History</h2>
-                        <small>{{ payments|length }} payment(s)</small>
-                    </div>
-                </div>
-                <div class="table-section">
-                    <div class="table-wrapper">
-                        <table class="table table-hover table-bordered mb-0">
-                            <thead>
-                                <tr><th>Receipt No</th><th>Date</th><th>Amount</th><th>Method</th><th>Reference</th><th>Received By</th>{% if can_void_payment %}<th></th>{% endif %}</tr>
-                            </thead>
-                            <tbody>
+    <!-- Right Column: Payments Ledger & Receipts -->
+    <div class="col-lg-7">
+        <div class="admin-card shadow-sm border-0 h-100">
+            <div class="admin-card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-secondary"></i> Payment Ledger &amp; Transactions
+                </h5>
+                <span class="badge bg-secondary-subtle text-dark border px-2 py-1">{{ payments.count }} Payment{{ payments.count|pluralize }}</span>
+            </div>
+            <div class="admin-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table admin-table mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Receipt No</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Reference</th>
+                                <th>Received By</th>
+                                {% if can_void_payment %}<th class="text-end">Void</th>{% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
                             {% for payment in payments %}
                             <tr>
-                                <td class="fw-semibold">{{ payment.receipt_no }}</td>
-                                <td>{{ payment.paid_on }}</td>
-                                <td>{{ payment.amount }}</td>
-                                <td>{{ payment.get_method_display }}</td>
-                                <td>{{ payment.reference_no|default:'-' }}</td>
-                                <td>{{ payment.received_by|default:'-' }}</td>
-                                {% if can_void_payment %}
+                                <td class="fw-bold font-monospace text-primary">{{ payment.receipt_no }}</td>
+                                <td class="small">{{ payment.paid_on|date:"d M Y" }}</td>
+                                <td class="fw-bold text-success">৳{{ payment.amount }}</td>
                                 <td>
-                                    <form method="post" onsubmit="return confirm('Void this payment?');">
+                                    <span class="badge bg-light text-dark border">
+                                        {{ payment.get_method_display }}
+                                    </span>
+                                </td>
+                                <td class="small text-muted font-monospace">{{ payment.reference_no|default:"-" }}</td>
+                                <td class="small text-muted">{{ payment.received_by|default:"Cashier" }}</td>
+                                {% if can_void_payment %}
+                                <td class="text-end">
+                                    <form method="post" onsubmit="return confirm('Void this payment receipt? This will reopen the due balance.');" class="d-inline">
                                         {% csrf_token %}
                                         <input type="hidden" name="action" value="void_payment">
                                         <input type="hidden" name="payment_id" value="{{ payment.pk }}">
-                                        <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-x-circle"></i> Void</button>
+                                        <button class="btn btn-outline-danger btn-sm py-0 px-2" type="submit" title="Void Payment">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
                                     </form>
                                 </td>
                                 {% endif %}
                             </tr>
                             {% empty %}
-                            <tr><td colspan="7" class="text-center py-4 text-muted">No payments recorded yet.</td></tr>
+                            <tr>
+                                <td colspan="{% if can_void_payment %}7{% else %}6{% endif %}" class="text-center py-5 text-muted">
+                                    <i class="bi bi-hourglass-split display-6 d-block mb-2 text-secondary"></i>
+                                    <p class="mb-0 fw-semibold">No payments recorded for this invoice yet.</p>
+                                    <small>Use the payment form on the left or pay online via SSLCommerz.</small>
+                                </td>
+                            </tr>
                             {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
-
-                {% if can_record_payment %}
-                <div class="dashboard-panel-header">
-                    <div><h2>Record Payment</h2></div>
-                </div>
-                <div class="form-section">
-                    <div class="form-card">
-                        <form method="post" class="form-section">
-                            {% csrf_token %}
-                            <div class="form-grid">
-                                <div class="form-group-card">
-                                    <label>Amount <span class="text-danger">*</span></label>
-                                    {% render_field payment_form.amount|add_class:'form-control' %}
-                                    {{ payment_form.amount.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Method <span class="text-danger">*</span></label>
-                                    {% render_field payment_form.method|add_class:'form-control' %}
-                                    {{ payment_form.method.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Paid On <span class="text-danger">*</span></label>
-                                    {% render_field payment_form.paid_on|add_class:'form-control' %}
-                                    {{ payment_form.paid_on.errors }}
-                                </div>
-                                <div class="form-group-card">
-                                    <label>Reference No</label>
-                                    {% render_field payment_form.reference_no|add_class:'form-control' %}
-                                    {{ payment_form.reference_no.errors }}
-                                </div>
-                                <div class="form-group-card full">
-                                    <label>Remarks</label>
-                                    {% render_field payment_form.remarks|add_class:'form-control' %}
-                                    {{ payment_form.remarks.errors }}
-                                </div>
-                                <div class="form-actions d-flex gap-2">
-                                    <button class="btn btn-primary" type="submit"><i class="bi bi-cash-coin"></i> Record Payment</button>
-                                    <a href="{% url 'fees:pay_online_invoice' invoice.pk %}" class="btn btn-outline-success"><i class="fas fa-credit-card me-1"></i> Pay via SSLCommerz</a>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                {% endif %}
             </div>
-
-            <aside class="dashboard-side">
-                <div class="dashboard-panel profile-panel">
-                    <span class="profile-avatar"><i class="bi bi-person-fill"></i></span>
-                    <h3>{{ invoice.student.name }}</h3>
-                    <p>Roll: {{ invoice.student.unique_roll|default:'-' }}</p>
-                    <div class="status-list">
-                        <div class="status-item"><strong>Session</strong><span>{{ invoice.session|default:'-' }}</span></div>
-                        <div class="status-item"><strong>Period</strong><span>{{ invoice.period_label|default:'-' }}</span></div>
-                        <div class="status-item"><strong>Generated By</strong><span>{{ invoice.generated_by|default:'-' }}</span></div>
-                    </div>
-                </div>
-                {% if invoice.remarks %}
-                <div class="dashboard-panel tips-panel">
-                    <h3>Remarks</h3>
-                    <p>{{ invoice.remarks }}</p>
-                </div>
-                {% endif %}
-            </aside>
         </div>
     </div>
-</section>
-{% endblock leftside %}
-
-{% block rightside %}
-{% endblock rightside %}
+</div>
+{% endblock content %}

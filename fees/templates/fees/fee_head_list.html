@@ -1,85 +1,101 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
 {% load widget_tweaks %}
-{% block title %}
-<title>Fee Heads</title>
-{% endblock title %}
 
-{% block leftside %}
-<style>
-{% include 'fees/_styles.html' %}
-</style>
+{% block title %}Fee Heads &amp; Categories | {{ webname.name_headline|default:"Admin Console" }}{% endblock title %}
+{% block breadcrumb_current %}Fee Heads{% endblock %}
 
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-tags-fill"></i> Fee Management</span>
-            <h1>Fee Heads</h1>
-            <p>Fee categories such as Tuition, Admission, or Exam fees, used when defining fee structures.</p>
-        </div>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-tags-fill text-primary"></i> Fee Heads &amp; Charge Categories
+        </h2>
+        <p class="text-muted small mb-0">Manage billing categories such as Tuition, Admission, Examination, Library, and Transport fees.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'fees:fee_structure_list' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-diagram-3"></i> Fee Structures
+        </a>
+        <a href="{% url 'fees:invoice_list' %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-receipt"></i> View Invoices
+        </a>
+    </div>
+</div>
 
-        <div class="dashboard-content with-side">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>All Fee Heads</h2>
-                        <small>{{ fee_heads|length }} defined</small>
-                    </div>
-                    <div class="action-row">
-                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'fees:fee_structure_list' %}"><i class="bi bi-diagram-3"></i> Fee Structures</a>
-                    </div>
-                </div>
-                {% include 'fees/_messages.html' %}
-                <div class="table-section">
-                    <div class="table-wrapper">
-                        <table class="table table-hover table-bordered mb-0">
-                            <thead>
-                                <tr><th>Name</th><th>Code</th><th>Description</th></tr>
-                            </thead>
-                            <tbody>
+<div class="row g-4">
+    <!-- Left: Fee Heads Table -->
+    <div class="col-lg-7">
+        <div class="admin-card shadow-sm border-0">
+            <div class="admin-card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-dark mb-0">Active Fee Heads</h5>
+                <span class="badge bg-secondary-subtle text-dark border px-2 py-1">{{ fee_heads|length }} Category{{ fee_heads|length|pluralize:"ies" }}</span>
+            </div>
+            <div class="admin-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table admin-table mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Category Name</th>
+                                <th>Code</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             {% for head in fee_heads %}
                             <tr>
-                                <td class="fw-semibold">{{ head.name }}</td>
-                                <td>{{ head.code }}</td>
-                                <td>{{ head.description|default:'-' }}</td>
+                                <td class="fw-bold text-dark">{{ head.name }}</td>
+                                <td><span class="badge bg-light text-secondary border font-monospace">{{ head.code }}</span></td>
+                                <td class="small text-muted">{{ head.description|default:"—" }}</td>
                             </tr>
                             {% empty %}
-                            <tr><td colspan="3" class="text-center py-4 text-muted">No fee heads defined yet.</td></tr>
+                            <tr>
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="bi bi-tags display-6 d-block mb-2 text-secondary"></i>
+                                    <p class="mb-0 fw-semibold">No fee heads configured yet.</p>
+                                    <small>Use the form on the right to define your first fee category.</small>
+                                </td>
+                            </tr>
                             {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-            <aside class="dashboard-side">
-                <div class="dashboard-panel form-section">
-                    <h3><i class="bi bi-plus-circle"></i> Add Fee Head</h3>
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="form-group-card mb-2">
-                            <label>Name{% if form.name.field.required %}<span class="text-danger">*</span>{% endif %}</label>
-                            {% render_field form.name|add_class:'form-control' %}
-                            {{ form.name.errors }}
-                        </div>
-                        <div class="form-group-card mb-2">
-                            <label>Code{% if form.code.field.required %}<span class="text-danger">*</span>{% endif %}</label>
-                            {% render_field form.code|add_class:'form-control' %}
-                            {{ form.code.errors }}
-                        </div>
-                        <div class="form-group-card mb-2">
-                            <label>Description</label>
-                            {% render_field form.description|add_class:'form-control' %}
-                            {{ form.description.errors }}
-                        </div>
-                        <button class="btn btn-primary w-100" type="submit"><i class="bi bi-check2-circle"></i> Add</button>
-                    </form>
-                </div>
-            </aside>
         </div>
     </div>
-</section>
-{% endblock leftside %}
 
-{% block rightside %}
-{% endblock rightside %}
+    <!-- Right: Add Fee Head Form -->
+    <div class="col-lg-5">
+        <div class="admin-card shadow-sm border-0">
+            <div class="admin-card-header bg-white py-3 border-bottom">
+                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-circle text-success"></i> Create New Fee Head
+                </h5>
+            </div>
+            <div class="admin-card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Category Name <span class="text-danger">*</span></label>
+                        {% render_field form.name class="form-control" placeholder="e.g. Tuition Fee, Exam Fee, Lab Fee" %}
+                        {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Unique Code <span class="text-danger">*</span></label>
+                        {% render_field form.code class="form-control" placeholder="e.g. TUITION, EXAM, ADM" %}
+                        {% if form.code.errors %}<div class="text-danger small mt-1">{{ form.code.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-dark">Description</label>
+                        {% render_field form.description class="form-control" rows="3" placeholder="Optional details or policy notes" %}
+                        {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>{% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-admin-primary w-100 py-2 shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-check-circle-fill"></i> Save Fee Head
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

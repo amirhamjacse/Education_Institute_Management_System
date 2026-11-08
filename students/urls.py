@@ -33,6 +33,16 @@ urlpatterns = [
         name='students_list'
     ),
     path(
+        'profile/<int:pk>/',
+        views.StudentAdminDetailView.as_view(),
+        name='student_admin_detail'
+    ),
+    path(
+        'detail/<int:pk>/',
+        views.StudentAdminDetailView.as_view(),
+        name='student_detail_admin'
+    ),
+    path(
         'edit/<int:id>/',
         views.StudentsUpdateView.as_view(),
         name='students_edit'

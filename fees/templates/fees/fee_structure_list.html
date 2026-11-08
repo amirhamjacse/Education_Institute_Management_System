@@ -1,84 +1,116 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
-{% block title %}
-<title>Fee Structures</title>
-{% endblock title %}
 
-{% block leftside %}
-<style>
-{% include 'fees/_styles.html' %}
-</style>
+{% block title %}Fee Structures | {{ webname.name_headline|default:"Admin Console" }}{% endblock title %}
+{% block breadcrumb_current %}Fee Structures{% endblock %}
 
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-diagram-3-fill"></i> Fee Management</span>
-            <h1>Fee Structures</h1>
-            <p>The fee amount charged per class, per session, at a given frequency.</p>
-        </div>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-diagram-3-fill text-primary"></i> Fee Structures &amp; Schedules
+        </h2>
+        <p class="text-muted small mb-0">Define fee rates, billing frequencies, and class-wise tuition schedules.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'fees:fee_head_list' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-tags"></i> Manage Fee Heads
+        </a>
+        <a href="{% url 'fees:fee_structure_add' %}" class="btn btn-admin-primary btn-sm d-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-plus-circle"></i> Add Fee Structure
+        </a>
+    </div>
+</div>
 
-        <div class="dashboard-content">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>Configured Fee Structures</h2>
-                        <small>{{ structures|length }} entries</small>
-                    </div>
-                    <div class="action-row">
-                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'fees:fee_head_list' %}"><i class="bi bi-tags"></i> Fee Heads</a>
-                        <a class="btn btn-primary btn-sm" href="{% url 'fees:fee_structure_add' %}"><i class="bi bi-plus-circle"></i> Add Structure</a>
-                    </div>
-                </div>
-                {% include 'fees/_messages.html' %}
-                <form method="get" class="filter-bar">
-                    <div>
-                        <label>Class</label>
-                        <select name="class_name">
-                            <option value="">All classes</option>
-                            {% for c in classes %}
-                            <option value="{{ c.id }}" {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label>Session</label>
-                        <input type="text" name="session" value="{{ selected_session|default:'' }}" placeholder="e.g. 2025-2026">
-                    </div>
-                    <div style="align-self:end;">
-                        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel-fill"></i> Filter</button>
-                    </div>
-                </form>
-                <div class="table-section">
-                    <div class="table-wrapper">
-                        <table class="table table-hover table-bordered mb-0">
-                            <thead>
-                                <tr><th>Class</th><th>Fee Head</th><th>Session</th><th>Frequency</th><th>Amount</th><th></th></tr>
-                            </thead>
-                            <tbody>
-                            {% for structure in structures %}
-                            <tr>
-                                <td class="fw-semibold">{{ structure.class_name }}</td>
-                                <td>{{ structure.fee_head }}</td>
-                                <td>{{ structure.session }}</td>
-                                <td>{{ structure.get_frequency_display }}</td>
-                                <td>{{ structure.amount }}</td>
-                                <td>
-                                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'fees:fee_structure_edit' structure.pk %}"><i class="bi bi-pencil"></i> Edit</a>
-                                    <a class="btn btn-sm btn-outline-primary" href="{% url 'fees:invoice_generate_query' %}"><i class="bi bi-receipt"></i> Generate</a>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr><td colspan="6" class="text-center py-4 text-muted">No fee structures match the selected filters.</td></tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+<!-- Filters Card -->
+<div class="admin-card mb-4">
+    <div class="admin-card-body py-3">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label small fw-semibold text-muted mb-1">Class / Department</label>
+                <select name="class_name" class="form-select">
+                    <option value="">All Classes</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}" {% if selected_class == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold text-muted mb-1">Academic Session</label>
+                <input type="text" name="session" value="{{ selected_session|default:'' }}" class="form-control" placeholder="e.g. 2025-2026">
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button class="btn btn-primary flex-fill" type="submit">
+                    <i class="bi bi-funnel-fill me-1"></i> Filter
+                </button>
+                <a href="{% url 'fees:fee_structure_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Fee Structures Table -->
+<div class="admin-card shadow-sm border-0">
+    <div class="admin-card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold text-dark mb-0">Active Fee Schedules</h5>
+        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-2 rounded-pill">
+            {{ structures|length }} Structure{{ structures|length|pluralize }}
+        </span>
+    </div>
+    <div class="admin-card-body p-0">
+        <div class="table-responsive">
+            <table class="table admin-table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>Class / Grade</th>
+                        <th>Fee Head</th>
+                        <th>Session</th>
+                        <th>Billing Frequency</th>
+                        <th>Standard Rate</th>
+                        <th class="text-end" style="width: 180px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for structure in structures %}
+                    <tr>
+                        <td class="fw-bold text-dark">
+                            <span class="badge bg-primary-subtle text-primary fs-6">{{ structure.class_name }}</span>
+                        </td>
+                        <td class="fw-semibold text-secondary">{{ structure.fee_head }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ structure.session }}</span></td>
+                        <td>
+                            <span class="badge bg-info-subtle text-info text-capitalize">
+                                {{ structure.get_frequency_display }}
+                            </span>
+                        </td>
+                        <td class="fw-bold text-success fs-6">৳{{ structure.amount }}</td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a class="btn btn-outline-secondary" href="{% url 'fees:fee_structure_edit' structure.pk %}" title="Edit Rate">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a class="btn btn-outline-primary" href="{% url 'fees:invoice_generate_query' %}" title="Generate Invoices">
+                                    <i class="bi bi-receipt"></i> Generate
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-sliders display-6 d-block mb-2 text-secondary"></i>
+                            <p class="mb-0 fw-semibold">No fee structures defined for this filter.</p>
+                            <a href="{% url 'fees:fee_structure_add' %}" class="btn btn-admin-primary btn-sm mt-2">
+                                <i class="bi bi-plus-circle me-1"></i> Add Fee Structure
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-</section>
-{% endblock leftside %}
-
-{% block rightside %}
-{% endblock rightside %}
+</div>
+{% endblock content %}

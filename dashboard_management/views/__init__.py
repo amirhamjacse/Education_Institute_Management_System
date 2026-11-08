@@ -15,6 +15,9 @@ from .id_card import (
 from .teacher_attendance import (
     TeacherAttendanceMarkView, TeacherAttendanceReportView
 )
+from .quick_search import AdminQuickSearchView
+from .export_views import ExportStudentsCSVView, ExportInvoicesCSVView
+
 __all__ = [
     OnlineAdmissionProcess,
     PortalManagerDashboard,
@@ -29,4 +32,7 @@ __all__ = [
     StudentIDCardView,
     TeacherAttendanceMarkView,
     TeacherAttendanceReportView,
+    AdminQuickSearchView,
+    ExportStudentsCSVView,
+    ExportInvoicesCSVView,
 ]

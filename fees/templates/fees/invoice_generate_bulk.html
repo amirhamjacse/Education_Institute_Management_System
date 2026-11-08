@@ -1,77 +1,113 @@
-{% extends 'institute/base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 {% load static %}
-{% block title %}
-<title>Generate Invoices - {{ class }}</title>
-{% endblock title %}
 
-{% block leftside %}
-<style>
-{% include 'fees/_styles.html' %}
-</style>
+{% block title %}Confirm Bulk Invoices - {{ class }} | Admin Console{% endblock title %}
+{% block breadcrumb_current %}Confirm Bulk Invoices{% endblock %}
 
-<section class="portal-dashboard bangla">
-    <div class="dashboard-shell">
-        <div class="dashboard-hero">
-            <span class="dashboard-eyebrow"><i class="bi bi-receipt-cutoff"></i> Invoice Generation</span>
-            <h1>{{ class }}{% if section %} - {{ section }}{% endif %}</h1>
-            <p>{{ fee_structure.fee_head }} &middot; {{ period }} &middot; Amount {{ fee_structure.amount }} &middot; Due {{ due_date }}</p>
-            <div class="dashboard-meta">
-                <span><i class="bi bi-people-fill"></i> {{ object_list|length }} students</span>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-receipt-cutoff text-primary"></i> Review &amp; Generate Invoices: {{ class }}{% if section %} - Sec {{ section }}{% endif %}
+        </h2>
+        <p class="text-muted small mb-0">
+            Fee Head: <strong>{{ fee_structure.fee_head }}</strong> &bull; Period: <strong>{{ period }}</strong> &bull; Rate: <strong class="text-success">৳{{ fee_structure.amount }}</strong> &bull; Due Date: <strong>{{ due_date }}</strong>
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'fees:invoice_generate_query' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Change Criteria
+        </a>
+    </div>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="admin-card shadow-sm border-0 mb-4">
+        <div class="admin-card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="fw-bold text-dark mb-0">Class Roster Checklist</h5>
+                <small class="text-muted">Already-invoiced candidates are disabled to prevent double billing.</small>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleAllCheckboxes(true)">
+                    <i class="bi bi-check-all me-1"></i> Select All Eligible
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleAllCheckboxes(false)">
+                    Deselect All
+                </button>
             </div>
         </div>
 
-        <div class="dashboard-content">
-            <div class="dashboard-panel">
-                <div class="dashboard-panel-header">
-                    <div>
-                        <h2>Roster</h2>
-                        <small>Already-invoiced students are pre-unchecked and disabled to avoid duplicate invoices.</small>
-                    </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'fees:invoice_generate_query' %}"><i class="bi bi-arrow-left"></i> Change Criteria</a>
-                </div>
-                {% include 'fees/_messages.html' %}
-                <div class="table-section">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="table-wrapper">
-                            <table class="table table-hover table-bordered mb-0">
-                                <thead>
-                                    <tr><th></th><th>#</th><th>Name</th><th>Roll</th><th>Status</th></tr>
-                                </thead>
-                                <tbody>
-                                {% for row in object_list %}
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" name="sid" value="{{ row.student.id }}"
-                                               {% if not row.already_invoiced %}checked{% else %}disabled{% endif %}>
-                                    </td>
-                                    <td class="text-muted">{{ forloop.counter }}</td>
-                                    <td class="fw-semibold">{{ row.student.name|default:'-' }}</td>
-                                    <td><span class="badge-roll">{{ row.student.unique_roll|default:'-' }}</span></td>
-                                    <td>
-                                        {% if row.already_invoiced %}
-                                        <span class="status-badge cancelled">Already Invoiced</span>
-                                        {% else %}
-                                        <span class="status-badge unpaid">Will Generate</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="5" class="text-center py-4 text-muted">No students found for this class/section/session.</td></tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="form-actions">
-                            <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle"></i> Generate Invoices</button>
-                        </div>
-                    </form>
-                </div>
+        <div class="admin-card-body p-0">
+            <div class="table-responsive">
+                <table class="table admin-table mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">Select</th>
+                            <th style="width: 50px;">#</th>
+                            <th>Student</th>
+                            <th>Roll / ID</th>
+                            <th>Status &amp; Billing Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in object_list %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="sid" value="{{ row.student.id }}" class="form-check-input eligible-check"
+                                       {% if not row.already_invoiced %}checked{% else %}disabled{% endif %}>
+                            </td>
+                            <td class="text-muted small">{{ forloop.counter }}</td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ row.student.name }}</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-secondary border font-monospace">{{ row.student.unique_roll }}</span>
+                            </td>
+                            <td>
+                                {% if row.already_invoiced %}
+                                <span class="badge bg-secondary-subtle text-muted px-2 py-1 rounded-pill">
+                                    <i class="bi bi-check2-circle me-1"></i>Already Invoiced (Skipped)
+                                </span>
+                                {% else %}
+                                <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill">
+                                    <i class="bi bi-plus-circle me-1"></i>Will Generate Invoice
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-people display-6 d-block mb-2 text-secondary"></i>
+                                <p class="mb-0 fw-semibold">No students found matching this class or section.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
+        </div>
+
+        <div class="admin-card-footer bg-white py-3 border-top d-flex justify-content-between align-items-center">
+            <a href="{% url 'fees:invoice_generate_query' %}" class="btn btn-outline-secondary">
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-admin-primary px-5 py-2 shadow-sm d-inline-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill"></i> Generate Invoices Now
+            </button>
         </div>
     </div>
-</section>
-{% endblock leftside %}
+</form>
+{% endblock content %}
 
-{% block rightside %}
-{% endblock rightside %}
+{% block extra_js %}
+<script>
+    function toggleAllCheckboxes(state) {
+        document.querySelectorAll('.eligible-check:not(:disabled)').forEach(cb => {
+            cb.checked = state;
+        });
+    }
+</script>
+{% endblock extra_js %}

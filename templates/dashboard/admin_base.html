@@ -531,6 +531,7 @@
         <!-- Navigation Scrollable Area -->
         <div class="sidebar-scroll">
             
+            {% if request.user.is_staff or request.user.is_superuser %}
             <p class="nav-section-title">Overview</p>
             <a href="{% url 'dashboard_management:portal_manager_board' %}" class="admin-nav-item {% if request.resolver_match.url_name == 'portal_manager_board' %}active{% endif %}">
                 <i class="bi bi-speedometer2"></i>
@@ -538,7 +539,7 @@
             </a>
             <a href="{% url 'students:dashobard_app' %}" class="admin-nav-item {% if request.resolver_match.url_name == 'dashobard_app' %}active{% endif %}">
                 <i class="bi bi-grid-fill"></i>
-                <span>Portal Role Hub</span>
+                <span>Portal Hub</span>
             </a>
 
             <p class="nav-section-title">Academic & Classrooms</p>
@@ -643,6 +644,46 @@
                 <i class="bi bi-images"></i>
                 <span>Campus Photo Gallery</span>
             </a>
+            {% else %}
+            <!-- Student Navigation Menu -->
+            <p class="nav-section-title">My Academic Workspace</p>
+            <a href="{% url 'students:students_dashobard' %}" class="admin-nav-item {% if request.resolver_match.url_name == 'students_dashobard' %}active{% endif %}">
+                <i class="bi bi-mortarboard-fill"></i>
+                <span>Student Hub</span>
+            </a>
+            <a href="{% url 'students:students_routine' %}" class="admin-nav-item {% if request.resolver_match.url_name == 'students_routine' %}active{% endif %}">
+                <i class="bi bi-calendar-week"></i>
+                <span>Class Timetable</span>
+            </a>
+            <a href="{% url 'students:admit_cards' %}" class="admin-nav-item {% if request.resolver_match.url_name == 'admit_cards' %}active{% endif %}">
+                <i class="bi bi-card-checklist"></i>
+                <span>Exam Admit Card</span>
+            </a>
+
+            <p class="nav-section-title">Campus & Services</p>
+            <a href="{% url 'students:my_library_books' %}" class="admin-nav-item {% if request.resolver_match.url_name == 'my_library_books' %}active{% endif %}">
+                <i class="bi bi-book"></i>
+                <span>My Borrowed Books</span>
+            </a>
+            <a href="{% url 'students:transport_list' %}" class="admin-nav-item {% if request.resolver_match.url_name == 'transport_list' %}active{% endif %}">
+                <i class="bi bi-bus-front"></i>
+                <span>Transport Routes</span>
+            </a>
+            <a href="{% url 'students:hostel_list' %}" class="admin-nav-item {% if request.resolver_match.url_name == 'hostel_list' %}active{% endif %}">
+                <i class="bi bi-buildings"></i>
+                <span>Hostels & Dorms</span>
+            </a>
+            <a href="{% url 'students:leave_apply' %}" class="admin-nav-item {% if request.resolver_match.url_name == 'leave_apply' %}active{% endif %}">
+                <i class="bi bi-calendar2-heart"></i>
+                <span>Apply for Leave</span>
+            </a>
+
+            <p class="nav-section-title">Financial Account</p>
+            <a href="{% url 'fees:my_invoices' %}" class="admin-nav-item {% if request.resolver_match.url_name == 'my_invoices' %}active{% endif %}">
+                <i class="bi bi-receipt"></i>
+                <span>My Fee Invoices</span>
+            </a>
+            {% endif %}
 
         </div>
 
@@ -677,6 +718,11 @@
                     <span>/</span>
                     <span class="text-dark fw-semibold">{% block breadcrumb_current %}Dashboard{% endblock %}</span>
                 </div>
+                <button type="button" class="btn btn-light border text-muted px-3 py-1 ms-lg-3 d-flex align-items-center gap-2 rounded-pill small" id="spotlightTriggerBtn" style="font-size: 0.82rem; background: #f8fafc;" data-bs-toggle="modal" data-bs-target="#spotlightModal">
+                    <i class="bi bi-search text-secondary"></i>
+                    <span class="d-none d-sm-inline">Quick search anything...</span>
+                    <kbd class="bg-white border text-muted px-1.5 py-0.5 rounded small d-none d-md-inline" style="font-size: 0.65rem;">Ctrl K</kbd>
+                </button>
             </div>
 
             <div class="topbar-right">
@@ -704,6 +750,7 @@
                             <div class="small text-muted">{{ request.user.email|default:"No email set" }}</div>
                         </li>
                         <li><a class="dropdown-item py-2" href="{% url 'dashboard_management:portal_manager_board' %}"><i class="bi bi-speedometer2 me-2 text-primary"></i>Admin Overview</a></li>
+                        <li><a class="dropdown-item py-2" href="{% url 'students:dashobard_app' %}"><i class="bi bi-grid-fill me-2 text-success"></i>Portal Hub</a></li>
                         <li><a class="dropdown-item py-2" href="{% url 'admin:index' %}" target="_blank"><i class="bi bi-gear-wide-connected me-2 text-secondary"></i>Django Admin Panel</a></li>
                         <li><a class="dropdown-item py-2" href="{% url 'password_change' %}"><i class="bi bi-key me-2 text-warning"></i>Change Password</a></li>
                         <li><hr class="dropdown-divider"></li>
@@ -747,9 +794,47 @@
 
     </div>
 
+    <!-- Global Spotlight Search Modal -->
+    <div class="modal fade" id="spotlightModal" tabindex="-1" aria-labelledby="spotlightModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden; background: #ffffff;">
+                <div class="modal-header border-bottom p-3 bg-light">
+                    <div class="input-group input-group-lg border-0 w-100">
+                        <span class="input-group-text bg-transparent border-0 text-muted ps-1"><i class="bi bi-search fs-5"></i></span>
+                        <input type="text" id="spotlightInput" class="form-control bg-transparent border-0 shadow-none ps-2" placeholder="Search students, roll #, teachers, invoices, or jump to tools..." autocomplete="off">
+                        <button type="button" class="btn-close ms-2 align-self-center" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-body p-0" style="max-height: 420px; overflow-y: auto;">
+                    <div id="spotlightDefaultHints" class="p-4 text-center text-muted">
+                        <i class="bi bi-stars fs-2 text-warning mb-2 d-block"></i>
+                        <h6 class="fw-bold text-dark mb-1">Spotlight Intelligence Search</h6>
+                        <p class="small text-muted mb-3">Instantly find any enrolled student, teacher, invoice, or navigate to administrative tools.</p>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            <span class="badge bg-white text-dark border px-2 py-1 shadow-xs"><i class="bi bi-person me-1 text-primary"></i>Student by Name / Roll</span>
+                            <span class="badge bg-white text-dark border px-2 py-1 shadow-xs"><i class="bi bi-person-badge me-1 text-success"></i>Teacher Profiles</span>
+                            <span class="badge bg-white text-dark border px-2 py-1 shadow-xs"><i class="bi bi-receipt me-1 text-danger"></i>Fee Invoices</span>
+                            <span class="badge bg-white text-dark border px-2 py-1 shadow-xs"><i class="bi bi-calendar3 me-1 text-info"></i>Timetables & Operations</span>
+                        </div>
+                    </div>
+                    <div id="spotlightResults" class="list-group list-group-flush" style="display: none;"></div>
+                    <div id="spotlightLoading" class="p-4 text-center text-muted" style="display: none;">
+                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                        <span class="small fw-semibold">Searching institute records...</span>
+                    </div>
+                </div>
+                <div class="modal-footer py-2 px-3 bg-light border-top d-flex justify-content-between text-muted small">
+                    <span><kbd class="bg-white border text-dark px-1">↑</kbd> <kbd class="bg-white border text-dark px-1">↓</kbd> navigate &bull; <kbd class="bg-white border text-dark px-1">Enter</kbd> open</span>
+                    <span>Press <kbd class="bg-white border text-dark px-1">ESC</kbd> to close</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="{% static 'institute/js/popper.js' %}"></script>
     <script src="{% static 'institute/js/bootstrap.js' %}"></script>
+    <script src="{% static 'institute/js/chart.min.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.getElementById('adminSidebar');
@@ -773,6 +858,124 @@
             tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
+
+            // Spotlight Search Logic
+            const spotlightInput = document.getElementById('spotlightInput');
+            const spotlightResults = document.getElementById('spotlightResults');
+            const spotlightHints = document.getElementById('spotlightDefaultHints');
+            const spotlightLoading = document.getElementById('spotlightLoading');
+            const spotlightModalEl = document.getElementById('spotlightModal');
+            let debounceTimer = null;
+            let currentFocusIdx = -1;
+
+            if (spotlightModalEl) {
+                spotlightModalEl.addEventListener('shown.bs.modal', function () {
+                    if (spotlightInput) spotlightInput.focus();
+                });
+            }
+
+            // Global Ctrl+K / Cmd+K shortcut
+            document.addEventListener('keydown', function (e) {
+                if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+                    e.preventDefault();
+                    if (spotlightModalEl) {
+                        const modal = bootstrap.Modal.getOrCreateInstance(spotlightModalEl);
+                        modal.show();
+                    }
+                }
+            });
+
+            if (spotlightInput && spotlightResults && spotlightHints && spotlightLoading) {
+                spotlightInput.addEventListener('input', function () {
+                    clearTimeout(debounceTimer);
+                    const q = this.value.trim();
+                    currentFocusIdx = -1;
+
+                    if (q.length < 2) {
+                        spotlightHints.style.display = 'block';
+                        spotlightResults.style.display = 'none';
+                        spotlightLoading.style.display = 'none';
+                        spotlightResults.innerHTML = '';
+                        return;
+                    }
+
+                    spotlightHints.style.display = 'none';
+                    spotlightLoading.style.display = 'block';
+                    spotlightResults.style.display = 'none';
+
+                    debounceTimer = setTimeout(function () {
+                        fetch('/dashboard_management/api/quick-search/?q=' + encodeURIComponent(q))
+                            .then(res => res.json())
+                            .then(data => {
+                                spotlightLoading.style.display = 'none';
+                                spotlightResults.innerHTML = '';
+                                if (!data.results || data.results.length === 0) {
+                                    spotlightResults.innerHTML = '<div class="p-4 text-center text-muted"><i class="bi bi-search fs-3 d-block text-secondary mb-2"></i>No records matching "<strong>' + q + '</strong>" found.</div>';
+                                    spotlightResults.style.display = 'block';
+                                    return;
+                                }
+
+                                data.results.forEach((item, index) => {
+                                    const a = document.createElement('a');
+                                    a.href = item.url;
+                                    a.className = 'list-group-item list-group-item-action d-flex align-items-center justify-content-between p-3 border-0 border-bottom';
+                                    a.setAttribute('data-index', index);
+                                    a.innerHTML = `
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="rounded-3 bg-light border d-flex align-items-center justify-content-center text-primary" style="width: 38px; height: 38px;">
+                                                <i class="bi ${item.icon || 'bi-arrow-right-short'} fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">${item.title}</div>
+                                                <div class="small text-muted">${item.subtitle}</div>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-light text-secondary border text-uppercase" style="font-size: 0.68rem;">${item.category}</span>
+                                    `;
+                                    spotlightResults.appendChild(a);
+                                });
+                                spotlightResults.style.display = 'block';
+                            })
+                            .catch(err => {
+                                spotlightLoading.style.display = 'none';
+                                spotlightResults.innerHTML = '<div class="p-3 text-center text-danger small">Error searching records. Please try again.</div>';
+                                spotlightResults.style.display = 'block';
+                            });
+                    }, 220);
+                });
+
+                // Keyboard arrow navigation
+                spotlightInput.addEventListener('keydown', function (e) {
+                    const items = spotlightResults.querySelectorAll('.list-group-item');
+                    if (!items.length) return;
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        currentFocusIdx = (currentFocusIdx + 1) % items.length;
+                        updateActiveItem(items);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        currentFocusIdx = (currentFocusIdx - 1 + items.length) % items.length;
+                        updateActiveItem(items);
+                    } else if (e.key === 'Enter') {
+                        if (currentFocusIdx >= 0 && items[currentFocusIdx]) {
+                            e.preventDefault();
+                            items[currentFocusIdx].click();
+                        }
+                    }
+                });
+
+                function updateActiveItem(items) {
+                    items.forEach((item, idx) => {
+                        if (idx === currentFocusIdx) {
+                            item.classList.add('active');
+                            item.scrollIntoView({ block: 'nearest' });
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+                }
+            }
         });
     </script>
     {% block extra_js %}{% endblock extra_js %}
